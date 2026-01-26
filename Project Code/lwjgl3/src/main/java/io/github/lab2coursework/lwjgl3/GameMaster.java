@@ -1,10 +1,28 @@
 package io.github.lab2coursework.lwjgl3;
 
-/* GameMaster is a superclass for the different class managers that will be inherited from */
+public abstract class GameMaster {
 
-class GameMaster extends GameEngine {
+    // Managers
+    protected InterfaceManager interfaceManager;
+    protected IOManager ioManager;
+    protected EntityManager entityManager;
+    protected ScreenManager screenManager;
+    protected CollisionManager collisionManager;
+    protected MovementManager movementManager;
 
-    public GameMaster() {
-        super();
-    }
+    // Engine State
+    protected boolean isRunning;
+    protected float deltaTime;
+
+    // Engine Lifecycle
+    public abstract void createGame();
+    public abstract void start();
+    public abstract void stop();
+    
+    // Game Loop
+    public abstract void update(float deltaTime);
+    public abstract void render();
+
+    // Cleanup
+    public abstract void dispose();
 }
