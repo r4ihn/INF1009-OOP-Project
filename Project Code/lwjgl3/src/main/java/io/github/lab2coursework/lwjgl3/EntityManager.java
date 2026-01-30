@@ -1,0 +1,32 @@
+package io.github.lab2coursework.lwjgl3;
+import java.util.List;
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+
+public class EntityManager {
+    private List<Entity> entityList;
+
+    public void addEntities(Entity entity) {
+        entityList.add(entity);
+    }
+
+    public void draw(SpriteBatch batch, ShapeRenderer shape) {
+        for (Entity entity : entityList) {
+            entity.draw(batch);
+            entity.draw(shape);
+        }
+    }
+
+    public void movement() {
+        for (Entity entity : entityList) {
+            entity.movement();
+        }
+    }
+
+    public void update(){
+        movement();
+    }
+
+    
+}

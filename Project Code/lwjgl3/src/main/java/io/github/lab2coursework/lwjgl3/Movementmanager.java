@@ -1,6 +1,4 @@
 package io.github.lab2coursework.lwjgl3;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import java.util.ArrayList;
 public class MovementManager {
 

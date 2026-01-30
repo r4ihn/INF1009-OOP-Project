@@ -1,9 +1,10 @@
 package io.github.lab2coursework.lwjgl3;
 
-public abstract class GameMaster {
+import com.badlogic.gdx.ApplicationAdapter;
+
+public class GameMaster extends ApplicationAdapter {
 
     // Managers
-    protected InterfaceManager interfaceManager;
     protected IOManager ioManager;
     protected EntityManager entityManager;
     protected ScreenManager screenManager;
@@ -15,14 +16,20 @@ public abstract class GameMaster {
     protected float deltaTime;
 
     // Engine Lifecycle
-    public abstract void createGame();
-    public abstract void start();
-    public abstract void stop();
+    public void createGame() {
+    }
+    public void start() {
+    }
+    public void stop() {
+    }
     
     // Game Loop
-    public abstract void update(float deltaTime);
-    public abstract void render();
+    public void update(float deltaTime) {
+    }
+    public void render() { 
+    }
 
     // Cleanup
-    public abstract void dispose();
+    public void dispose() {
+    }
 }
