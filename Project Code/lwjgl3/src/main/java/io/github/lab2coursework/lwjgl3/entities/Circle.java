@@ -1,4 +1,4 @@
-package io.github.lab2coursework.lwjgl3;
+package io.github.lab2coursework.lwjgl3.entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -41,6 +41,6 @@ public class Circle extends Entity {
     @Override
     public void update(){
         this.movement();
-    }   
+    }
 }
 

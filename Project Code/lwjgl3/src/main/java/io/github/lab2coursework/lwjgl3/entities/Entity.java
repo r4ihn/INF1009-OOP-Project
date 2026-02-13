@@ -1,8 +1,9 @@
-package io.github.lab2coursework.lwjgl3;
+package io.github.lab2coursework.lwjgl3.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import io.github.lab2coursework.lwjgl3.movement.iMoveable;
 
 public abstract class Entity implements iMoveable {
     // Private attributes for Encapsulation

@@ -1,6 +1,7 @@
-package io.github.lab2coursework.lwjgl3;
+package io.github.lab2coursework.lwjgl3.core;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import io.github.lab2coursework.lwjgl3.managers.*;
 
 public class GameMaster extends ApplicationAdapter {
 
@@ -22,11 +23,11 @@ public class GameMaster extends ApplicationAdapter {
     }
     public void stop() {
     }
-    
+
     // Game Loop
     public void update(float deltaTime) {
     }
-    public void render() { 
+    public void render() {
     }
 
     // Cleanup

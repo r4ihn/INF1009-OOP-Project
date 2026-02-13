@@ -1,8 +1,9 @@
-package io.github.lab2coursework.lwjgl3;
+package io.github.lab2coursework.lwjgl3.managers;
 import java.util.List;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import io.github.lab2coursework.lwjgl3.entities.Entity;
 
 public class EntityManager {
     private List<Entity> entityList;
@@ -28,5 +29,5 @@ public class EntityManager {
         movement();
     }
 
-    
+
 }
