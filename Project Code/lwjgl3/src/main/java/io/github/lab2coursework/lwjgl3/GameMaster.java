@@ -18,15 +18,18 @@ public class GameMaster extends ApplicationAdapter {
     // Engine Lifecycle
     public void create() {
     }
+
     public void start() {
     }
+
     public void stop() {
     }
-    
+
     // Game Loop
     public void update(float deltaTime) {
     }
-    public void render() { 
+
+    public void render() {
     }
 
     // Cleanup

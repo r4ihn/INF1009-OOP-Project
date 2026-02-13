@@ -8,7 +8,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Triangle extends Entity {
 
-    public Triangle() { }
+    public Triangle() {
+    }
 
     public Triangle(float x, float y, Color color, float speed) {
         super(x, y, color, speed);

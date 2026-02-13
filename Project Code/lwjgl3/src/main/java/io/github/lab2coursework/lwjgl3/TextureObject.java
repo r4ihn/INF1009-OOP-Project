@@ -1,4 +1,5 @@
 package io.github.lab2coursework.lwjgl3;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -36,15 +37,15 @@ public class TextureObject extends Entity {
     public void draw(ShapeRenderer shape) { }
 
     @Override
-    public void update(){
+    public void update() {
         this.movement();
     }
-    
-    public void userMovement(){
+
+    public void userMovement() {
 
     }
 
-    public  void AiMovement(){
-        
+    public void AiMovement() {
+
     }
 }

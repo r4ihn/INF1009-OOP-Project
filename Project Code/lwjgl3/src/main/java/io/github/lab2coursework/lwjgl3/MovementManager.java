@@ -1,5 +1,7 @@
 package io.github.lab2coursework.lwjgl3;
+
 import java.util.ArrayList;
+
 public class MovementManager {
 
     private ArrayList<Entity> entities;
@@ -9,7 +11,7 @@ public class MovementManager {
     }
 
     public void leftMovement(Entity entity) {
-        entity.setX(entity.getX() + entity.getSpeed()); 
+        entity.setX(entity.getX() + entity.getSpeed());
     }
 
     public void upMovement(Entity entity) {
@@ -21,7 +23,7 @@ public class MovementManager {
     }
 
     public void stopMovement(Entity entity) {
-    // Movement management logic to be implemented
+        // Movement management logic to be implemented
     }
 
     public void setSpeed(Entity entity, float speed) {

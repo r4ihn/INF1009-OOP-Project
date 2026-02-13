@@ -5,8 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e2b7760c-3aeb-48b2-a1be-5d43aab146fb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/P4_Team5_ProjectPart1Final.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/P4_Team5_ProjectPart1Final.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/nativeimage.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/nativeimage.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Circle.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Circle.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Entity.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Entity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/EntityManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/EntityManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/GameMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/GameMaster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Lwjgl3Launcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Lwjgl3Launcher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/MovementManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/MovementManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/StartupHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/StartupHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/TextureObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/TextureObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Triangle.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Triangle.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/iMoveable.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/iMoveable.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,7 +30,71 @@
       <entry key="_C:/Users/Raiha/INF1009_OOP/Project/P4_Team5_ProjectPart1Final" value="38YddxgIpCAR9lTeFZfDDxGgCor" />
     </persistenceIdMap>
   </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="62" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$/Project Code">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$/Project Code">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Project Code" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Project Code" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Project Code" type="f1a62948:ProjectNode" />
+                <item name="lwjgl3" type="2d1252cf:ModuleNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Project Code" type="f1a62948:ProjectNode" />
+                <item name="lwjgl3" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Project Code" type="f1a62948:ProjectNode" />
+                <item name="lwjgl3" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="application" type="c8890929:TasksNode$1" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Project Code" type="f1a62948:ProjectNode" />
+                <item name="lwjgl3" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="other" type="c8890929:TasksNode$1" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -27,11 +103,15 @@
     &quot;assignee&quot;: &quot;r4ihn&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/r4ihn/P4_Team5_ProjectPart1Final.git",
-    "accountId": "4e1f1464-1b0d-47d9-9aaa-da28a7430a99"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/r4ihn/P4_Team5_ProjectPart1Final.git&quot;,
+    &quot;accountId&quot;: &quot;4e1f1464-1b0d-47d9-9aaa-da28a7430a99&quot;
   }
+}</component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
 }]]></component>
   <component name="McpProjectServerCommands">
     <commands />
@@ -47,17 +127,23 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.Lwjgl3Launcher.executor": "Run",
+    "Gradle.C:/P4_Team5_ProjectPart1Final.executor": "Run",
+    "Gradle.C:/P4_Team5_ProjectPart1Final/Project Code/lwjgl3/build.gradle.executor": "Run",
+    "Gradle.Project Code [:lwjgl3:io.github.lab2coursework.lwjgl3.Lwjgl3Launcher.main()].executor": "Run",
+    "Gradle.Project Code [:lwjgl3:run].executor": "Run",
+    "Gradle.Project Code [run].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "EntityManager",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/School/Y1T2/Object Oriented Programming/OOPProject",
+    "last_opened_file_path": "C:/P4_Team5_ProjectPart1Final",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -66,10 +152,126 @@
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="gradle " />
+    </option>
+  </component>
+  <component name="RunManager" selected="Gradle.Project Code [:lwjgl3:run]">
+    <configuration name="Lwjgl3Launcher (1)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="io.github.lab2coursework.lwjgl3.Lwjgl3Launcher" />
+      <module name="Project_Code.lwjgl3.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="io.github.lab2coursework.lwjgl3.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Lwjgl3Launcher" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="io.github.lab2coursework.lwjgl3.Lwjgl3Launcher" />
+      <module name="P4_Team5_ProjectPart1Final" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="io.github.lab2coursework.lwjgl3.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="C:/P4_Team5_ProjectPart1Final" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list />
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="Project Code [:lwjgl3:run]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/Project Code" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":lwjgl3:run" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="Project Code [run]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/Project Code" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="run" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Gradle.Project Code [:lwjgl3:run]" />
+        <item itemvalue="Gradle.Project Code [run]" />
+        <item itemvalue="Application.Lwjgl3Launcher" />
+        <item itemvalue="Application.Lwjgl3Launcher (1)" />
+        <item itemvalue="Gradle.C:/P4_Team5_ProjectPart1Final" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

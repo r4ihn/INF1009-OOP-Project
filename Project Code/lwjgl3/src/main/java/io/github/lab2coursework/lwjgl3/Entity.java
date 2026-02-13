@@ -31,8 +31,8 @@ public abstract class Entity implements iMoveable {
     public float getSpeed() { return speed;}
     public void setSpeed(float speed) { this.speed = speed;}
 
-    public abstract void draw(ShapeRenderer shape);
-    public abstract void draw(SpriteBatch batch);
+    public void draw(ShapeRenderer shape){ };
+    public void draw(SpriteBatch batch){ };
 
     @Override
     public void movement(){

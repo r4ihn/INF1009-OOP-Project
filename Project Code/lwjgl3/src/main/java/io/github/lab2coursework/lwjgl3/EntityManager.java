@@ -1,4 +1,5 @@
 package io.github.lab2coursework.lwjgl3;
+
 import java.util.List;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -24,9 +25,9 @@ public class EntityManager {
         }
     }
 
-    public void update(){
+    public void update() {
         movement();
     }
 
-    
+
 }
