@@ -38,8 +38,8 @@ public class CollisionManager {
         }
 
         if (e.getX() < minX) e.setX(minX);
-        if (e.getX() < maxX) e.setX(maxX);
+        if (e.getX() > maxX) e.setX(maxX);
         if (e.getY() < minY) e.setY(minY);
-        if (e.getY() < maxY) e.setY(maxY);
+        if (e.getY() > maxY) e.setY(maxY);
     }
 }
