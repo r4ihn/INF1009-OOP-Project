@@ -3,6 +3,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class TextureObject extends Entity {
     private Texture tex;
@@ -29,6 +30,10 @@ public class TextureObject extends Entity {
         batch.draw(this.getTexture(), this.getX(), this.getY(),
             this.getTexture().getWidth(), this.getTexture().getHeight());
     }
+
+    // No-op ShapeRenderer draw to satisfy abstract contract
+    @Override
+    public void draw(ShapeRenderer shape) { }
 
     @Override
     public void update(){

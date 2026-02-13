@@ -4,11 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Circle extends Entity {
     private float radius;
 
-    public void Circlet(){ }
+    // Fixed constructor name
+    public Circle() { }
 
     public Circle(float x, float y, float radius, Color color, float speed) {
         super(x, y, color, speed);
@@ -24,6 +26,10 @@ public class Circle extends Entity {
         shape.setColor(this.getColor());
         shape.circle(getX(), getY(), this.radius);
     }
+
+    // Required by Entity abstract contract; no-op for Shape-based Circle
+    @Override
+    public void draw(SpriteBatch batch) { }
 
     @Override
     public void movement() {
@@ -43,4 +49,3 @@ public class Circle extends Entity {
         this.movement();
     }   
 }
-
