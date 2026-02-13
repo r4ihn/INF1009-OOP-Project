@@ -16,7 +16,7 @@ public class GameMaster extends ApplicationAdapter {
     protected float deltaTime;
 
     // Engine Lifecycle
-    public void createGame() {
+    public void create() {
     }
     public void start() {
     }
