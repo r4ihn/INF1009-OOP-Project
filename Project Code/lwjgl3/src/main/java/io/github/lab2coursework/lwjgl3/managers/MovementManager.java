@@ -1,6 +1,4 @@
-package io.github.lab2coursework.lwjgl3.managers;
-import io.github.lab2coursework.lwjgl3.entities.Entity;
-
+package io.github.lab2coursework.lwjgl3;
 import java.util.ArrayList;
 public class MovementManager {
 
