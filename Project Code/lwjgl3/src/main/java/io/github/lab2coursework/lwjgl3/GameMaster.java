@@ -1,6 +1,7 @@
 package io.github.lab2coursework.lwjgl3;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
 
 public class GameMaster extends ApplicationAdapter {
 
@@ -22,11 +23,17 @@ public class GameMaster extends ApplicationAdapter {
     }
     public void stop() {
     }
-    
-    // Game Loop
+
     public void update(float deltaTime) {
+        entityManager.update(); // entities move first
+
+        float worldW = Gdx.graphics.getWidth();
+        float worldH = Gdx.graphics.getHeight();
+
+        collisionManager.keepEntitiesInBounds(entityManager.getEntities(), worldW, worldH);
     }
-    public void render() { 
+
+    public void render() {
     }
 
     // Cleanup
