@@ -1,30 +1,26 @@
 package io.github.lab2coursework.lwjgl3;
-import java.util.ArrayList;
-public class MovementManager {
 
-    private ArrayList<Entity> entities;
+public abstract class MovementManager{
+    public abstract void update(Entity entity);
 
-    public void rightMovement(Entity entity) {
+    protected void moveRight(Entity entity) {
+        entity.setX(entity.getX() + entity.getSpeed());
+    }
+
+    protected void moveLeft(Entity entity) {
         entity.setX(entity.getX() - entity.getSpeed());
     }
 
-    public void leftMovement(Entity entity) {
-        entity.setX(entity.getX() + entity.getSpeed()); 
-    }
-
-    public void upMovement(Entity entity) {
+    protected void moveUp(Entity entity) {
         entity.setY(entity.getY() + entity.getSpeed());
     }
 
-    public void downMovement(Entity entity) {
+    protected void moveDown(Entity entity) {
         entity.setY(entity.getY() - entity.getSpeed());
     }
 
-    public void stopMovement(Entity entity) {
-    // Movement management logic to be implemented
-    }
+    protected void stop(Entity entity) {
 
-    public void setSpeed(Entity entity, float speed) {
-        entity.setSpeed(speed);
     }
 }
+
