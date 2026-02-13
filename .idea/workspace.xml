@@ -4,26 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e2b7760c-3aeb-48b2-a1be-5d43aab146fb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/nativeimage.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/nativeimage.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Circle.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Circle.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Entity.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Entity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/EntityManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/EntityManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/GameMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/GameMaster.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Lwjgl3Launcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Lwjgl3Launcher.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/MovementManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/MovementManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/StartupHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/StartupHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/TextureObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/TextureObject.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Triangle.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Triangle.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/iMoveable.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/iMoveable.java" afterDir="false" />
-    </list>
+    <list default="true" id="e2b7760c-3aeb-48b2-a1be-5d43aab146fb" name="Changes" comment="Changes in GameMaster and EntityManager" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" show_ignored="true">
+    <option name="groupingKeys">
+      <option value="directory" />
+      <option value="module" />
+      <option value="repository" />
+    </option>
   </component>
   <component name="CopilotPersistence">
     <persistenceIdMap>
@@ -31,7 +23,7 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="62" />
+    <option name="cachedIndexableFilesCount" value="55" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="ExternalProjectsData">
@@ -43,6 +35,9 @@
     <system id="GRADLE">
       <state>
         <task path="$PROJECT_DIR$/Project Code">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$">
           <activation />
         </task>
         <projects_view>
@@ -290,10 +285,23 @@
       <workItem from="1768980534085" duration="309000" />
       <workItem from="1770374976585" duration="483000" />
     </task>
+    <task id="LOCAL-00001" summary="Changes in GameMaster and EntityManager">
+      <option name="closed" value="true" />
+      <created>1770994667303</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1770994667303</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Changes in GameMaster and EntityManager" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changes in GameMaster and EntityManager" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
