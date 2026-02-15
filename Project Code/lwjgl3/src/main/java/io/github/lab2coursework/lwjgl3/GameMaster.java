@@ -47,17 +47,18 @@ public class GameMaster extends ApplicationAdapter {
     public void stop() {
     }
 
-    // Game Loop
     public void update(float deltaTime) {
         entityManager.update();
 
-        // clamp AFTER entities have moved
         collisionManager.keepEntitiesInBounds(
             entityManager.getEntities(),
             Gdx.graphics.getWidth(),
             Gdx.graphics.getHeight()
         );
+
+        collisionManager.resolveEntityCollisions(entityManager.getEntities());
     }
+
 
 
     public void render() {
