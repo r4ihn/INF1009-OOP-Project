@@ -29,8 +29,8 @@ public class GameMaster extends ApplicationAdapter {
         entityManager = new EntityManager();
         screenManager = new ScreenManager();
         collisionManager = new CollisionManager();
-        movementManager = new MovementManager();
 
+        movementManager = new PlayerMovement(Gdx.input);
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
 
@@ -50,7 +50,15 @@ public class GameMaster extends ApplicationAdapter {
     // Game Loop
     public void update(float deltaTime) {
         entityManager.update();
+
+        // clamp AFTER entities have moved
+        collisionManager.keepEntitiesInBounds(
+            entityManager.getEntities(),
+            Gdx.graphics.getWidth(),
+            Gdx.graphics.getHeight()
+        );
     }
+
 
     public void render() {
         deltaTime = Gdx.graphics.getDeltaTime();
