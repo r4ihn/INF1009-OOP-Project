@@ -18,12 +18,6 @@ public class EntityManager {
         }
     }
 
-    public void movement() {
-        for (Entity entity : entities) {
-            entity.movement();
-        }
-    }
-
     public void drawShapes(ShapeRenderer shape) {
         for (Entity entity : entities) {
             entity.draw(shape);
