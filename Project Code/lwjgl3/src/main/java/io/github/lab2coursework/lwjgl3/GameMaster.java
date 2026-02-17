@@ -2,6 +2,7 @@ package io.github.lab2coursework.lwjgl3;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -29,12 +30,31 @@ public class GameMaster extends ApplicationAdapter {
         entityManager = new EntityManager();
         screenManager = new ScreenManager();
         collisionManager = new CollisionManager();
+        movementManager = new MovementManager(entityManager.getEntities());
+
 
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
 
-        entityManager.addEntity(new Circle(200, 200, 40, Color.CYAN, 2f));
-        entityManager.addEntity(new Triangle(500, 200, Color.ORANGE, 2f));
+        // 1. Create Player 1 that is a circle to be controlled by W, A, S, D
+        Circle player1 = new Circle(200, 200, 40, Color.CYAN, 2f);
+        player1.setMovementStrategy(new PlayerMovement(
+            Input.Keys.W,
+            Input.Keys.S,
+            Input.Keys.A,
+            Input.Keys.D
+        ));
+        entityManager.addEntity(player1);
+
+        // 2. Create Player 2 that is a triangle to be controlled by Arrow Keys
+        Triangle player2 = new Triangle(500, 200, Color.ORANGE, 2f);
+        player2.setMovementStrategy(new PlayerMovement(
+            Input.Keys.UP,
+            Input.Keys.DOWN,
+            Input.Keys.LEFT,
+            Input.Keys.RIGHT
+        ));
+        entityManager.addEntity(player2);
         entityManager.addEntity(new TextureObject("libgdx.png", 140, 210, 0f));
 
         isRunning = true;
@@ -48,6 +68,8 @@ public class GameMaster extends ApplicationAdapter {
 
     public void update(float deltaTime) {
         entityManager.update();
+
+        movementManager.updateMovement();
 
         collisionManager.applyAll(
             entityManager.getEntities(),
