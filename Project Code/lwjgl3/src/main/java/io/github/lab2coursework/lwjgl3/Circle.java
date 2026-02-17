@@ -26,21 +26,7 @@ public class Circle extends Entity {
     }
 
     @Override
-    public void movement() {
-        // Down Key (Move Down)
-        if (Gdx.input.isKeyPressed(Input.Keys.DPAD_DOWN)) {
-            this.setY(this.getY() - this.getSpeed());
-        }
-
-        // Up key (Move UP)
-        if (Gdx.input.isKeyPressed(Input.Keys.DPAD_UP)) {
-            this.setY(this.getY() + this.getSpeed());
-        }
-    }
-
-    @Override
     public void update(){
-        this.movement();
     }
 }
 

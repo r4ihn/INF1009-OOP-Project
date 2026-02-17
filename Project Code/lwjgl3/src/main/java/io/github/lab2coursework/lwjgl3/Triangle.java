@@ -27,20 +27,7 @@ public class Triangle extends Entity {
     public void draw(SpriteBatch batch) { }
 
     @Override
-    public void movement() {
-        // 1. Move Right (A Key)
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            this.setX(this.getX() - this.getSpeed());
-        }
-
-        // 2. Move Left (D Key)
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            this.setX(this.getX() + this.getSpeed());
-        }
-    }
-
-    @Override
     public void update() {
-        movement();
+
     }
 }
