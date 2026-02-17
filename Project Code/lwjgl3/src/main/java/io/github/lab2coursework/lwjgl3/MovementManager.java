@@ -15,8 +15,13 @@ public class MovementManager {
         if (entities == null) return;
 
         for (Entity e : entities) {
-            // Tell the entity to process its movement strategy
-            e.movement();
+            // 1. Grab the assigned strategy (PlayerMovement or AiMovement)
+            Movement strategy = e.getMovementStrategy();
+
+            // 2. If the entity has a strategy assigned, execute the movement math
+            if (strategy != null) {
+                strategy.update(e);
+            }
         }
     }
 }
