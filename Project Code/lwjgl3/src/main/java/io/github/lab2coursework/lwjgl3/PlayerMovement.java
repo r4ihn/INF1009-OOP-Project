@@ -1,31 +1,23 @@
 package io.github.lab2coursework.lwjgl3;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 
-// 2. The Player Implementation (From your UML)
-public class PlayerMovement extends MovementManager {
-
-    private Input currentInput; // Passed in from IOManager
-
-    public PlayerMovement(Input input) {
-        this.currentInput = input;
-    }
+public class PlayerMovement extends Movement {
 
     @Override
     public void update(Entity entity) {
-        // Read the input and apply the simple movement functions
-        if (currentInput.isKeyPressed(Input.Keys.W)) {
-            moveUp(entity);
+        if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.DPAD_UP)) {
+            UpMovement(entity);
         }
-        if (currentInput.isKeyPressed(Input.Keys.S)) {
-            moveDown(entity);
+        if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DPAD_DOWN)) {
+            DownMovement(entity);
         }
-        if (currentInput.isKeyPressed(Input.Keys.A)) {
-            moveLeft(entity);
+        if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.DPAD_LEFT)) {
+            LeftMovement(entity);
         }
-        if (currentInput.isKeyPressed(Input.Keys.D)) {
-            moveRight(entity);
+        if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.DPAD_RIGHT)) {
+            RightMovement(entity);
         }
     }
-
 }

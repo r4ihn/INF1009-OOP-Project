@@ -1,26 +1,22 @@
 package io.github.lab2coursework.lwjgl3;
 
-public abstract class MovementManager{
-    public abstract void update(Entity entity);
+import java.util.List;
 
-    protected void moveRight(Entity entity) {
-        entity.setX(entity.getX() + entity.getSpeed());
+public class MovementManager {
+
+    // As per UML: - entities: List<Entity>
+    private List<Entity> entities;
+
+    public MovementManager(List<Entity> entities) {
+        this.entities = entities;
     }
 
-    protected void moveLeft(Entity entity) {
-        entity.setX(entity.getX() - entity.getSpeed());
-    }
+    public void updateMovement() {
+        if (entities == null) return;
 
-    protected void moveUp(Entity entity) {
-        entity.setY(entity.getY() + entity.getSpeed());
-    }
-
-    protected void moveDown(Entity entity) {
-        entity.setY(entity.getY() - entity.getSpeed());
-    }
-
-    protected void stop(Entity entity) {
-
+        for (Entity e : entities) {
+            // Tell the entity to process its movement strategy
+            e.movement();
+        }
     }
 }
-
