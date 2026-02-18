@@ -4,10 +4,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-public abstract class Entity implements iMoveable {
+public abstract class Entity {
     // Private attributes for Encapsulation
     private float x, y, speed;
     private Color color;
+
+    private Movement movementStrategy;
 
     public Entity() {}
 
@@ -17,6 +19,10 @@ public abstract class Entity implements iMoveable {
         this.color = color;
         this.speed = speed;
     }
+
+    // Allow the Manager to get and set the strategy
+    public Movement getMovementStrategy() { return movementStrategy; }
+    public void setMovementStrategy(Movement movementStrategy) { this.movementStrategy = movementStrategy; }
 
     // Standard getters and setters
     public Color getColor() { return color; }
@@ -33,14 +39,6 @@ public abstract class Entity implements iMoveable {
 
     public void draw(ShapeRenderer shape){ };
     public void draw(SpriteBatch batch){ };
-
-    @Override
-    public void movement(){
-        this.y -= this.speed;
-        if(this.y < 0){
-            this.y = 400;
-        }
-    }
 
     public abstract void update();
 }
