@@ -4,14 +4,13 @@ import java.util.List;
 
 public class MovementManager {
 
-    // As per UML: - entities: List<Entity>
-    private List<Entity> entities;
+    private final List<Entity> entities;
 
     public MovementManager(List<Entity> entities) {
         this.entities = entities;
     }
 
-    public void updateMovement() {
+    public void updateMovement(float deltaTime) {
         if (entities == null) return;
 
         for (Entity e : entities) {
@@ -20,7 +19,7 @@ public class MovementManager {
 
             // 2. If the entity has a strategy assigned, execute the movement math
             if (strategy != null) {
-                strategy.update(e);
+                strategy.update(e, deltaTime);
             }
         }
     }

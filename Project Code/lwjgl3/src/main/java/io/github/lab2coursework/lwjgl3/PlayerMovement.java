@@ -9,6 +9,9 @@ public class PlayerMovement extends Movement {
     private int leftKey;
     private int rightKey;
 
+    //Reference to input system
+    private IOManager ioManager;
+
     // The Constructor: We assign the keys when we create the strategy
     public PlayerMovement(int upKey, int downKey, int leftKey, int rightKey) {
         this.upKey = upKey;
@@ -18,19 +21,19 @@ public class PlayerMovement extends Movement {
     }
 
     @Override
-    public void update(Entity entity) {
+    public void update(Entity entity, float deltaTime) {
         // Now it checks the variables instead of hardcoded keys!
         if (Gdx.input.isKeyPressed(upKey)) {
-            UpMovement(entity);
+            UpMovement(entity, deltaTime);
         }
         if (Gdx.input.isKeyPressed(downKey)) {
-            DownMovement(entity);
+            DownMovement(entity, deltaTime);
         }
         if (Gdx.input.isKeyPressed(leftKey)) {
-            LeftMovement(entity);
+            LeftMovement(entity, deltaTime);
         }
         if (Gdx.input.isKeyPressed(rightKey)) {
-            RightMovement(entity);
+            RightMovement(entity, deltaTime);
         }
     }
 }
