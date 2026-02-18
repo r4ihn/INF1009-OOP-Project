@@ -30,7 +30,6 @@ public class GameMaster extends ApplicationAdapter {
         entityManager = new EntityManager();
         screenManager = new ScreenManager();
         collisionManager = new CollisionManager();
-        movementManager = new PlayerMovement(Gdx.input);
 
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
@@ -55,6 +54,9 @@ public class GameMaster extends ApplicationAdapter {
         ));
         entityManager.addEntity(player2);
         entityManager.addEntity(new TextureObject("libgdx.png", 140, 210, 0f));
+
+        // Initialize MovementManager with the list of entities
+        movementManager = new MovementManager(entityManager.getEntities());
 
         isRunning = true;
     }
