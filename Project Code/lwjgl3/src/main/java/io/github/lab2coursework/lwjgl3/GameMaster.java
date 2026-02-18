@@ -29,7 +29,7 @@ public class GameMaster extends ApplicationAdapter {
         entityManager = new EntityManager();
         screenManager = new ScreenManager();
         collisionManager = new CollisionManager();
-        movementManager = new MovementManager();
+        movementManager = new PlayerMovement(Gdx.input);
 
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
