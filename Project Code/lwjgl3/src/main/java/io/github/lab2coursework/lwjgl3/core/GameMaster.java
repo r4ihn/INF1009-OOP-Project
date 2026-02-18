@@ -1,6 +1,10 @@
-package io.github.lab2coursework.lwjgl3;
+package io.github.lab2coursework.lwjgl3.core;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import io.github.lab2coursework.lwjgl3.EntityManager;
+import io.github.lab2coursework.lwjgl3.MovementManager;
+import io.github.lab2coursework.lwjgl3.managers.CollisionManager;
+import io.github.lab2coursework.lwjgl3.managers.IOManager;
 import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
 
 public class GameMaster extends ApplicationAdapter {
