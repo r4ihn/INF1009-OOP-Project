@@ -1,4 +1,4 @@
-package io.github.lab2coursework.lwjgl3;
+package io.github.lab2coursework.lwjgl3.movement;
 
 public class AIMovement extends Movement {
 
