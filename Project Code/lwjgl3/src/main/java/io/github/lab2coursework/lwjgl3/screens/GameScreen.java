@@ -4,13 +4,21 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import io.github.lab2coursework.lwjgl3.*;
 import io.github.lab2coursework.lwjgl3.entities.Circle;
+import io.github.lab2coursework.lwjgl3.entities.Entity;
 import io.github.lab2coursework.lwjgl3.entities.Triangle;
 import io.github.lab2coursework.lwjgl3.graphics.TextureObject;
+import io.github.lab2coursework.lwjgl3.input.Action;
+import io.github.lab2coursework.lwjgl3.input.Key;
+import io.github.lab2coursework.lwjgl3.input.KeyboardInput;
 import io.github.lab2coursework.lwjgl3.managers.*;
+import io.github.lab2coursework.lwjgl3.movement.AIMovement;
+import io.github.lab2coursework.lwjgl3.movement.Movement;
 import io.github.lab2coursework.lwjgl3.movement.PlayerMovement;
 
 public class GameScreen extends AbstractScreen {
@@ -19,9 +27,12 @@ public class GameScreen extends AbstractScreen {
     private final EntityManager entityManager;
     private final CollisionManager collisionManager;
     private final MovementManager movementManager;
+    private final Entity[] droplets;
+    private Entity bucket;
 
     private  SpriteBatch spriteBatch;
     private  ShapeRenderer shapeRenderer;
+    private Texture backgroundTexture = new Texture("GameBG.jpg");
 
     public GameScreen(ScreenManager screenManager) {
         super(screenManager);
@@ -32,25 +43,53 @@ public class GameScreen extends AbstractScreen {
         spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
 
-        // Demo entities (same as GameMaster)
-        Circle player1 = new Circle(200, 200, 40, Color.CYAN, 240f);
-        player1.setMovementStrategy(new PlayerMovement(
-            Input.Keys.W, Input.Keys.S, Input.Keys.A, Input.Keys.D
-        ));
+        // Produce Droplets
+        droplets = new Entity[20];
+        for (int i = 0; i < droplets.length; i++) {
+
+            // Assign random starting positions and speed
+            float randomX = MathUtils.random(0, 1280);
+            float randomY = MathUtils.random(200, 1000);
+            float randomSpeed = MathUtils.random(50, 200);
+            droplets[i] = new TextureObject("droplet.png", randomX, randomY, randomSpeed);
+
+            // Assign Ai Movement to droplets
+            AIMovement aiMovement = new AIMovement();
+            droplets[i].setMovementStrategy(aiMovement);
+
+            // Add each droplet to the entity list
+            entityManager.addEntities(droplets[i]);
+        }
+
+        // Add bucket
+        bucket = new TextureObject("bucket.png", 300, 0, 0);
+        entityManager.addEntities(bucket);
+
+
+        // Set Circle as player movement
+        Circle player1 = new Circle(200, 200, 40, Color.PINK, 240f);
+        PlayerMovement p1Movement = new PlayerMovement();
+        player1.setMovementStrategy(p1Movement);
+        ioManager.setCurrentInput(new KeyboardInput());
+        ioManager.bindKey(Key.W, () -> p1Movement.setMovingUp(Gdx.input.isKeyPressed(Input.Keys.W)));
+        ioManager.bindKey(Key.S, () -> p1Movement.setMovingDown(Gdx.input.isKeyPressed(Input.Keys.S)));
+        ioManager.bindKey(Key.A, () -> p1Movement.setMovingLeft(Gdx.input.isKeyPressed(Input.Keys.A)));
+        ioManager.bindKey(Key.D, () -> p1Movement.setMovingRight(Gdx.input.isKeyPressed(Input.Keys.D)));
         entityManager.addEntities(player1);
 
+        // Set Triangle as player movement
         Triangle player2 = new Triangle(500, 200, Color.ORANGE, 240f);
-        player2.setMovementStrategy(new PlayerMovement(
-            Input.Keys.UP, Input.Keys.DOWN, Input.Keys.LEFT, Input.Keys.RIGHT
-        ));
+        PlayerMovement p2Movement = new PlayerMovement();
+        player2.setMovementStrategy(p2Movement);
+        ioManager.bindKey(Key.UP, () -> p2Movement.setMovingUp(Gdx.input.isKeyPressed(Input.Keys.UP)));
+        ioManager.bindKey(Key.DOWN, () -> p2Movement.setMovingDown(Gdx.input.isKeyPressed(Input.Keys.DOWN)));
+        ioManager.bindKey(Key.LEFT, () -> p2Movement.setMovingLeft(Gdx.input.isKeyPressed(Input.Keys.LEFT)));
+        ioManager.bindKey(Key.RIGHT, () -> p2Movement.setMovingRight(Gdx.input.isKeyPressed(Input.Keys.RIGHT)));
         entityManager.addEntities(player2);
-
-        entityManager.addEntities(new TextureObject("libgdx.png", 140, 210, 240f));
 
         movementManager = new MovementManager(entityManager.getEntities());
 
     }
-
 
 
     @Override
@@ -58,7 +97,16 @@ public class GameScreen extends AbstractScreen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
             screenManager.push(new PauseScreen(screenManager));
         }
-        entityManager.update();
+
+        ioManager.processInput(Key.W.getCode());
+        ioManager.processInput(Key.S.getCode());
+        ioManager.processInput(Key.A.getCode());
+        ioManager.processInput(Key.D.getCode());
+        ioManager.processInput(Key.UP.getCode());
+        ioManager.processInput(Key.DOWN.getCode());
+        ioManager.processInput(Key.LEFT.getCode());
+        ioManager.processInput(Key.RIGHT.getCode());
+
         movementManager.updateMovement(delta);
 
         collisionManager.applyAll(
@@ -68,23 +116,38 @@ public class GameScreen extends AbstractScreen {
         );
     }
 
+
     @Override
     protected void draw(float delta) {
+        // 1. Clear screen
         Gdx.gl.glClearColor(0.12f, 0.12f, 0.16f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        entityManager.draw(null, shapeRenderer);
-        shapeRenderer.end();
+        // 2. Draw the background first
+        if (backgroundTexture != null) {
+            spriteBatch.begin();
+            spriteBatch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            spriteBatch.end();
+        }
 
+        // 3. Draw other sprites/textures on top
         spriteBatch.begin();
         entityManager.draw(spriteBatch, null);
         spriteBatch.end();
+
+        // 4. Draw shapes (circles/triangles)
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        entityManager.draw(null, shapeRenderer);
+        shapeRenderer.end();
     }
+
 
     @Override
     public void dispose() {
         super.dispose();
+        if (backgroundTexture != null) {
+            backgroundTexture.dispose();
+        }
         spriteBatch.dispose();
         shapeRenderer.dispose();
     }
