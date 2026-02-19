@@ -1,5 +1,7 @@
 package io.github.lab2coursework.lwjgl3.movement;
 
+import io.github.lab2coursework.lwjgl3.entities.Entity;
+
 public abstract class Movement {
 
     public abstract void update(Entity entity, float deltaTime);
@@ -22,9 +24,5 @@ public abstract class Movement {
     protected void DownMovement(Entity entity, float deltaTime) {
 
         entity.setY(entity.getY() - (entity.getSpeed() * deltaTime));
-    }
-
-    protected void stop(Entity entity) {
-        // Optional stop logic
     }
 }

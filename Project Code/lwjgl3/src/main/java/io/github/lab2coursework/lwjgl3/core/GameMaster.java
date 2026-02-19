@@ -1,4 +1,4 @@
-package io.github.lab2coursework.lwjgl3;
+package io.github.lab2coursework.lwjgl3.core;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -7,6 +7,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import io.github.lab2coursework.lwjgl3.entities.Circle;
+import io.github.lab2coursework.lwjgl3.entities.Triangle;
+import io.github.lab2coursework.lwjgl3.graphics.TextureObject;
+import io.github.lab2coursework.lwjgl3.managers.*;
+import io.github.lab2coursework.lwjgl3.movement.PlayerMovement;
 
 public class GameMaster extends ApplicationAdapter {
 
@@ -42,7 +47,7 @@ public class GameMaster extends ApplicationAdapter {
             Input.Keys.A,
             Input.Keys.D
         ));
-        entityManager.addEntity(player1);
+        entityManager.addEntities(player1);
 
         // 2. Create Player 2 that is a triangle to be controlled by Arrow Keys
         Triangle player2 = new Triangle(500, 200, Color.ORANGE, 240f); //Speed is frames per second
@@ -52,8 +57,8 @@ public class GameMaster extends ApplicationAdapter {
             Input.Keys.LEFT,
             Input.Keys.RIGHT
         ));
-        entityManager.addEntity(player2);
-        entityManager.addEntity(new TextureObject("libgdx.png", 140, 210, 240f));
+        entityManager.addEntities(player2);
+        entityManager.addEntities(new TextureObject("libgdx.png", 140, 210, 240f));
 
 
         // Initialize MovementManager with the list of entities
@@ -73,7 +78,7 @@ public class GameMaster extends ApplicationAdapter {
 
         movementManager.updateMovement(deltaTime);
 
-        collisionManager.applyAll(
+        collisionManager.keepEntitiesInBounds(
             entityManager.getEntities(),
             (float) Gdx.graphics.getWidth(),
             (float) Gdx.graphics.getHeight()
