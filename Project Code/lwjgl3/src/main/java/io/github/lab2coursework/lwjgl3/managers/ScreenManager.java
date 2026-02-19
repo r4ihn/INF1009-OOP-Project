@@ -1,4 +1,4 @@
-package lwjgl3.src.main.java.io.github.lab2coursework.lwjgl3.managers;
+package io.github.lab2coursework.lwjgl3.managers;
 
 // Import statements
 import com.badlogic.gdx.Screen;

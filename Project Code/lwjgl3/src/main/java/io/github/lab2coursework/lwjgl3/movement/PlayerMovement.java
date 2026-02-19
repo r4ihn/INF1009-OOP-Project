@@ -1,6 +1,8 @@
-package io.github.lab2coursework.lwjgl3;
+package io.github.lab2coursework.lwjgl3.movement;
 
 import com.badlogic.gdx.Gdx;
+import io.github.lab2coursework.lwjgl3.entities.Entity;
+import io.github.lab2coursework.lwjgl3.managers.IOManager;
 
 public class PlayerMovement extends Movement {
     // Variables to store which keys this specific player uses

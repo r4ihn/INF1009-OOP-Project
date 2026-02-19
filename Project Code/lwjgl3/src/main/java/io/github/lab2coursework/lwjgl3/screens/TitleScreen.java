@@ -1,4 +1,4 @@
-package lwjgl3.src.main.java.io.github.lab2coursework.lwjgl3.screens;
+package io.github.lab2coursework.lwjgl3.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -14,7 +14,7 @@ public class TitleScreen extends io.github.lab2coursework.lwjgl3.screens.Abstrac
     @Override
     protected void update(float delta) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            screenManager.setScreen(new GameScreen(screenManager));
+            screenManager.push(new GameScreen(screenManager));
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();

@@ -1,4 +1,4 @@
-package io.github.lab2coursework.lwjgl3;
+package io.github.lab2coursework.lwjgl3.entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -25,22 +25,9 @@ public class Circle extends Entity {
         shape.circle(getX(), getY(), this.radius);
     }
 
-    @Override
-    public void movement() {
-        // Down Key (Move Down)
-        if (Gdx.input.isKeyPressed(Input.Keys.DPAD_DOWN)) {
-            this.setY(this.getY() - this.getSpeed());
-        }
-
-        // Up key (Move UP)
-        if (Gdx.input.isKeyPressed(Input.Keys.DPAD_UP)) {
-            this.setY(this.getY() + this.getSpeed());
-        }
-    }
 
     @Override
     public void update(){
-        this.movement();
     }
 }
 

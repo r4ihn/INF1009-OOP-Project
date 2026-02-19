@@ -1,4 +1,7 @@
-package lwjgl3.src.main.java.io.github.lab2coursework.lwjgl3.managers;
+package io.github.lab2coursework.lwjgl3.managers;
+
+import io.github.lab2coursework.lwjgl3.entities.Entity;
+import io.github.lab2coursework.lwjgl3.movement.Movement;
 
 import java.util.List;
 

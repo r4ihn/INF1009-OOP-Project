@@ -20,7 +20,7 @@ public abstract class AbstractScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         update(delta);
-        draw(delta);
+        draw(delta); // Add this line
     }
 
     protected abstract void update(float delta);
@@ -30,4 +30,6 @@ public abstract class AbstractScreen extends ScreenAdapter {
         batch.dispose();
         font.dispose();
     }
+
+    protected abstract void draw(float delta);
 }
