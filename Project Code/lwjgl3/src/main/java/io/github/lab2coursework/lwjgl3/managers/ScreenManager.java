@@ -23,7 +23,6 @@ public class ScreenManager {
         if (screenStack.isEmpty()) return;
         Screen top = screenStack.pop();
         top.hide(); // Hide popped screen
-        top.dispose(); // Dispose popped screen
         if (!screenStack.isEmpty()) {
             screenStack.peek().resume(); // Resume previous screen
         }
