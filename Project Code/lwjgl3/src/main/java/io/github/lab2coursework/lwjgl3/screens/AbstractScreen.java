@@ -24,7 +24,6 @@ public abstract class AbstractScreen extends ScreenAdapter {
     }
 
     protected abstract void update(float delta);
-    protected abstract void draw(float delta);
 
     @Override
     public void dispose() {
