@@ -1,8 +1,8 @@
 package io.github.lab2coursework.lwjgl3.managers;
 
-import io.github.lab2coursework.lwjgl3.CollisionRule;
-import io.github.lab2coursework.lwjgl3.KeepInBoundsRule;
-import io.github.lab2coursework.lwjgl3.PhysicsCollisionRule;
+import io.github.lab2coursework.lwjgl3.collision.CollisionRule;
+import io.github.lab2coursework.lwjgl3.collision.KeepInBoundsRule;
+import io.github.lab2coursework.lwjgl3.collision.PhysicsCollisionRule;
 import io.github.lab2coursework.lwjgl3.entities.Entity;
 
 import java.util.ArrayList;
