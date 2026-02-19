@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e2b7760c-3aeb-48b2-a1be-5d43aab146fb" name="Changes" comment="Add EndScreen class with restart and return functionality to GameScreen and TitleScreen">
-      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/screens/GameScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/screens/GameScreen.java" afterDir="false" />
+    <list default="true" id="e2b7760c-3aeb-48b2-a1be-5d43aab146fb" name="Changes" comment="Add EndScreen class with restart and return functionality to GameScreen">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -113,7 +113,7 @@
     </excluded-from-favorite>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="EntityManager" />
+        <entry key="$PROJECT_DIR$" value="feature/screenSide" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -124,12 +124,23 @@
     &quot;assignee&quot;: &quot;r4ihn&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/r4ihn/P4_Team5_ProjectPart1Final.git",
-    "accountId": "3829d22a-4ba2-4dc6-9246-15592e11c50f"
+  <component name="GitHubPullRequestState">{
+  &quot;prStates&quot;: [
+    {
+      &quot;id&quot;: {
+        &quot;id&quot;: &quot;PR_kwDOQ-DAq87E3D7T&quot;,
+        &quot;number&quot;: 4
+      },
+      &quot;lastSeen&quot;: 1771502899787
+    }
+  ]
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/r4ihn/P4_Team5_ProjectPart1Final.git&quot;,
+    &quot;accountId&quot;: &quot;3829d22a-4ba2-4dc6-9246-15592e11c50f&quot;
   }
-}]]></component>
+}</component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -149,39 +160,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Lwjgl3Launcher.executor": "Run",
-    "Gradle.C:/P4_Team5_ProjectPart1Final.executor": "Run",
-    "Gradle.C:/P4_Team5_ProjectPart1Final/Project Code/lwjgl3/build.gradle.executor": "Run",
-    "Gradle.Project Code [:lwjgl3:io.github.lab2coursework.lwjgl3.Lwjgl3Launcher.main()].executor": "Run",
-    "Gradle.Project Code [:lwjgl3:run].executor": "Run",
-    "Gradle.Project Code [run].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "feature/screenSide",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/P4_Team5_ProjectPart1Final",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Lwjgl3Launcher.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.C:/P4_Team5_ProjectPart1Final.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.C:/P4_Team5_ProjectPart1Final/Project Code/lwjgl3/build.gradle.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Project Code [:lwjgl3:io.github.lab2coursework.lwjgl3.Lwjgl3Launcher.main()].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Project Code [:lwjgl3:run].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Project Code [run].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#4 on feature/screenSide&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/P4_Team5_ProjectPart1Final&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunAnythingCache">
     <option name="myCommands">
       <command value="gradle " />
@@ -300,7 +311,6 @@
         <item itemvalue="Application.Lwjgl3Launcher" />
         <item itemvalue="Gradle.C:/P4_Team5_ProjectPart1Final" />
         <item itemvalue="Gradle.Project Code [run]" />
-        <item itemvalue="Application.Lwjgl3Launcher (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -325,6 +335,9 @@
       <workItem from="1771165032023" duration="328000" />
       <workItem from="1771406847739" duration="860000" />
       <workItem from="1771408444170" duration="1135000" />
+      <workItem from="1771502365306" duration="107000" />
+      <workItem from="1771502645452" duration="177000" />
+      <workItem from="1771502890225" duration="73000" />
     </task>
     <task id="LOCAL-00001" summary="Changes in GameMaster and EntityManager">
       <option name="closed" value="true" />
@@ -374,7 +387,23 @@
       <option name="project" value="LOCAL" />
       <updated>1771483875702</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Add EndScreen class with restart and return functionality to GameScreen">
+      <option name="closed" value="true" />
+      <created>1771484336024</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1771484336024</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Add EndScreen class with restart and return functionality to GameScreen">
+      <option name="closed" value="true" />
+      <created>1771484345682</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1771484345682</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -410,7 +439,8 @@
     <MESSAGE value="Refactor TitleScreen.java to include buttons for entering and escaping the game as an override" />
     <MESSAGE value="Add PauseScreen class with functionality to resume or return to TitleScreen" />
     <MESSAGE value="Add EndScreen class with restart and return functionality to GameScreen and TitleScreen" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add EndScreen class with restart and return functionality to GameScreen and TitleScreen" />
+    <MESSAGE value="Add EndScreen class with restart and return functionality to GameScreen" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add EndScreen class with restart and return functionality to GameScreen" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
