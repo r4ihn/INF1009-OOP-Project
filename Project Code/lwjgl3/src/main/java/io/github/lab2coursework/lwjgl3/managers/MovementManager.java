@@ -1,30 +1,26 @@
-package io.github.lab2coursework.lwjgl3;
-import java.util.ArrayList;
+package lwjgl3.src.main.java.io.github.lab2coursework.lwjgl3.managers;
+
+import java.util.List;
+
 public class MovementManager {
 
-    private ArrayList<Entity> entities;
+    private final List<Entity> entities;
 
-    public void rightMovement(Entity entity) {
-        entity.setX(entity.getX() - entity.getSpeed());
+    public MovementManager(List<Entity> entities) {
+        this.entities = entities;
     }
 
-    public void leftMovement(Entity entity) {
-        entity.setX(entity.getX() + entity.getSpeed());
-    }
+    public void updateMovement(float deltaTime) {
+        if (entities == null) return;
 
-    public void upMovement(Entity entity) {
-        entity.setY(entity.getY() + entity.getSpeed());
-    }
+        for (Entity e : entities) {
+            // 1. Grab the assigned strategy (PlayerMovement or AiMovement)
+            Movement strategy = e.getMovementStrategy();
 
-    public void downMovement(Entity entity) {
-        entity.setY(entity.getY() - entity.getSpeed());
-    }
-
-    public void stopMovement(Entity entity) {
-    // Movement management logic to be implemented
-    }
-
-    public void setSpeed(Entity entity, float speed) {
-        entity.setSpeed(speed);
+            // 2. If the entity has a strategy assigned, execute the movement math
+            if (strategy != null) {
+                strategy.update(e, deltaTime);
+            }
+        }
     }
 }
