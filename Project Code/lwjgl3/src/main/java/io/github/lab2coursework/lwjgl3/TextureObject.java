@@ -39,4 +39,10 @@ public class TextureObject extends Entity {
     @Override
     public void update() {
     }
+
+    public void movement() {
+        // Example movement logic for TextureObject
+        this.setX(this.getX() + this.getSpeed()); // Move right
+        this.setY(this.getY() + this.getSpeed()); // Move up
+    }
 }
