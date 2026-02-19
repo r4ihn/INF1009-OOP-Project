@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e2b7760c-3aeb-48b2-a1be-5d43aab146fb" name="Changes" comment="Add PauseScreen class with functionality to resume or return to TitleScreen" />
+    <list default="true" id="e2b7760c-3aeb-48b2-a1be-5d43aab146fb" name="Changes" comment="Add EndScreen class with restart and return functionality to GameScreen and TitleScreen">
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/screens/GameScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/screens/GameScreen.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -364,7 +366,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771483222279</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Add EndScreen class with restart and return functionality to GameScreen and TitleScreen">
+      <option name="closed" value="true" />
+      <created>1771483875702</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1771483875702</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -399,7 +409,8 @@
     <MESSAGE value="Refactor screen management and add GameScreen class; enhance CollisionManager and MovementManager functionality" />
     <MESSAGE value="Refactor TitleScreen.java to include buttons for entering and escaping the game as an override" />
     <MESSAGE value="Add PauseScreen class with functionality to resume or return to TitleScreen" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add PauseScreen class with functionality to resume or return to TitleScreen" />
+    <MESSAGE value="Add EndScreen class with restart and return functionality to GameScreen and TitleScreen" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add EndScreen class with restart and return functionality to GameScreen and TitleScreen" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
