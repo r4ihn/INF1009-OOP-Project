@@ -1,6 +1,11 @@
-package lwjgl3.src.main.java.io.github.lab2coursework.lwjgl3.managers;
+package io.github.lab2coursework.lwjgl3.managers;
 
 import com.badlogic.gdx.graphics.Texture;
+import io.github.lab2coursework.lwjgl3.entities.Circle;
+import io.github.lab2coursework.lwjgl3.entities.Entity;
+import io.github.lab2coursework.lwjgl3.entities.Triangle;
+import io.github.lab2coursework.lwjgl3.graphics.TextureObject;
+
 import java.util.List;
 
 public class CollisionManager {
