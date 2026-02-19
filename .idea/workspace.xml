@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e2b7760c-3aeb-48b2-a1be-5d43aab146fb" name="Changes" comment="Refactor screen management and add GameScreen class; enhance CollisionManager and MovementManager functionality">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/screens/AbstractScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/screens/AbstractScreen.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/screens/TitleScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/screens/TitleScreen.java" afterDir="false" />
+    <list default="true" id="e2b7760c-3aeb-48b2-a1be-5d43aab146fb" name="Changes" comment="Refactor TitleScreen.java to include buttons for entering and escaping the game as an override">
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/screens/PauseScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/screens/PauseScreen.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -352,7 +350,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771481929715</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Refactor TitleScreen.java to include buttons for entering and escaping the game as an override">
+      <option name="closed" value="true" />
+      <created>1771483020863</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1771483020863</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -385,7 +391,8 @@
     <MESSAGE value="Changes in GameMaster and EntityManager" />
     <MESSAGE value="Get GameMaster.java working using new PlayerMovement method in IntelliJ." />
     <MESSAGE value="Refactor screen management and add GameScreen class; enhance CollisionManager and MovementManager functionality" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor screen management and add GameScreen class; enhance CollisionManager and MovementManager functionality" />
+    <MESSAGE value="Refactor TitleScreen.java to include buttons for entering and escaping the game as an override" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor TitleScreen.java to include buttons for entering and escaping the game as an override" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
