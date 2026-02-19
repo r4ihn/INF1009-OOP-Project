@@ -94,11 +94,11 @@ public class GameMaster extends ApplicationAdapter {
         }
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        entityManager.drawShapes(shapeRenderer);
+        entityManager.draw(null,shapeRenderer);
         shapeRenderer.end();
 
         batch.begin();
-        entityManager.drawSprites(batch);
+        entityManager.draw(batch,null);
         batch.end();
     }
 
