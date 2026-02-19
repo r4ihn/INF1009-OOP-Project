@@ -3,8 +3,8 @@ package io.github.lab2coursework.lwjgl3;
 public class AIMovement extends Movement {
 
     @Override
-    public void update(Entity entity) {
-        DownMovement(entity);
+    public void update(Entity entity, float deltaTime) {
+        DownMovement(entity,deltaTime);
 
         // Loop when object falls off the bottom of the screen (Y < 0)
         if (entity.getY() < 0) {

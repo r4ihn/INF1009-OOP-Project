@@ -35,7 +35,7 @@ public class GameMaster extends ApplicationAdapter {
         shapeRenderer = new ShapeRenderer();
 
         // 1. Create Player 1 that is a circle to be controlled by W, A, S, D
-        Circle player1 = new Circle(200, 200, 40, Color.CYAN, 2f);
+        Circle player1 = new Circle(200, 200, 40, Color.CYAN, 240f); //Speed is frames per second
         player1.setMovementStrategy(new PlayerMovement(
             Input.Keys.W,
             Input.Keys.S,
@@ -45,7 +45,7 @@ public class GameMaster extends ApplicationAdapter {
         entityManager.addEntity(player1);
 
         // 2. Create Player 2 that is a triangle to be controlled by Arrow Keys
-        Triangle player2 = new Triangle(500, 200, Color.ORANGE, 2f);
+        Triangle player2 = new Triangle(500, 200, Color.ORANGE, 240f); //Speed is frames per second
         player2.setMovementStrategy(new PlayerMovement(
             Input.Keys.UP,
             Input.Keys.DOWN,
@@ -53,7 +53,8 @@ public class GameMaster extends ApplicationAdapter {
             Input.Keys.RIGHT
         ));
         entityManager.addEntity(player2);
-        entityManager.addEntity(new TextureObject("libgdx.png", 140, 210, 0f));
+        entityManager.addEntity(new TextureObject("libgdx.png", 140, 210, 240f));
+
 
         // Initialize MovementManager with the list of entities
         movementManager = new MovementManager(entityManager.getEntities());
@@ -70,7 +71,7 @@ public class GameMaster extends ApplicationAdapter {
     public void update(float deltaTime) {
         entityManager.update();
 
-        movementManager.updateMovement();
+        movementManager.updateMovement(deltaTime);
 
         collisionManager.applyAll(
             entityManager.getEntities(),

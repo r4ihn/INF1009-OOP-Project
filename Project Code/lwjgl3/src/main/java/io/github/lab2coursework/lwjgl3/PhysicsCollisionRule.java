@@ -2,12 +2,13 @@ package io.github.lab2coursework.lwjgl3;
 
 public class PhysicsCollisionRule implements CollisionRule {
 
+    // Checks if entities collide
     @Override
     public boolean matches(Entity a, Entity b) {
-        return (a instanceof Circle && b instanceof Triangle)
-            || (a instanceof Triangle && b instanceof Circle);
+        return (a instanceof Circle && b instanceof Triangle) || (a instanceof Triangle && b instanceof Circle);
     }
 
+    // Calculates the outcome of entity movement when collision occurs
     @Override
     public void resolve(Entity a, Entity b) {
         Circle c;
@@ -21,14 +22,14 @@ public class PhysicsCollisionRule implements CollisionRule {
             t = (Triangle) a;
         }
 
-        float left   = t.getX();
-        float right  = t.getX() + 100f;
+        float left = t.getX();
+        float right = t.getX() + 100f;
         float bottom = t.getY();
-        float top    = t.getY() + 100f;
+        float top = t.getY() + 100f;
 
         float cx = c.getX();
         float cy = c.getY();
-        float r  = c.getRadius();
+        float r = c.getRadius();
 
         float closestX = clamp(cx, left, right);
         float closestY = clamp(cy, bottom, top);
@@ -39,6 +40,7 @@ public class PhysicsCollisionRule implements CollisionRule {
         float dist2 = dx * dx + dy * dy;
         float r2 = r * r;
 
+        // Circle gets pushed by triangle
         if (dist2 < r2) {
             float dist = (float) Math.sqrt(dist2);
 
