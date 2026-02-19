@@ -80,9 +80,6 @@ public class GameMaster extends ApplicationAdapter {
         );
     }
 
-
-
-
     public void render() {
         deltaTime = Gdx.graphics.getDeltaTime();
         ScreenUtils.clear(0.12f, 0.12f, 0.16f, 1f);
