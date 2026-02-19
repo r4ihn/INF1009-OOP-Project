@@ -1,10 +1,9 @@
-package lwjgl3.src.main.java.io.github.lab2coursework.lwjgl3.screens;
+package io.github.lab2coursework.lwjgl3.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
-import io.github.lab2coursework.lwjgl3.ScreenManager;
-import lwjgl3.src.main.java.io.github.lab2coursework.lwjgl3.managers.ScreenManager;
+import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
 
 public class EndScreen extends io.github.lab2coursework.lwjgl3.screens.AbstractScreen {
 

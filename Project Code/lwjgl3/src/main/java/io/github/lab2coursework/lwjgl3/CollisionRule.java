@@ -1,5 +1,7 @@
 package io.github.lab2coursework.lwjgl3;
 
+import io.github.lab2coursework.lwjgl3.entities.Entity;
+
 public interface CollisionRule {
     // Decides the entities affected
     boolean matches(Entity a, Entity b);

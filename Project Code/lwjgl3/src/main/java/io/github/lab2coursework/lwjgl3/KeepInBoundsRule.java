@@ -1,5 +1,9 @@
 package io.github.lab2coursework.lwjgl3;
 
+import io.github.lab2coursework.lwjgl3.entities.Circle;
+import io.github.lab2coursework.lwjgl3.entities.Entity;
+import io.github.lab2coursework.lwjgl3.entities.Triangle;
+
 public class KeepInBoundsRule implements CollisionRule {
 
     private final float worldW;

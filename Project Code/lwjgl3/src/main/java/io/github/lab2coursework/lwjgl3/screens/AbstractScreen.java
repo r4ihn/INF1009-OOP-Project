@@ -30,4 +30,6 @@ public abstract class AbstractScreen extends ScreenAdapter {
         batch.dispose();
         font.dispose();
     }
+
+    protected abstract void draw(float delta);
 }

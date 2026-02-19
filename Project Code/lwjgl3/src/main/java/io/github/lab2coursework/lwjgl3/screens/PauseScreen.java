@@ -1,12 +1,12 @@
-package lwjgl3.src.main.java.io.github.lab2coursework.lwjgl3.screens;
+package io.github.lab2coursework.lwjgl3.screens;
 
 // Import statements
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
-import io.github.lab2coursework.lwjgl3.ScreenManager;
+import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
 
-public class PauseScreen extends io.github.lab2coursework.lwjgl3.screens.AbstractScreen {
+public class PauseScreen extends AbstractScreen {
 
     public PauseScreen(ScreenManager screenManager) {
         super(screenManager);
@@ -18,7 +18,7 @@ public class PauseScreen extends io.github.lab2coursework.lwjgl3.screens.Abstrac
             screenManager.pop(); // return to previous screen
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            screenManager.set(new TitleScreen(screenManager));
+            screenManager.push(new TitleScreen(screenManager));
         }
     }
 

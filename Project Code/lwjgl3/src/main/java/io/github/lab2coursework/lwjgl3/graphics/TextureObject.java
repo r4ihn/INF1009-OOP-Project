@@ -33,14 +33,6 @@ public class TextureObject extends Entity {
 
     @Override
     public void update(){
-        this.movement();
     }
 
-    public void userMovement(){
-
-    }
-
-    public  void AiMovement(){
-
-    }
 }
