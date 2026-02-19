@@ -1,31 +1,39 @@
 package io.github.lab2coursework.lwjgl3;
 
-import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Gdx;
 
-// 2. The Player Implementation (From your UML)
-public class PlayerMovement extends MovementManager {
+public class PlayerMovement extends Movement {
+    // Variables to store which keys this specific player uses
+    private int upKey;
+    private int downKey;
+    private int leftKey;
+    private int rightKey;
 
-    private Input currentInput; // Passed in from IOManager
+    //Reference to input system
+    private IOManager ioManager;
 
-    public PlayerMovement(Input input) {
-        this.currentInput = input;
+    // The Constructor: We assign the keys when we create the strategy
+    public PlayerMovement(int upKey, int downKey, int leftKey, int rightKey) {
+        this.upKey = upKey;
+        this.downKey = downKey;
+        this.leftKey = leftKey;
+        this.rightKey = rightKey;
     }
 
     @Override
-    public void update(Entity entity) {
-        // Read the input and apply the simple movement functions
-        if (currentInput.isKeyPressed(Input.Keys.W)) {
-            moveUp(entity);
+    public void update(Entity entity, float deltaTime) {
+        // Now it checks the variables instead of hardcoded keys!
+        if (Gdx.input.isKeyPressed(upKey)) {
+            UpMovement(entity, deltaTime);
         }
-        if (currentInput.isKeyPressed(Input.Keys.S)) {
-            moveDown(entity);
+        if (Gdx.input.isKeyPressed(downKey)) {
+            DownMovement(entity, deltaTime);
         }
-        if (currentInput.isKeyPressed(Input.Keys.A)) {
-            moveLeft(entity);
+        if (Gdx.input.isKeyPressed(leftKey)) {
+            LeftMovement(entity, deltaTime);
         }
-        if (currentInput.isKeyPressed(Input.Keys.D)) {
-            moveRight(entity);
+        if (Gdx.input.isKeyPressed(rightKey)) {
+            RightMovement(entity, deltaTime);
         }
     }
-
 }

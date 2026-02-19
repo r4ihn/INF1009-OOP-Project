@@ -1,9 +1,10 @@
-package io.github.lab2coursework.lwjgl3.graphics;
+package io.github.lab2coursework.lwjgl3;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import io.github.lab2coursework.lwjgl3.entities.Entity;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class TextureObject extends Entity {
     private Texture tex;
@@ -31,16 +32,11 @@ public class TextureObject extends Entity {
             this.getTexture().getWidth(), this.getTexture().getHeight());
     }
 
+    // No-op ShapeRenderer draw to satisfy abstract contract
     @Override
-    public void update(){
-        this.movement();
-    }
+    public void draw(ShapeRenderer shape) { }
 
-    public void userMovement(){
-
-    }
-
-    public  void AiMovement(){
-
+    @Override
+    public void update() {
     }
 }

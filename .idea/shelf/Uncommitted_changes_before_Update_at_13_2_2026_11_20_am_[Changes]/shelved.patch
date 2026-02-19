@@ -1,0 +1,727 @@
+Index: Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/GameMaster.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package io.github.lab2coursework.lwjgl3;\n\nimport com.badlogic.gdx.ApplicationAdapter;\n\npublic class GameMaster extends ApplicationAdapter {\n\n    // Managers\n    protected IOManager ioManager;\n    protected EntityManager entityManager;\n    protected ScreenManager screenManager;\n    protected CollisionManager collisionManager;\n    protected MovementManager movementManager;\n\n    // Engine State\n    protected boolean isRunning;\n    protected float deltaTime;\n\n    // Engine Lifecycle\n    public void createGame() {\n    }\n    public void start() {\n    }\n    public void stop() {\n    }\n    \n    // Game Loop\n    public void update(float deltaTime) {\n    }\n    public void render() { \n    }\n\n    // Cleanup\n    public void dispose() {\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/GameMaster.java b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/GameMaster.java
+--- a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/GameMaster.java	(revision 4182fe95f01501c12f097131ebef686f600902e2)
++++ b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/GameMaster.java	(date 1770363587042)
+@@ -18,18 +18,21 @@
+     // Engine Lifecycle
+     public void createGame() {
+     }
++
+     public void start() {
+     }
++
+     public void stop() {
+     }
+-    
++
+     // Game Loop
+     public void update(float deltaTime) {
+     }
+-    public void render() { 
++
++    public void render() {
+     }
+ 
+     // Cleanup
+     public void dispose() {
+     }
+-}
+\ No newline at end of file
++}
+Index: Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/StartupHelper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/*\n * Copyright 2020 damios\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at:\n * https://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n//Note, the above license and copyright applies to this file only.\n\npackage io.github.lab2coursework.lwjgl3;\n\nimport com.badlogic.gdx.Version;\nimport com.badlogic.gdx.backends.lwjgl3.Lwjgl3NativesLoader;\nimport org.lwjgl.system.macosx.LibC;\nimport org.lwjgl.system.macosx.ObjCRuntime;\n\nimport java.io.BufferedReader;\nimport java.io.File;\nimport java.io.InputStreamReader;\nimport java.lang.management.ManagementFactory;\nimport java.util.ArrayList;\n\nimport static org.lwjgl.system.JNI.invokePPP;\nimport static org.lwjgl.system.JNI.invokePPZ;\nimport static org.lwjgl.system.macosx.ObjCRuntime.objc_getClass;\nimport static org.lwjgl.system.macosx.ObjCRuntime.sel_getUid;\n\n/**\n * Adds some utilities to ensure that the JVM was started with the\n * {@code -XstartOnFirstThread} argument, which is required on macOS for LWJGL 3\n * to function. Also helps on Windows when users have names with characters from\n * outside the Latin alphabet, a common cause of startup crashes.\n * <br>\n * <a href=\"https://jvm-gaming.org/t/starting-jvm-on-mac-with-xstartonfirstthread-programmatically/57547\">Based on this java-gaming.org post by kappa</a>\n * @author damios\n */\npublic class StartupHelper {\n\n    private static final String JVM_RESTARTED_ARG = \"jvmIsRestarted\";\n\n    private StartupHelper() {\n        throw new UnsupportedOperationException();\n    }\n\n    /**\n     * Starts a new JVM if the application was started on macOS without the\n     * {@code -XstartOnFirstThread} argument. This also includes some code for\n     * Windows, for the case where the user's home directory includes certain\n     * non-Latin-alphabet characters (without this code, most LWJGL3 apps fail\n     * immediately for those users). Returns whether a new JVM was started and\n     * thus no code should be executed.\n     * <p>\n     * <u>Usage:</u>\n     *\n     * <pre><code>\n     * public static void main(String... args) {\n     * \tif (StartupHelper.startNewJvmIfRequired(true)) return; // This handles macOS support and helps on Windows.\n     * \t// after this is the actual main method code\n     * }\n     * </code></pre>\n     *\n     * @param redirectOutput\n     *            whether the output of the new JVM should be rerouted to the\n     *            old JVM, so it can be accessed in the same place; keeps the\n     *            old JVM running if enabled\n     * @return whether a new JVM was started and thus no code should be executed\n     *         in this one\n     */\n    public static boolean startNewJvmIfRequired(boolean redirectOutput) {\n        String osName = System.getProperty(\"os.name\").toLowerCase(java.util.Locale.ROOT);\n        if (!osName.contains(\"mac\")) {\n            if (osName.contains(\"windows\")) {\n// Here, we are trying to work around an issue with how LWJGL3 loads its extracted .dll files.\n// By default, LWJGL3 extracts to the directory specified by \"java.io.tmpdir\", which is usually the user's home.\n// If the user's name has non-ASCII (or some non-alphanumeric) characters in it, that would fail.\n// By extracting to the relevant \"ProgramData\" folder, which is usually \"C:\\ProgramData\", we avoid this.\n// We also temporarily change the \"user.name\" property to one without any chars that would be invalid.\n// We revert our changes immediately after loading LWJGL3 natives.\n                String programData = System.getenv(\"ProgramData\");\n                if(programData == null) programData = \"C:\\\\Temp\\\\\"; // if ProgramData isn't set, try some fallback.\n                String prevTmpDir = System.getProperty(\"java.io.tmpdir\", programData);\n                String prevUser = System.getProperty(\"user.name\", \"libGDX_User\");\n                System.setProperty(\"java.io.tmpdir\", programData + \"/libGDX-temp\");\n                System.setProperty(\"user.name\", (\"User_\" + prevUser.hashCode() + \"_GDX\" + Version.VERSION).replace('.', '_'));\n                Lwjgl3NativesLoader.load();\n                System.setProperty(\"java.io.tmpdir\", prevTmpDir);\n                System.setProperty(\"user.name\", prevUser);\n            }\n            return false;\n        }\n\n        // There is no need for -XstartOnFirstThread on Graal native image\n        if (!System.getProperty(\"org.graalvm.nativeimage.imagecode\", \"\").isEmpty()) {\n            return false;\n        }\n\n        // Checks if we are already on the main thread, such as from running via Construo.\n        long objc_msgSend = ObjCRuntime.getLibrary().getFunctionAddress(\"objc_msgSend\");\n        long NSThread      = objc_getClass(\"NSThread\");\n        long currentThread = invokePPP(NSThread, sel_getUid(\"currentThread\"), objc_msgSend);\n        boolean isMainThread = invokePPZ(currentThread, sel_getUid(\"isMainThread\"), objc_msgSend);\n        if(isMainThread) return false;\n\n        long pid = LibC.getpid();\n\n        // check whether -XstartOnFirstThread is enabled\n        if (\"1\".equals(System.getenv(\"JAVA_STARTED_ON_FIRST_THREAD_\" + pid))) {\n            return false;\n        }\n\n        // check whether the JVM was previously restarted\n        // avoids looping, but most certainly leads to a crash\n        if (\"true\".equals(System.getProperty(JVM_RESTARTED_ARG))) {\n            System.err.println(\n                    \"There was a problem evaluating whether the JVM was started with the -XstartOnFirstThread argument.\");\n            return false;\n        }\n\n        // Restart the JVM with -XstartOnFirstThread\n        ArrayList<String> jvmArgs = new ArrayList<>();\n        String separator = System.getProperty(\"file.separator\", \"/\");\n        // The following line is used assuming you target Java 8, the minimum for LWJGL3.\n        String javaExecPath = System.getProperty(\"java.home\") + separator + \"bin\" + separator + \"java\";\n        // If targeting Java 9 or higher, you could use the following instead of the above line:\n        //String javaExecPath = ProcessHandle.current().info().command().orElseThrow();\n\n        if (!(new File(javaExecPath)).exists()) {\n            System.err.println(\n                    \"A Java installation could not be found. If you are distributing this app with a bundled JRE, be sure to set the -XstartOnFirstThread argument manually!\");\n            return false;\n        }\n\n        jvmArgs.add(javaExecPath);\n        jvmArgs.add(\"-XstartOnFirstThread\");\n        jvmArgs.add(\"-D\" + JVM_RESTARTED_ARG + \"=true\");\n        jvmArgs.addAll(ManagementFactory.getRuntimeMXBean().getInputArguments());\n        jvmArgs.add(\"-cp\");\n        jvmArgs.add(System.getProperty(\"java.class.path\"));\n        String mainClass = System.getenv(\"JAVA_MAIN_CLASS_\" + pid);\n        if (mainClass == null) {\n            StackTraceElement[] trace = Thread.currentThread().getStackTrace();\n            if (trace.length > 0) {\n                mainClass = trace[trace.length - 1].getClassName();\n            } else {\n                System.err.println(\"The main class could not be determined.\");\n                return false;\n            }\n        }\n        jvmArgs.add(mainClass);\n\n        try {\n            if (!redirectOutput) {\n                ProcessBuilder processBuilder = new ProcessBuilder(jvmArgs);\n                processBuilder.start();\n            } else {\n                Process process = (new ProcessBuilder(jvmArgs))\n                        .redirectErrorStream(true).start();\n                BufferedReader processOutput = new BufferedReader(\n                        new InputStreamReader(process.getInputStream()));\n                String line;\n\n                while ((line = processOutput.readLine()) != null) {\n                    System.out.println(line);\n                }\n\n                process.waitFor();\n            }\n        } catch (Exception e) {\n            System.err.println(\"There was a problem restarting the JVM\");\n            e.printStackTrace();\n        }\n\n        return true;\n    }\n\n    /**\n     * Starts a new JVM if the application was started on macOS without the\n     * {@code -XstartOnFirstThread} argument. Returns whether a new JVM was\n     * started and thus no code should be executed. Redirects the output of the\n     * new JVM to the old one.\n     * <p>\n     * <u>Usage:</u>\n     *\n     * <pre>\n     * public static void main(String... args) {\n     * \tif (StartupHelper.startNewJvmIfRequired()) return; // This handles macOS support and helps on Windows.\n     * \t// the actual main method code\n     * }\n     * </pre>\n     *\n     * @return whether a new JVM was started and thus no code should be executed\n     *         in this one\n     */\n    public static boolean startNewJvmIfRequired() {\n        return startNewJvmIfRequired(true);\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/StartupHelper.java b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/StartupHelper.java
+--- a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/StartupHelper.java	(revision 4182fe95f01501c12f097131ebef686f600902e2)
++++ b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/StartupHelper.java	(date 1770363587177)
+@@ -39,6 +39,7 @@
+  * outside the Latin alphabet, a common cause of startup crashes.
+  * <br>
+  * <a href="https://jvm-gaming.org/t/starting-jvm-on-mac-with-xstartonfirstthread-programmatically/57547">Based on this java-gaming.org post by kappa</a>
++ *
+  * @author damios
+  */
+ public class StartupHelper {
+@@ -66,12 +67,11 @@
+      * }
+      * </code></pre>
+      *
+-     * @param redirectOutput
+-     *            whether the output of the new JVM should be rerouted to the
+-     *            old JVM, so it can be accessed in the same place; keeps the
+-     *            old JVM running if enabled
++     * @param redirectOutput whether the output of the new JVM should be rerouted to the
++     *                       old JVM, so it can be accessed in the same place; keeps the
++     *                       old JVM running if enabled
+      * @return whether a new JVM was started and thus no code should be executed
+-     *         in this one
++     * in this one
+      */
+     public static boolean startNewJvmIfRequired(boolean redirectOutput) {
+         String osName = System.getProperty("os.name").toLowerCase(java.util.Locale.ROOT);
+@@ -84,7 +84,7 @@
+ // We also temporarily change the "user.name" property to one without any chars that would be invalid.
+ // We revert our changes immediately after loading LWJGL3 natives.
+                 String programData = System.getenv("ProgramData");
+-                if(programData == null) programData = "C:\\Temp\\"; // if ProgramData isn't set, try some fallback.
++                if (programData == null) programData = "C:\\Temp\\"; // if ProgramData isn't set, try some fallback.
+                 String prevTmpDir = System.getProperty("java.io.tmpdir", programData);
+                 String prevUser = System.getProperty("user.name", "libGDX_User");
+                 System.setProperty("java.io.tmpdir", programData + "/libGDX-temp");
+@@ -103,10 +103,10 @@
+ 
+         // Checks if we are already on the main thread, such as from running via Construo.
+         long objc_msgSend = ObjCRuntime.getLibrary().getFunctionAddress("objc_msgSend");
+-        long NSThread      = objc_getClass("NSThread");
++        long NSThread = objc_getClass("NSThread");
+         long currentThread = invokePPP(NSThread, sel_getUid("currentThread"), objc_msgSend);
+         boolean isMainThread = invokePPZ(currentThread, sel_getUid("isMainThread"), objc_msgSend);
+-        if(isMainThread) return false;
++        if (isMainThread) return false;
+ 
+         long pid = LibC.getpid();
+ 
+@@ -119,7 +119,7 @@
+         // avoids looping, but most certainly leads to a crash
+         if ("true".equals(System.getProperty(JVM_RESTARTED_ARG))) {
+             System.err.println(
+-                    "There was a problem evaluating whether the JVM was started with the -XstartOnFirstThread argument.");
++                "There was a problem evaluating whether the JVM was started with the -XstartOnFirstThread argument.");
+             return false;
+         }
+ 
+@@ -133,7 +133,7 @@
+ 
+         if (!(new File(javaExecPath)).exists()) {
+             System.err.println(
+-                    "A Java installation could not be found. If you are distributing this app with a bundled JRE, be sure to set the -XstartOnFirstThread argument manually!");
++                "A Java installation could not be found. If you are distributing this app with a bundled JRE, be sure to set the -XstartOnFirstThread argument manually!");
+             return false;
+         }
+ 
+@@ -161,9 +161,9 @@
+                 processBuilder.start();
+             } else {
+                 Process process = (new ProcessBuilder(jvmArgs))
+-                        .redirectErrorStream(true).start();
++                    .redirectErrorStream(true).start();
+                 BufferedReader processOutput = new BufferedReader(
+-                        new InputStreamReader(process.getInputStream()));
++                    new InputStreamReader(process.getInputStream()));
+                 String line;
+ 
+                 while ((line = processOutput.readLine()) != null) {
+@@ -196,9 +196,9 @@
+      * </pre>
+      *
+      * @return whether a new JVM was started and thus no code should be executed
+-     *         in this one
++     * in this one
+      */
+     public static boolean startNewJvmIfRequired() {
+         return startNewJvmIfRequired(true);
+     }
+-}
+\ No newline at end of file
++}
+Index: Project Code/lwjgl3/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\nbuildscript {\n  repositories {\n    gradlePluginPortal()\n  }\n  dependencies {\n    classpath \"io.github.fourlastor:construo:2.1.0\"\n    if(enableGraalNative == 'true') {\n      classpath \"org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.9.28\"\n    }\n  }\n}\nplugins {\n  id \"application\"\n}\napply plugin: 'io.github.fourlastor.construo'\n\n\nimport io.github.fourlastor.construo.Target\n\nsourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]\napplication.mainClass = 'io.github.lab2coursework.lwjgl3.Lwjgl3Launcher'\neclipse.project.name = appName + '-lwjgl3'\njava.sourceCompatibility = 8\njava.targetCompatibility = 8\nif (JavaVersion.current().isJava9Compatible()) {\n        compileJava.options.release.set(8)\n}\n\ndependencies {\n  implementation \"com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion\"\n  implementation \"com.badlogicgames.gdx:gdx-lwjgl3-angle:$gdxVersion\"\n  implementation \"com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop\"\n  implementation project(':core')\n\n  if(enableGraalNative == 'true') {\n    implementation \"io.github.berstanio:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion\"\n\n    }\n}\n\ndef os = System.properties['os.name'].toLowerCase(Locale.ROOT)\n\nrun {\n  workingDir = rootProject.file('assets').path\n// You can uncomment the next line if your IDE claims a build failure even when the app closed properly.\n  //setIgnoreExitValue(true)\n\n  if (os.contains('mac')) jvmArgs += \"-XstartOnFirstThread\"\n}\n\njar {\n// sets the name of the .jar file this produces to the name of the game or app, with the version after.\n  archiveFileName.set(\"${appName}-${projectVersion}.jar\")\n// the duplicatesStrategy matters starting in Gradle 7.0; this setting works.\n  duplicatesStrategy = DuplicatesStrategy.EXCLUDE\n  dependsOn configurations.runtimeClasspath\n  from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }\n// these \"exclude\" lines remove some unnecessary duplicate files in the output JAR.\n  exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')\n  dependencies {\n    exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')\n  }\n// setting the manifest makes the JAR runnable.\n// enabling native access helps avoid a warning when Java 24 or later runs the JAR.\n  manifest {\n    attributes 'Main-Class': application.mainClass, 'Enable-Native-Access': 'ALL-UNNAMED'\n  }\n// this last step may help on some OSes that need extra instruction to make runnable JARs.\n  doLast {\n    file(archiveFile).setExecutable(true, false)\n  }\n}\n\n// Builds a JAR that only includes the files needed to run on macOS, not Windows or Linux.\n// The file size for a Mac-only JAR is about 7MB smaller than a cross-platform JAR.\ntasks.register(\"jarMac\") {\n  dependsOn(\"jar\")\n  group(\"build\")\n  jar.archiveFileName.set(\"${appName}-${projectVersion}-mac.jar\")\n  jar.exclude(\"windows/x86/**\", \"windows/x64/**\", \"linux/arm32/**\", \"linux/arm64/**\", \"linux/x64/**\", \"**/*.dll\", \"**/*.so\",\n    'META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')\n  dependencies {\n    jar.exclude(\"windows/x86/**\", \"windows/x64/**\", \"linux/arm32/**\", \"linux/arm64/**\", \"linux/x64/**\",\n      'META-INF/INDEX.LIST', 'META-INF/maven/**')\n  }\n}\n\n// Builds a JAR that only includes the files needed to run on Linux, not Windows or macOS.\n// The file size for a Linux-only JAR is about 5MB smaller than a cross-platform JAR.\ntasks.register(\"jarLinux\") {\n  dependsOn(\"jar\")\n  group(\"build\")\n  jar.archiveFileName.set(\"${appName}-${projectVersion}-linux.jar\")\n  jar.exclude(\"windows/x86/**\", \"windows/x64/**\", \"macos/arm64/**\", \"macos/x64/**\", \"**/*.dll\", \"**/*.dylib\",\n    'META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')\n  dependencies {\n    jar.exclude(\"windows/x86/**\", \"windows/x64/**\", \"macos/arm64/**\", \"macos/x64/**\",\n      'META-INF/INDEX.LIST', 'META-INF/maven/**')\n  }\n}\n\n// Builds a JAR that only includes the files needed to run on Windows, not Linux or macOS.\n// The file size for a Windows-only JAR is about 6MB smaller than a cross-platform JAR.\ntasks.register(\"jarWin\") {\n  dependsOn(\"jar\")\n  group(\"build\")\n  jar.archiveFileName.set(\"${appName}-${projectVersion}-win.jar\")\n  jar.exclude(\"macos/arm64/**\", \"macos/x64/**\", \"linux/arm32/**\", \"linux/arm64/**\", \"linux/x64/**\", \"**/*.dylib\", \"**/*.so\",\n    'META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')\n  dependencies {\n    jar.exclude(\"macos/arm64/**\", \"macos/x64/**\", \"linux/arm32/**\", \"linux/arm64/**\", \"linux/x64/**\",\n      'META-INF/INDEX.LIST', 'META-INF/maven/**')\n  }\n}\n\nconstruo {\n    // name of the executable\n    name.set(appName)\n    // human-readable name, used for example in the `.app` name for macOS\n    humanName.set(appName)\n\n    targets.configure {\n      register(\"linuxX64\", Target.Linux) {\n        architecture.set(Target.Architecture.X86_64)\n        jdkUrl.set(\"https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_linux_hotspot_17.0.15_6.tar.gz\")\n        // Linux does not currently have a way to set the icon on the executable\n      }\n      register(\"macM1\", Target.MacOs) {\n        architecture.set(Target.Architecture.AARCH64)\n        jdkUrl.set(\"https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.15_6.tar.gz\")\n        // macOS needs an identifier\n        identifier.set(\"io.github.lab2coursework.\" + appName)\n        // Optional: icon for macOS, as an ICNS file\n        macIcon.set(project.file(\"icons/logo.icns\"))\n      }\n      register(\"macX64\", Target.MacOs) {\n        architecture.set(Target.Architecture.X86_64)\n        jdkUrl.set(\"https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_mac_hotspot_17.0.15_6.tar.gz\")\n        // macOS needs an identifier\n        identifier.set(\"io.github.lab2coursework.\" + appName)\n        // Optional: icon for macOS, as an ICNS file\n        macIcon.set(project.file(\"icons/logo.icns\"))\n      }\n      register(\"winX64\", Target.Windows) {\n        architecture.set(Target.Architecture.X86_64)\n        // Optional: icon for Windows, as a PNG\n        icon.set(project.file(\"icons/logo.png\"))\n        jdkUrl.set(\"https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_windows_hotspot_17.0.15_6.zip\")\n        // Uncomment the next line to show a console when the game runs, to print messages.\n        //useConsole.set(true)\n      }\n    }\n}\n\n// Equivalent to the jar task; here for compatibility with gdx-setup.\ntasks.register('dist') {\n  dependsOn 'jar'\n}\n\ndistributions {\n  main {\n    contents {\n      into('libs') {\n        project.configurations.runtimeClasspath.files.findAll { file ->\n          file.getName() != project.tasks.jar.outputs.files.singleFile.name\n        }.each { file ->\n          exclude file.name\n        }\n      }\n    }\n  }\n}\n\nstartScripts.dependsOn(':lwjgl3:jar')\nstartScripts.classpath = project.tasks.jar.outputs.files\n\nif(enableGraalNative == 'true') {\n  apply from: file(\"nativeimage.gradle\")\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Project Code/lwjgl3/build.gradle b/Project Code/lwjgl3/build.gradle
+--- a/Project Code/lwjgl3/build.gradle	(revision 4182fe95f01501c12f097131ebef686f600902e2)
++++ b/Project Code/lwjgl3/build.gradle	(date 1770363587161)
+@@ -1,11 +1,10 @@
+-
+ buildscript {
+   repositories {
+     gradlePluginPortal()
+   }
+   dependencies {
+     classpath "io.github.fourlastor:construo:2.1.0"
+-    if(enableGraalNative == 'true') {
++    if (enableGraalNative == 'true') {
+       classpath "org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.9.28"
+     }
+   }
+@@ -18,13 +17,13 @@
+ 
+ import io.github.fourlastor.construo.Target
+ 
+-sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
++sourceSets.main.resources.srcDirs += [rootProject.file('assets').path]
+ application.mainClass = 'io.github.lab2coursework.lwjgl3.Lwjgl3Launcher'
+ eclipse.project.name = appName + '-lwjgl3'
+ java.sourceCompatibility = 8
+ java.targetCompatibility = 8
+ if (JavaVersion.current().isJava9Compatible()) {
+-        compileJava.options.release.set(8)
++  compileJava.options.release.set(8)
+ }
+ 
+ dependencies {
+@@ -33,10 +32,10 @@
+   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+   implementation project(':core')
+ 
+-  if(enableGraalNative == 'true') {
++  if (enableGraalNative == 'true') {
+     implementation "io.github.berstanio:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
+ 
+-    }
++  }
+ }
+ 
+ def os = System.properties['os.name'].toLowerCase(Locale.ROOT)
+@@ -115,42 +114,42 @@
+ }
+ 
+ construo {
+-    // name of the executable
+-    name.set(appName)
+-    // human-readable name, used for example in the `.app` name for macOS
+-    humanName.set(appName)
++  // name of the executable
++  name.set(appName)
++  // human-readable name, used for example in the `.app` name for macOS
++  humanName.set(appName)
+ 
+-    targets.configure {
+-      register("linuxX64", Target.Linux) {
+-        architecture.set(Target.Architecture.X86_64)
+-        jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_linux_hotspot_17.0.15_6.tar.gz")
+-        // Linux does not currently have a way to set the icon on the executable
+-      }
+-      register("macM1", Target.MacOs) {
+-        architecture.set(Target.Architecture.AARCH64)
+-        jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.15_6.tar.gz")
+-        // macOS needs an identifier
+-        identifier.set("io.github.lab2coursework." + appName)
+-        // Optional: icon for macOS, as an ICNS file
+-        macIcon.set(project.file("icons/logo.icns"))
+-      }
+-      register("macX64", Target.MacOs) {
+-        architecture.set(Target.Architecture.X86_64)
+-        jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_mac_hotspot_17.0.15_6.tar.gz")
+-        // macOS needs an identifier
+-        identifier.set("io.github.lab2coursework." + appName)
+-        // Optional: icon for macOS, as an ICNS file
+-        macIcon.set(project.file("icons/logo.icns"))
+-      }
+-      register("winX64", Target.Windows) {
+-        architecture.set(Target.Architecture.X86_64)
+-        // Optional: icon for Windows, as a PNG
+-        icon.set(project.file("icons/logo.png"))
+-        jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_windows_hotspot_17.0.15_6.zip")
+-        // Uncomment the next line to show a console when the game runs, to print messages.
+-        //useConsole.set(true)
+-      }
+-    }
++  targets.configure {
++    register("linuxX64", Target.Linux) {
++      architecture.set(Target.Architecture.X86_64)
++      jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_linux_hotspot_17.0.15_6.tar.gz")
++      // Linux does not currently have a way to set the icon on the executable
++    }
++    register("macM1", Target.MacOs) {
++      architecture.set(Target.Architecture.AARCH64)
++      jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.15_6.tar.gz")
++      // macOS needs an identifier
++      identifier.set("io.github.lab2coursework." + appName)
++      // Optional: icon for macOS, as an ICNS file
++      macIcon.set(project.file("icons/logo.icns"))
++    }
++    register("macX64", Target.MacOs) {
++      architecture.set(Target.Architecture.X86_64)
++      jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_mac_hotspot_17.0.15_6.tar.gz")
++      // macOS needs an identifier
++      identifier.set("io.github.lab2coursework." + appName)
++      // Optional: icon for macOS, as an ICNS file
++      macIcon.set(project.file("icons/logo.icns"))
++    }
++    register("winX64", Target.Windows) {
++      architecture.set(Target.Architecture.X86_64)
++      // Optional: icon for Windows, as a PNG
++      icon.set(project.file("icons/logo.png"))
++      jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_windows_hotspot_17.0.15_6.zip")
++      // Uncomment the next line to show a console when the game runs, to print messages.
++      //useConsole.set(true)
++    }
++  }
+ }
+ 
+ // Equivalent to the jar task; here for compatibility with gdx-setup.
+@@ -175,6 +174,6 @@
+ startScripts.dependsOn(':lwjgl3:jar')
+ startScripts.classpath = project.tasks.jar.outputs.files
+ 
+-if(enableGraalNative == 'true') {
++if (enableGraalNative == 'true') {
+   apply from: file("nativeimage.gradle")
+ }
+Index: Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Lwjgl3Launcher.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package io.github.lab2coursework.lwjgl3;\n\nimport com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;\nimport com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;\n\n/** Launches the desktop (LWJGL3) application. */\npublic class Lwjgl3Launcher {\n    public static void main(String[] args) {\n        if (StartupHelper.startNewJvmIfRequired()) return; // This handles macOS support and helps on Windows.\n        createApplication();\n    }\n\n    private static Lwjgl3Application createApplication() {\n        return new Lwjgl3Application(new GameMaster(), getDefaultConfiguration());\n    }\n\n    private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {\n        Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();\n        configuration.setTitle(\"oopProjectWork\");\n        //// Vsync limits the frames per second to what your hardware can display, and helps eliminate\n        //// screen tearing. This setting doesn't always work on Linux, so the line after is a safeguard.\n        configuration.useVsync(true);\n        //// Limits FPS to the refresh rate of the currently active monitor, plus 1 to try to match fractional\n        //// refresh rates. The Vsync setting above should limit the actual FPS to match the monitor.\n        configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate + 1);\n        //// If you remove the above line and set Vsync to false, you can get unlimited FPS, which can be\n        //// useful for testing performance, but can also be very stressful to some hardware.\n        //// You may also need to configure GPU drivers to fully disable Vsync; this can cause screen tearing.\n\n        configuration.setWindowedMode(1920, 1080);\n        //// You can change these files; they are in lwjgl3/src/main/resources/ .\n        //// They can also be loaded from the root of assets/ .\n        configuration.setWindowIcon(\"libgdx128.png\", \"libgdx64.png\", \"libgdx32.png\", \"libgdx16.png\");\n\n        //// This should improve compatibility with Windows machines with buggy OpenGL drivers, Macs\n        //// with Apple Silicon that have to emulate compatibility with OpenGL anyway, and more.\n        //// This uses the dependency `com.badlogicgames.gdx:gdx-lwjgl3-angle` to function.\n        //// You can choose to remove the following line and the mentioned dependency if you want; they\n        //// are not intended for games that use GL30 (which is compatibility with OpenGL ES 3.0).\n        configuration.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20, 0, 0);\n\n        return configuration;\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Lwjgl3Launcher.java b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Lwjgl3Launcher.java
+--- a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Lwjgl3Launcher.java	(revision 4182fe95f01501c12f097131ebef686f600902e2)
++++ b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Lwjgl3Launcher.java	(date 1770363587066)
+@@ -3,7 +3,9 @@
+ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+ 
+-/** Launches the desktop (LWJGL3) application. */
++/**
++ * Launches the desktop (LWJGL3) application.
++ */
+ public class Lwjgl3Launcher {
+     public static void main(String[] args) {
+         if (StartupHelper.startNewJvmIfRequired()) return; // This handles macOS support and helps on Windows.
+Index: Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/MovementManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package io.github.lab2coursework.lwjgl3;\nimport java.util.ArrayList;\npublic class MovementManager {\n\n    private ArrayList<Entity> entities;\n\n    public void rightMovement(Entity entity) {\n        entity.setX(entity.getX() - entity.getSpeed());\n    }\n\n    public void leftMovement(Entity entity) {\n        entity.setX(entity.getX() + entity.getSpeed()); \n    }\n\n    public void upMovement(Entity entity) {\n        entity.setY(entity.getY() + entity.getSpeed());\n    }\n\n    public void downMovement(Entity entity) {\n        entity.setY(entity.getY() - entity.getSpeed());\n    }\n\n    public void stopMovement(Entity entity) {\n    // Movement management logic to be implemented\n    }\n\n    public void setSpeed(Entity entity, float speed) {\n        entity.setSpeed(speed);\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/MovementManager.java b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/MovementManager.java
+--- a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/MovementManager.java	(revision 4182fe95f01501c12f097131ebef686f600902e2)
++++ b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/MovementManager.java	(date 1770363587014)
+@@ -1,5 +1,7 @@
+ package io.github.lab2coursework.lwjgl3;
++
+ import java.util.ArrayList;
++
+ public class MovementManager {
+ 
+     private ArrayList<Entity> entities;
+@@ -9,7 +11,7 @@
+     }
+ 
+     public void leftMovement(Entity entity) {
+-        entity.setX(entity.getX() + entity.getSpeed()); 
++        entity.setX(entity.getX() + entity.getSpeed());
+     }
+ 
+     public void upMovement(Entity entity) {
+@@ -21,7 +23,7 @@
+     }
+ 
+     public void stopMovement(Entity entity) {
+-    // Movement management logic to be implemented
++        // Movement management logic to be implemented
+     }
+ 
+     public void setSpeed(Entity entity, float speed) {
+Index: Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Entity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package io.github.lab2coursework.lwjgl3;\n\nimport com.badlogic.gdx.graphics.Color;\nimport com.badlogic.gdx.graphics.g2d.SpriteBatch;\nimport com.badlogic.gdx.graphics.glutils.ShapeRenderer;\n\npublic abstract class Entity implements iMoveable {\n    // Private attributes for Encapsulation\n    private float x, y, speed;\n    private Color color;\n\n    public Entity() {}\n\n    public Entity(float x, float y, Color color, float speed) {\n        this.x = x;\n        this.y = y;\n        this.color = color;\n        this.speed = speed;\n    }\n\n    // Standard getters and setters\n    public Color getColor() { return color; }\n    public void setColor(Color color) { this.color = color; }\n\n    public float getX() { return x; }\n    public void setX(float x) { this.x = x; }\n\n    public float getY() { return y; }\n    public void setY(float y) { this.y = y; }\n\n    public float getSpeed() { return speed;}\n    public void setSpeed(float speed) { this.speed = speed;}\n\n    public void draw(ShapeRenderer shape){ };\n    public void draw(SpriteBatch batch){ };\n\n    @Override\n    public void movement(){\n        this.y -= this.speed;\n        if(this.y < 0){\n            this.y = 400;\n        }\n    }\n\n    public abstract void update();\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Entity.java b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Entity.java
+--- a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Entity.java	(revision 4182fe95f01501c12f097131ebef686f600902e2)
++++ b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Entity.java	(date 1770363587109)
+@@ -9,7 +9,8 @@
+     private float x, y, speed;
+     private Color color;
+ 
+-    public Entity() {}
++    public Entity() {
++    }
+ 
+     public Entity(float x, float y, Color color, float speed) {
+         this.x = x;
+@@ -19,25 +20,52 @@
+     }
+ 
+     // Standard getters and setters
+-    public Color getColor() { return color; }
+-    public void setColor(Color color) { this.color = color; }
++    public Color getColor() {
++        return color;
++    }
++
++    public void setColor(Color color) {
++        this.color = color;
++    }
++
++    public float getX() {
++        return x;
++    }
++
++    public void setX(float x) {
++        this.x = x;
++    }
+ 
+-    public float getX() { return x; }
+-    public void setX(float x) { this.x = x; }
++    public float getY() {
++        return y;
++    }
+ 
+-    public float getY() { return y; }
+-    public void setY(float y) { this.y = y; }
++    public void setY(float y) {
++        this.y = y;
++    }
+ 
+-    public float getSpeed() { return speed;}
+-    public void setSpeed(float speed) { this.speed = speed;}
++    public float getSpeed() {
++        return speed;
++    }
+ 
+-    public void draw(ShapeRenderer shape){ };
+-    public void draw(SpriteBatch batch){ };
++    public void setSpeed(float speed) {
++        this.speed = speed;
++    }
++
++    public void draw(ShapeRenderer shape) {
++    }
++
++    ;
++
++    public void draw(SpriteBatch batch) {
++    }
++
++    ;
+ 
+     @Override
+-    public void movement(){
++    public void movement() {
+         this.y -= this.speed;
+-        if(this.y < 0){
++        if (this.y < 0) {
+             this.y = 400;
+         }
+     }
+Index: Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/TextureObject.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package io.github.lab2coursework.lwjgl3;\nimport com.badlogic.gdx.Gdx;\nimport com.badlogic.gdx.graphics.Color;\nimport com.badlogic.gdx.graphics.Texture;\nimport com.badlogic.gdx.graphics.g2d.SpriteBatch;\n\npublic class TextureObject extends Entity {\n    private Texture tex;\n\n    public TextureObject() {\n    }\n\n    public TextureObject(String path, float x, float y, float speed) {\n        // Pass x, y, a default color (White), and speed to Entity\n        super(x, y, Color.WHITE, speed);\n        this.tex = new Texture(Gdx.files.internal(path));\n    }\n\n    public Texture getTexture() {\n        return tex;\n    }\n\n    public void setTexture(Texture tex) {\n        this.tex = tex;\n    }\n\n    @Override\n    public void draw(SpriteBatch batch) {\n        batch.draw(this.getTexture(), this.getX(), this.getY(),\n            this.getTexture().getWidth(), this.getTexture().getHeight());\n    }\n\n    @Override\n    public void update(){\n        this.movement();\n    }\n    \n    public void userMovement(){\n\n    }\n\n    public  void AiMovement(){\n        \n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/TextureObject.java b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/TextureObject.java
+--- a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/TextureObject.java	(revision 4182fe95f01501c12f097131ebef686f600902e2)
++++ b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/TextureObject.java	(date 1770363587139)
+@@ -1,4 +1,5 @@
+ package io.github.lab2coursework.lwjgl3;
++
+ import com.badlogic.gdx.Gdx;
+ import com.badlogic.gdx.graphics.Color;
+ import com.badlogic.gdx.graphics.Texture;
+@@ -31,15 +32,15 @@
+     }
+ 
+     @Override
+-    public void update(){
++    public void update() {
+         this.movement();
+     }
+-    
+-    public void userMovement(){
++
++    public void userMovement() {
+ 
+     }
+ 
+-    public  void AiMovement(){
+-        
++    public void AiMovement() {
++
+     }
+ }
+Index: Project Code/lwjgl3/nativeimage.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\nproject(\":lwjgl3\") {\n  apply plugin: \"org.graalvm.buildtools.native\"\n\n  graalvmNative {\n    binaries {\n      main {\n        imageName = appName\n        mainClass = application.mainClass\n        requiredVersion = '23.0'\n        buildArgs.add(\"-march=compatibility\")\n        jvmArgs.addAll(\"-Dfile.encoding=UTF8\")\n        sharedLibrary = false\n        resources.autodetect()\n      }\n    }\n  }\n\n  run {\n    doNotTrackState(\"Running the app should not be affected by Graal.\")\n  }\n\n  // Modified from https://lyze.dev/2021/04/29/libGDX-Internal-Assets-List/ ; thanks again, Lyze!\n  // This creates a resource-config.json file based on the contents of the assets folder (and the libGDX icons).\n  // This file is used by Graal Native to embed those specific files.\n  // This has to run before nativeCompile, so it runs at the start of an unrelated resource-handling command.\n  generateResourcesConfigFile.doFirst {\n    def assetsFolder = new File(\"${project.rootDir}/assets/\")\n    def lwjgl3 = project(':lwjgl3')\n    def resFolder = new File(\"${lwjgl3.projectDir}/src/main/resources/META-INF/native-image/${lwjgl3.ext.appName}\")\n    resFolder.mkdirs()\n    def resFile = new File(resFolder, \"resource-config.json\")\n    resFile.delete()\n    resFile.append(\n            \"\"\"{\n  \"resources\":{\n  \"includes\":[\n    {\n      \"pattern\": \".*(\"\"\")\n    // This adds every filename in the assets/ folder to a pattern that adds those files as resources.\n    fileTree(assetsFolder).each {\n      // The backslash-Q and backslash-E escape the start and end of a literal string, respectively.\n      resFile.append(\"\\\\\\\\Q${it.name}\\\\\\\\E|\")\n    }\n    // We also match all of the window icon images this way and the font files that are part of libGDX.\n    resFile.append(\n            \"\"\"libgdx.+\\\\\\\\.png|lsans.+)\"\n    }\n  ]},\n  \"bundles\":[]\n}\"\"\"\n    )\n  }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Project Code/lwjgl3/nativeimage.gradle b/Project Code/lwjgl3/nativeimage.gradle
+--- a/Project Code/lwjgl3/nativeimage.gradle	(revision 4182fe95f01501c12f097131ebef686f600902e2)
++++ b/Project Code/lwjgl3/nativeimage.gradle	(date 1770363587023)
+@@ -1,4 +1,3 @@
+-
+ project(":lwjgl3") {
+   apply plugin: "org.graalvm.buildtools.native"
+ 
+@@ -32,7 +31,7 @@
+     def resFile = new File(resFolder, "resource-config.json")
+     resFile.delete()
+     resFile.append(
+-            """{
++      """{
+   "resources":{
+   "includes":[
+     {
+@@ -44,7 +43,7 @@
+     }
+     // We also match all of the window icon images this way and the font files that are part of libGDX.
+     resFile.append(
+-            """libgdx.+\\\\.png|lsans.+)"
++      """libgdx.+\\\\.png|lsans.+)"
+     }
+   ]},
+   "bundles":[]
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"e2b7760c-3aeb-48b2-a1be-5d43aab146fb\" name=\"Changes\" comment=\"\" />\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"CopilotPersistence\">\r\n    <persistenceIdMap>\r\n      <entry key=\"_C:/Users/Raiha/INF1009_OOP/Project/P4_Team5_ProjectPart1Final\" value=\"38YddxgIpCAR9lTeFZfDDxGgCor\" />\r\n    </persistenceIdMap>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\"><![CDATA[{\r\n  \"lastFilter\": {\r\n    \"state\": \"OPEN\",\r\n    \"assignee\": \"r4ihn\"\r\n  }\r\n}]]></component>\r\n  <component name=\"GithubPullRequestsUISettings\"><![CDATA[{\r\n  \"selectedUrlAndAccountId\": {\r\n    \"url\": \"https://github.com/r4ihn/P4_Team5_ProjectPart1Final.git\",\r\n    \"accountId\": \"e1c698fd-8c19-463e-90dc-360b6afcf36f\"\r\n  }\r\n}]]></component>\r\n  <component name=\"McpProjectServerCommands\">\r\n    <commands />\r\n    <urls />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\"><![CDATA[{\r\n  \"associatedIndex\": 5\r\n}]]></component>\r\n  <component name=\"ProjectId\" id=\"38YddxgIpCAR9lTeFZfDDxGgCor\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\r\n    \"RunOnceActivity.MCP Project settings loaded\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"RunOnceActivity.git.unshallow\": \"true\",\r\n    \"RunOnceActivity.typescript.service.memoryLimit.init\": \"true\",\r\n    \"com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1\": \"true\",\r\n    \"git-widget-placeholder\": \"main\",\r\n    \"ignore.virus.scanning.warn.message\": \"true\",\r\n    \"junie.onboarding.icon.badge.shown\": \"true\",\r\n    \"kotlin-language-version-configured\": \"true\",\r\n    \"last_opened_file_path\": \"C:/Users/Raiha/INF1009_OOP/Project/P4_Team5_ProjectPart1Final\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"to.speed.mode.migration.done\": \"true\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240\" />\r\n        <option value=\"bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.240\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"e2b7760c-3aeb-48b2-a1be-5d43aab146fb\" name=\"Changes\" comment=\"\" />\r\n      <created>1768980532476</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1768980532476</updated>\r\n      <workItem from=\"1768980534085\" duration=\"309000\" />\r\n    </task>\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"github-copilot-workspace\">\r\n    <instructionFileLocations>\r\n      <option value=\".github/instructions\" />\r\n    </instructionFileLocations>\r\n    <promptFileLocations>\r\n      <option value=\".github/prompts\" />\r\n    </promptFileLocations>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 4182fe95f01501c12f097131ebef686f600902e2)
++++ b/.idea/workspace.xml	(date 1770952517436)
+@@ -4,7 +4,21 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="e2b7760c-3aeb-48b2-a1be-5d43aab146fb" name="Changes" comment="" />
++    <list default="true" id="e2b7760c-3aeb-48b2-a1be-5d43aab146fb" name="Changes" comment="">
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/build.gradle" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/nativeimage.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/nativeimage.gradle" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Circle.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Circle.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Entity.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Entity.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/EntityManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/EntityManager.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/GameMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/GameMaster.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Lwjgl3Launcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Lwjgl3Launcher.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/MovementManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/MovementManager.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/StartupHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/StartupHelper.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/TextureObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/TextureObject.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Triangle.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Triangle.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/iMoveable.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/iMoveable.java" afterDir="false" />
++    </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+@@ -18,52 +32,54 @@
+   <component name="Git.Settings">
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+-  "lastFilter": {
+-    "state": "OPEN",
+-    "assignee": "r4ihn"
++  <component name="GitHubPullRequestSearchHistory">{
++  &quot;lastFilter&quot;: {
++    &quot;state&quot;: &quot;OPEN&quot;,
++    &quot;assignee&quot;: &quot;r4ihn&quot;
+   }
+-}]]></component>
+-  <component name="GithubPullRequestsUISettings"><![CDATA[{
+-  "selectedUrlAndAccountId": {
+-    "url": "https://github.com/r4ihn/P4_Team5_ProjectPart1Final.git",
+-    "accountId": "e1c698fd-8c19-463e-90dc-360b6afcf36f"
++}</component>
++  <component name="GithubPullRequestsUISettings">{
++  &quot;selectedUrlAndAccountId&quot;: {
++    &quot;url&quot;: &quot;https://github.com/r4ihn/P4_Team5_ProjectPart1Final.git&quot;,
++    &quot;accountId&quot;: &quot;38ea60c3-326e-4481-948d-46b98ec910f5&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="McpProjectServerCommands">
+     <commands />
+     <urls />
+   </component>
+-  <component name="ProjectColorInfo"><![CDATA[{
+-  "associatedIndex": 5
+-}]]></component>
++  <component name="ProjectColorInfo">{
++  &quot;associatedIndex&quot;: 5
++}</component>
+   <component name="ProjectId" id="38YddxgIpCAR9lTeFZfDDxGgCor" />
+   <component name="ProjectViewState">
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "ModuleVcsDetector.initialDetectionPerformed": "true",
+-    "RunOnceActivity.MCP Project settings loaded": "true",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "RunOnceActivity.git.unshallow": "true",
+-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+-    "git-widget-placeholder": "main",
+-    "ignore.virus.scanning.warn.message": "true",
+-    "junie.onboarding.icon.badge.shown": "true",
+-    "kotlin-language-version-configured": "true",
+-    "last_opened_file_path": "C:/Users/Raiha/INF1009_OOP/Project/P4_Team5_ProjectPart1Final",
+-    "node.js.detected.package.eslint": "true",
+-    "node.js.detected.package.tslint": "true",
+-    "node.js.selected.package.eslint": "(autodetect)",
+-    "node.js.selected.package.tslint": "(autodetect)",
+-    "nodejs_package_manager_path": "npm",
+-    "to.speed.mode.migration.done": "true",
+-    "vue.rearranger.settings.migration": "true"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;Gradle.C:/P4_Team5_ProjectPart1Final/Project Code/build.gradle.executor&quot;: &quot;Run&quot;,
++    &quot;Gradle.C:/P4_Team5_ProjectPart1Final/Project Code/lwjgl3/build.gradle.executor&quot;: &quot;Debug&quot;,
++    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
++    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
++    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
++    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
++    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
++    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
++    &quot;last_opened_file_path&quot;: &quot;C:/Users/Raiha/INF1009_OOP/Project/P4_Team5_ProjectPart1Final&quot;,
++    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
++    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
++    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
++    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
++    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="SharedIndexes">
+     <attachedChunks>
+       <set>
+@@ -80,6 +96,8 @@
+       <option name="presentableId" value="Default" />
+       <updated>1768980532476</updated>
+       <workItem from="1768980534085" duration="309000" />
++      <workItem from="1770363487169" duration="1334000" />
++      <workItem from="1770952378074" duration="138000" />
+     </task>
+     <servers />
+   </component>
+Index: Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Triangle.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package io.github.lab2coursework.lwjgl3;\n\nimport com.badlogic.gdx.Gdx;\nimport com.badlogic.gdx.Input;\nimport com.badlogic.gdx.graphics.Color;\nimport com.badlogic.gdx.graphics.glutils.ShapeRenderer;\n\npublic class Triangle extends Entity {\n\n    public Triangle() { }\n\n    public Triangle(float x, float y, Color color, float speed) {\n        super(x, y, color, speed);\n    }\n\n    @Override\n    public void draw(ShapeRenderer shape) {\n        shape.setColor(this.getColor());\n        // Draw triangle based on position\n        shape.triangle(getX(), getY(), getX() + 100, getY(), getX() + 50, getY() + 100);\n    }\n\n    @Override\n    public void movement() {\n        // 1. Move Right (A Key)\n        if (Gdx.input.isKeyPressed(Input.Keys.A)) {\n            this.setX(this.getX() - this.getSpeed());\n        }\n\n        // 2. Move Left (D Key)\n        if (Gdx.input.isKeyPressed(Input.Keys.D)) {\n            this.setX(this.getX() + this.getSpeed());\n        }\n    }\n\n    @Override\n    public void update() {\n        movement();\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Triangle.java b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Triangle.java
+--- a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Triangle.java	(revision 4182fe95f01501c12f097131ebef686f600902e2)
++++ b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Triangle.java	(date 1770363587096)
+@@ -7,7 +7,8 @@
+ 
+ public class Triangle extends Entity {
+ 
+-    public Triangle() { }
++    public Triangle() {
++    }
+ 
+     public Triangle(float x, float y, Color color, float speed) {
+         super(x, y, color, speed);
+Index: Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/iMoveable.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package io.github.lab2coursework.lwjgl3;\npublic interface iMoveable {\n    public void movement();\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/iMoveable.java b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/iMoveable.java
+--- a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/iMoveable.java	(revision 4182fe95f01501c12f097131ebef686f600902e2)
++++ b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/iMoveable.java	(date 1770363587003)
+@@ -1,4 +1,5 @@
+ package io.github.lab2coursework.lwjgl3;
++
+ public interface iMoveable {
+     public void movement();
+ }
+Index: Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/EntityManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package io.github.lab2coursework.lwjgl3;\nimport java.util.List;\n\nimport com.badlogic.gdx.graphics.g2d.SpriteBatch;\nimport com.badlogic.gdx.graphics.glutils.ShapeRenderer;\n\npublic class EntityManager {\n    private List<Entity> entityList;\n\n    public void addEntities(Entity entity) {\n        entityList.add(entity);\n    }\n\n    public void draw(SpriteBatch batch, ShapeRenderer shape) {\n        for (Entity entity : entityList) {\n            entity.draw(batch);\n            entity.draw(shape);\n        }\n    }\n\n    public void movement() {\n        for (Entity entity : entityList) {\n            entity.movement();\n        }\n    }\n\n    public void update(){\n        movement();\n    }\n\n    \n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/EntityManager.java b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/EntityManager.java
+--- a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/EntityManager.java	(revision 4182fe95f01501c12f097131ebef686f600902e2)
++++ b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/EntityManager.java	(date 1770363587077)
+@@ -1,4 +1,5 @@
+ package io.github.lab2coursework.lwjgl3;
++
+ import java.util.List;
+ 
+ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+@@ -24,9 +25,9 @@
+         }
+     }
+ 
+-    public void update(){
++    public void update() {
+         movement();
+     }
+ 
+-    
++
+ }
+Index: Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Circle.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package io.github.lab2coursework.lwjgl3;\n\nimport com.badlogic.gdx.Gdx;\nimport com.badlogic.gdx.Input;\nimport com.badlogic.gdx.graphics.Color;\nimport com.badlogic.gdx.graphics.glutils.ShapeRenderer;\n\npublic class Circle extends Entity {\n    private float radius;\n\n    public void Circlet(){ }\n\n    public Circle(float x, float y, float radius, Color color, float speed) {\n        super(x, y, color, speed);\n        this.radius = radius;\n    }\n\n    public float getRadius() { return radius; }\n\n    public void setRadius(float radius){ this.radius = radius; }\n\n    @Override\n    public void draw(ShapeRenderer shape) {\n        shape.setColor(this.getColor());\n        shape.circle(getX(), getY(), this.radius);\n    }\n\n    @Override\n    public void movement() {\n        // Down Key (Move Down)\n        if (Gdx.input.isKeyPressed(Input.Keys.DPAD_DOWN)) {\n            this.setY(this.getY() - this.getSpeed());\n        }\n\n        // Up key (Move UP)\n        if (Gdx.input.isKeyPressed(Input.Keys.DPAD_UP)) {\n            this.setY(this.getY() + this.getSpeed());\n        }\n    }\n\n    @Override\n    public void update(){\n        this.movement();\n    }   \n}\n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Circle.java b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Circle.java
+--- a/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Circle.java	(revision 4182fe95f01501c12f097131ebef686f600902e2)
++++ b/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/Circle.java	(date 1770363587128)
+@@ -8,16 +8,21 @@
+ public class Circle extends Entity {
+     private float radius;
+ 
+-    public void Circlet(){ }
++    public void Circlet() {
++    }
+ 
+     public Circle(float x, float y, float radius, Color color, float speed) {
+         super(x, y, color, speed);
+         this.radius = radius;
+     }
+ 
+-    public float getRadius() { return radius; }
++    public float getRadius() {
++        return radius;
++    }
+ 
+-    public void setRadius(float radius){ this.radius = radius; }
++    public void setRadius(float radius) {
++        this.radius = radius;
++    }
+ 
+     @Override
+     public void draw(ShapeRenderer shape) {
+@@ -39,8 +44,8 @@
+     }
+ 
+     @Override
+-    public void update(){
++    public void update() {
+         this.movement();
+-    }   
++    }
+ }
+ 
