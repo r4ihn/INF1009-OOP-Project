@@ -61,7 +61,7 @@ public class GameScreen extends AbstractScreen {
         entityManager.update();
         movementManager.updateMovement(delta);
 
-        collisionManager.keepEntitiesInBounds(
+        collisionManager.applyAll(
             entityManager.getEntities(),
             (float) Gdx.graphics.getWidth(),
             (float) Gdx.graphics.getHeight()
