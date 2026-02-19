@@ -4,8 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e2b7760c-3aeb-48b2-a1be-5d43aab146fb" name="Changes" comment="Organised">
+    <list default="true" id="e2b7760c-3aeb-48b2-a1be-5d43aab146fb" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/screens/GameScreen.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/CollisionManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/MovementManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/managers/CollisionManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/managers/CollisionManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/managers/MovementManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/managers/MovementManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/managers/ScreenManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/managers/ScreenManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/screens/AbstractScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/screens/AbstractScreen.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/screens/TitleScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project Code/lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/screens/TitleScreen.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,11 +31,11 @@
     <persistenceIdMap>
       <entry key="_C:/P4_Team5_ProjectPart1Final" value="39cVEpteO6Gnr71vr96H2ohcBSS" />
       <entry key="_C:/Users/Raiha/INF1009_OOP/Project/P4_Team5_ProjectPart1Final" value="38YddxgIpCAR9lTeFZfDDxGgCor" />
+      <entry key="_C:/Users/Raiha/IdeaProjects/P4_Team5_ProjectPart1Final" value="39sIJPkbXZZRqBDx8Qa0dQs3IgV" />
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
     <option name="cachedIndexableFilesCount" value="61" />
-    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$/Project Code">
@@ -87,6 +95,13 @@
       </state>
     </system>
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Rebase.Settings">
     <option name="NEW_BASE" value="EntityManager" />
   </component>
@@ -104,22 +119,9 @@
         </map>
       </branch-storage>
     </excluded-from-favorite>
-    <favorite-branches>
-      <branch-storage>
-        <map>
-          <entry type="REMOTE">
-            <value>
-              <list>
-                <branch-info repo="$PROJECT_DIR$" source="origin/feature/screenSide" />
-              </list>
-            </value>
-          </entry>
-        </map>
-      </branch-storage>
-    </favorite-branches>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="EntityManager" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -130,12 +132,12 @@
     &quot;assignee&quot;: &quot;r4ihn&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/r4ihn/P4_Team5_ProjectPart1Final.git&quot;,
-    &quot;accountId&quot;: &quot;38ea60c3-326e-4481-948d-46b98ec910f5&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/r4ihn/P4_Team5_ProjectPart1Final.git",
+    "accountId": "3829d22a-4ba2-4dc6-9246-15592e11c50f"
   }
-}</component>
+}]]></component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -155,39 +157,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.Lwjgl3Launcher.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.C:/P4_Team5_ProjectPart1Final.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.C:/P4_Team5_ProjectPart1Final/Project Code/lwjgl3/build.gradle.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Project Code [:lwjgl3:io.github.lab2coursework.lwjgl3.Lwjgl3Launcher.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Project Code [:lwjgl3:run].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Project Code [run].executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/screenSide&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/P4_Team5_ProjectPart1Final&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Lwjgl3Launcher.executor": "Run",
+    "Gradle.C:/P4_Team5_ProjectPart1Final.executor": "Run",
+    "Gradle.C:/P4_Team5_ProjectPart1Final/Project Code/lwjgl3/build.gradle.executor": "Run",
+    "Gradle.Project Code [:lwjgl3:io.github.lab2coursework.lwjgl3.Lwjgl3Launcher.main()].executor": "Run",
+    "Gradle.Project Code [:lwjgl3:run].executor": "Run",
+    "Gradle.Project Code [run].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "feature/screenSide",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/P4_Team5_ProjectPart1Final",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunAnythingCache">
     <option name="myCommands">
       <command value="gradle " />
@@ -201,12 +203,12 @@
     </option>
   </component>
   <component name="RunManager" selected="Application.Lwjgl3Launcher">
-    <configuration name="Lwjgl3Launcher (1)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+    <configuration name="Lwjgl3Launcher" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="io.github.lab2coursework.lwjgl3.Lwjgl3Launcher" />
-      <module name="Project_Code.lwjgl3.main" />
+      <module name="P4_Team5_ProjectPart1Final" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="io.github.lab2coursework.lwjgl3.*" />
+          <option name="PATTERN" value="lwjgl3.src.main.java.io.github.lab2coursework.lwjgl3.managers.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -216,10 +218,10 @@
     </configuration>
     <configuration name="Lwjgl3Launcher" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="io.github.lab2coursework.lwjgl3.Lwjgl3Launcher" />
-      <module name="P4_Team5_ProjectPart1Final" />
+      <module name="Project_Code.lwjgl3.main" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="io.github.lab2coursework.lwjgl3.*" />
+          <option name="PATTERN" value="lwjgl3.src.main.java.io.github.lab2coursework.lwjgl3.managers.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -348,15 +350,7 @@
       <option name="project" value="LOCAL" />
       <updated>1771407384762</updated>
     </task>
-    <task id="LOCAL-00003" summary="Organised">
-      <option name="closed" value="true" />
-      <created>1771477985561</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1771477985561</updated>
-    </task>
-    <option name="localTasksCounter" value="4" />
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -373,7 +367,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="main" />
+                        <option value="HEAD" />
                       </list>
                     </value>
                   </entry>
@@ -388,10 +382,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Changes in GameMaster and EntityManager" />
     <MESSAGE value="Get GameMaster.java working using new PlayerMovement method in IntelliJ." />
-    <MESSAGE value="Organised" />
-    <option name="LAST_COMMIT_MESSAGE" value="Organised" />
-    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
-    <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="LAST_COMMIT_MESSAGE" value="Get GameMaster.java working using new PlayerMovement method in IntelliJ." />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

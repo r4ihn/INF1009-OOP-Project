@@ -1,15 +1,34 @@
 package io.github.lab2coursework.lwjgl3.screens;
 
-public abstract class AbstractScreen {
-    // The functions that all screens will have, but will be overridden
-    // in the specific screen classes
-    public void show() {}
-    public void hide()  {}
-    public void pause() {}
-    public void resume() {}
-    public void dispose() {}
+// Import statements
+import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
 
-    // Abstract functions that MUST be implemented in the child classes
-    public abstract void render();
-    public abstract void update(float delta);
+public abstract class AbstractScreen extends ScreenAdapter {
+    protected final ScreenManager screenManager;
+    protected SpriteBatch batch;
+    protected BitmapFont font;
+
+    public AbstractScreen(ScreenManager screenManager) {
+        this.screenManager = screenManager;
+        this.batch = new SpriteBatch();
+        this.font = new BitmapFont(); // Default font
+    }
+
+    @Override
+    public void render(float delta) {
+        update(delta);
+        draw(delta);
+    }
+
+    protected abstract void update(float delta);
+    protected abstract void draw(float delta);
+
+    @Override
+    public void dispose() {
+        batch.dispose();
+        font.dispose();
+    }
 }
