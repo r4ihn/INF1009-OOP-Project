@@ -14,7 +14,7 @@
  */
 //Note, the above license and copyright applies to this file only.
 
-package io.github.lab2coursework.lwjgl3;
+package io.github.lab2coursework.lwjgl3.core;
 
 import com.badlogic.gdx.Version;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3NativesLoader;

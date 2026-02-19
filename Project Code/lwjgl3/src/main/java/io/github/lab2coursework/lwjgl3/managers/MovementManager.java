@@ -1,4 +1,4 @@
-package io.github.lab2coursework.lwjgl3;
+package lwjgl3.src.main.java.io.github.lab2coursework.lwjgl3.managers;
 
 import java.util.List;
 
