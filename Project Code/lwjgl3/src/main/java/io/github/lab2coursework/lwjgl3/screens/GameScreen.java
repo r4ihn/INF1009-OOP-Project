@@ -12,13 +12,12 @@ import io.github.lab2coursework.lwjgl3.*;
 import io.github.lab2coursework.lwjgl3.entities.Circle;
 import io.github.lab2coursework.lwjgl3.entities.Entity;
 import io.github.lab2coursework.lwjgl3.entities.Triangle;
+import io.github.lab2coursework.lwjgl3.entities.Raindrop;
 import io.github.lab2coursework.lwjgl3.graphics.TextureObject;
-import io.github.lab2coursework.lwjgl3.input.Action;
 import io.github.lab2coursework.lwjgl3.input.Key;
 import io.github.lab2coursework.lwjgl3.input.KeyboardInput;
 import io.github.lab2coursework.lwjgl3.managers.*;
 import io.github.lab2coursework.lwjgl3.movement.AIMovement;
-import io.github.lab2coursework.lwjgl3.movement.Movement;
 import io.github.lab2coursework.lwjgl3.movement.PlayerMovement;
 
 public class GameScreen extends AbstractScreen {
@@ -27,12 +26,11 @@ public class GameScreen extends AbstractScreen {
     private final EntityManager entityManager;
     private final CollisionManager collisionManager;
     private final MovementManager movementManager;
-    private final Entity[] droplets;
     private Entity bucket;
 
-    private  SpriteBatch spriteBatch;
-    private  ShapeRenderer shapeRenderer;
-    private Texture backgroundTexture = new Texture("GameBG.jpg");
+    private final SpriteBatch spriteBatch;
+    private final ShapeRenderer shapeRenderer;
+    private final Texture backgroundTexture = new Texture("GameBG.jpg");
 
     public GameScreen(ScreenManager screenManager) {
         super(screenManager);
@@ -43,22 +41,15 @@ public class GameScreen extends AbstractScreen {
         spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
 
-        // Produce Droplets
-        droplets = new Entity[20];
-        for (int i = 0; i < droplets.length; i++) {
-
-            // Assign random starting positions and speed
+// Produce Droplets (no array needed)
+        for (int i = 0; i < 20; i++) {
             float randomX = MathUtils.random(0, 1280);
             float randomY = MathUtils.random(200, 1000);
             float randomSpeed = MathUtils.random(50, 200);
-            droplets[i] = new TextureObject("droplet.png", randomX, randomY, randomSpeed);
 
-            // Assign Ai Movement to droplets
-            AIMovement aiMovement = new AIMovement();
-            droplets[i].setMovementStrategy(aiMovement);
-
-            // Add each droplet to the entity list
-            entityManager.addEntities(droplets[i]);
+            Raindrop drop = new Raindrop("droplet.png", randomX, randomY, randomSpeed);
+            drop.setMovementStrategy(new AIMovement());
+            entityManager.addEntities(drop);
         }
 
         // Add bucket

@@ -3,6 +3,7 @@ package io.github.lab2coursework.lwjgl3.collision;
 import io.github.lab2coursework.lwjgl3.entities.Circle;
 import io.github.lab2coursework.lwjgl3.entities.Entity;
 import io.github.lab2coursework.lwjgl3.entities.Triangle;
+import io.github.lab2coursework.lwjgl3.entities.Raindrop;
 
 public class KeepInBoundsRule implements CollisionRule {
 
@@ -16,7 +17,7 @@ public class KeepInBoundsRule implements CollisionRule {
 
     @Override
     public boolean matches(Entity a, Entity b) {
-        return (a != null && b == null);
+        return (a != null && b == null && !(a instanceof Raindrop));
     }
 
     @Override

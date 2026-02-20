@@ -4,7 +4,7 @@ import io.github.lab2coursework.lwjgl3.collision.CollisionRule;
 import io.github.lab2coursework.lwjgl3.collision.KeepInBoundsRule;
 import io.github.lab2coursework.lwjgl3.collision.PhysicsCollisionRule;
 import io.github.lab2coursework.lwjgl3.entities.Entity;
-
+import io.github.lab2coursework.lwjgl3.collision.RaindropCollisionRule;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +14,7 @@ public class CollisionManager {
 
     public CollisionManager() {
         rules.add(new PhysicsCollisionRule());
+        rules.add(new RaindropCollisionRule());
     }
 
     public void applyAll(List<Entity> entities, float worldW, float worldH) {
