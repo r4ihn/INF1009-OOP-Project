@@ -16,9 +16,9 @@ public class PlayerMovement extends Movement {
     @Override
     public void update(Entity entity, float deltaTime) {
         // Apply the actual movement based on the action
-        if (movingUp) entity.setY(entity.getY() + entity.getSpeed() * deltaTime);
-        if (movingDown) entity.setY(entity.getY() - entity.getSpeed() * deltaTime);
-        if (movingLeft) entity.setX(entity.getX() - entity.getSpeed() * deltaTime);
-        if (movingRight) entity.setX(entity.getX() + entity.getSpeed() * deltaTime);
+        if (movingUp) UpMovement(entity, deltaTime);
+        if (movingDown) DownMovement(entity, deltaTime);
+        if (movingLeft) LeftMovement(entity, deltaTime);
+        if (movingRight) RightMovement(entity, deltaTime);
     }
 }
