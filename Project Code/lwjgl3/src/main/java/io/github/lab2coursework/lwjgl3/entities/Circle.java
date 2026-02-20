@@ -1,6 +1,5 @@
 package io.github.lab2coursework.lwjgl3.entities;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class Circle extends Entity {
@@ -24,10 +23,6 @@ public class Circle extends Entity {
             shape.setColor(this.getColor());
             shape.circle(getX(), getY(), this.radius);
         }
-    }
-
-    @Override
-    public void draw(SpriteBatch batch) {
     }
 
     @Override
