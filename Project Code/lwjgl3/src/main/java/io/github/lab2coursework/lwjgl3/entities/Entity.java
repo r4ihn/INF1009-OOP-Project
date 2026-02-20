@@ -38,8 +38,8 @@ public abstract class Entity {
     public float getSpeed() { return speed;}
     public void setSpeed(float speed) { this.speed = speed;}
 
-    public void draw(ShapeRenderer shape){ };
-    public void draw(SpriteBatch batch){ };
+    public void draw(ShapeRenderer shape){ }
+    public void draw(SpriteBatch batch){ }
 
     public abstract void update();
 }
