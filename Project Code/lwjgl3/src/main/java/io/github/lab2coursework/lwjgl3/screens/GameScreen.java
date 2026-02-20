@@ -26,7 +26,6 @@ public class GameScreen extends AbstractScreen {
     private final EntityManager entityManager;
     private final CollisionManager collisionManager;
     private final MovementManager movementManager;
-    private Entity bucket;
 
     private final SpriteBatch spriteBatch;
     private final ShapeRenderer shapeRenderer;
@@ -53,7 +52,7 @@ public class GameScreen extends AbstractScreen {
         }
 
         // Add bucket
-        bucket = new TextureObject("bucket.png", 300, 0, 0);
+        Entity bucket = new TextureObject("bucket.png", 300, 0, 0);
         entityManager.addEntities(bucket);
 
 
@@ -115,11 +114,9 @@ public class GameScreen extends AbstractScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // 2. Draw the background first
-        if (backgroundTexture != null) {
-            spriteBatch.begin();
-            spriteBatch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            spriteBatch.end();
-        }
+        spriteBatch.begin();
+        spriteBatch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        spriteBatch.end();
 
         // 3. Draw other sprites/textures on top
         spriteBatch.begin();
@@ -136,9 +133,7 @@ public class GameScreen extends AbstractScreen {
     @Override
     public void dispose() {
         super.dispose();
-        if (backgroundTexture != null) {
-            backgroundTexture.dispose();
-        }
+        backgroundTexture.dispose();
         spriteBatch.dispose();
         shapeRenderer.dispose();
     }
