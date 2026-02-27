@@ -19,7 +19,7 @@ public class GameMaster extends ApplicationAdapter {
     protected float deltaTime;
 
 
-    // Engine Lifecycle
+    // Engine Lifecycle (THe new methods should be inside constructor)
     public void create() {
         ioManager = new IOManager();
         entityManager = new EntityManager();
