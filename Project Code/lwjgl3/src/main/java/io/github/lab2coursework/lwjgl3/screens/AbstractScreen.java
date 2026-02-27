@@ -27,8 +27,13 @@ public abstract class AbstractScreen extends ScreenAdapter {
 
     @Override
     public void dispose() {
-        batch.dispose();
-        font.dispose();
+        // Check if not null to prevent crashing during rapid screen switching
+        if (batch != null){
+            batch.dispose();
+        }
+        if (font != null){
+            font.dispose();
+        }
     }
 
     protected abstract void draw(float delta);

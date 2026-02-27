@@ -1,13 +1,13 @@
 package io.github.lab2coursework.lwjgl3.core;
 
-import com.badlogic.gdx.ApplicationListener; // Changed to Interface
+import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import io.github.lab2coursework.lwjgl3.managers.*;
 import io.github.lab2coursework.lwjgl3.screens.TitleScreen;
 
-public class GameMaster implements ApplicationListener {
+public class GameMaster extends ApplicationAdapter {
 
-    // Managers as defined in your UML
+    // Managers
     protected IOManager ioManager;
     protected EntityManager entityManager;
     protected ScreenManager screenManager;
@@ -18,9 +18,9 @@ public class GameMaster implements ApplicationListener {
     protected boolean isRunning;
     protected float deltaTime;
 
-    @Override
+
+    // Engine Lifecycle
     public void create() {
-        // Initialize managers according to UML structure
         ioManager = new IOManager();
         entityManager = new EntityManager();
         screenManager = new ScreenManager();
@@ -28,41 +28,23 @@ public class GameMaster implements ApplicationListener {
 
         isRunning = true;
 
-        // Set the initial screen to TitleScreen
+        // set initial screen to TitleScreen
         screenManager.set(new TitleScreen(screenManager));
     }
 
-    @Override
+
     public void render() {
         deltaTime = Gdx.graphics.getDeltaTime();
 
+
         if (isRunning) {
-            // ScreenManager handles update() and draw() for the active screen
             screenManager.render(deltaTime);
         }
     }
 
-    @Override
-    public void resize(int width, int height) {
-        screenManager.resize(width, height);
-    }
-
-    @Override
-    public void pause() {
-        // Required by ApplicationListener interface
-        isRunning = false;
-    }
-
-    @Override
-    public void resume() {
-        // Required by ApplicationListener interface
-        isRunning = true;
-    }
-
-    @Override
+    // Cleanup
     public void dispose() {
-        // Clean up resources
-        if (screenManager != null) {
+        if(screenManager != null){
             screenManager.dispose();
         }
     }

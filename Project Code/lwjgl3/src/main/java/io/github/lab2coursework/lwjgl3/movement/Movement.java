@@ -25,8 +25,4 @@ public abstract class Movement {
 
         entity.setY(entity.getY() - (entity.getSpeed() * deltaTime));
     }
-
-    protected void stop(Entity entity) {
-        // Optional stop logic
-    }
 }

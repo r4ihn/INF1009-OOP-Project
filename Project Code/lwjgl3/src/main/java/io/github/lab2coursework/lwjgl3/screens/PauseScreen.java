@@ -18,7 +18,7 @@ public class PauseScreen extends AbstractScreen {
             screenManager.pop(); // return to previous screen
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            screenManager.set(new TitleScreen(screenManager));
+            screenManager.push(new TitleScreen(screenManager));
         }
     }
 

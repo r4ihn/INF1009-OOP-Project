@@ -1,4 +1,6 @@
-package io.github.lab2coursework.lwjgl3;
+package io.github.lab2coursework.lwjgl3.collision;
+
+import io.github.lab2coursework.lwjgl3.entities.Entity;
 
 import io.github.lab2coursework.lwjgl3.entities.Entity;
 
