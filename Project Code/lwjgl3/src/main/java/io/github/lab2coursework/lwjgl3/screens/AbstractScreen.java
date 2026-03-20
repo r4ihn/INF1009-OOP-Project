@@ -10,6 +10,7 @@ public abstract class AbstractScreen extends ScreenAdapter {
     protected final ScreenManager screenManager;
     protected SpriteBatch batch;
     protected BitmapFont font;
+    private boolean disposed;
 
     public AbstractScreen(ScreenManager screenManager) {
         this.screenManager = screenManager;
@@ -20,13 +21,18 @@ public abstract class AbstractScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         update(delta);
-        draw(delta); // Add this line
+        // If update() switched screens, this screen may have been disposed.
+        if (disposed || screenManager.peak() != this) {
+            return;
+        }
+        draw(delta);
     }
 
     protected abstract void update(float delta);
 
     @Override
     public void dispose() {
+        disposed = true;
         // Check if not null to prevent crashing during rapid screen switching
         if (batch != null){
             batch.dispose();
