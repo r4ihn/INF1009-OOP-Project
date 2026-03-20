@@ -16,6 +16,7 @@ public class LetterBlock extends Entity {
     private final float  height;
     private       boolean landed;    // true once it has been placed on the stack
     private       boolean discarded; // true once thrown into the bin
+    private       int     wordIndex = -1; // which word (0=CAT, 1=DOG, 2=FOX) this block belongs to
 
     public LetterBlock(char letter, float x, float y, float width, float height, Color color) {
         super(x, y, color, 0f);
@@ -63,9 +64,11 @@ public class LetterBlock extends Entity {
     public float   getHeight()   { return height; }
     public boolean isLanded()    { return landed; }
     public boolean isDiscarded() { return discarded; }
+    public int     getWordIndex() { return wordIndex; }
 
     public void setLanded(boolean v)    { this.landed    = v; }
     public void setDiscarded(boolean v) { this.discarded = v; }
+    public void setWordIndex(int idx)   { this.wordIndex = idx; }
 
     /** AABB bounds helpers used by collision rules */
     public float getRight()  { return getX() + width; }

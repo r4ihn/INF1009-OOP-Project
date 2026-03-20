@@ -1,33 +1,46 @@
 package io.github.lab2coursework.lwjgl3.movement;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import io.github.lab2coursework.lwjgl3.entities.Entity;
 
 /**
- * Strategy: bounces the crane arm left and right between two X boundaries.
+ * Strategy: allows player to control crane arm movement with LEFT/RIGHT arrow keys.
+ * Replaces the previous auto-bounce behavior with keyboard input.
  */
 public class CraneMovement extends Movement {
 
     private final float minX;
     private final float maxX;
-    private float direction = 1f; // +1 = right, -1 = left
+    private final float moveSpeed;
 
     public CraneMovement(float minX, float maxX) {
         this.minX = minX;
         this.maxX = maxX;
+        this.moveSpeed = 300f; // pixels per second
     }
 
     @Override
     public void update(Entity entity, float deltaTime) {
-        entity.setX(entity.getX() + entity.getSpeed() * direction * deltaTime);
+        float direction = 0f;
 
-        if (entity.getX() >= maxX) {
-            entity.setX(maxX);
+        // Check keyboard input
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             direction = -1f;
-        } else if (entity.getX() <= minX) {
-            entity.setX(minX);
+        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             direction = 1f;
         }
-    }
 
-    public float getDirection() { return direction; }
+        // Update position
+        float newX = entity.getX() + moveSpeed * direction * deltaTime;
+
+        // Clamp to boundaries
+        if (newX < minX) {
+            newX = minX;
+        } else if (newX > maxX) {
+            newX = maxX;
+        }
+
+        entity.setX(newX);
+    }
 }
