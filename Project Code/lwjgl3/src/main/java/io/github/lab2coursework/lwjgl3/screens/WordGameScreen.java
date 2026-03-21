@@ -22,6 +22,8 @@ import java.util.List;
 
 /**
  * Main gameplay screen for the word-building crane game.
+ * Owns the per-frame game loop for crane control, rope handling, drop logic,
+ * landing/discard outcomes, and HUD rendering for this mode.
  *
  * Template Method pattern:
  *   render() → update() → draw()   (defined in AbstractScreen)
@@ -95,6 +97,7 @@ public class WordGameScreen extends AbstractScreen {
 
     @Override
     protected void update(float delta) {
+        // Drives gameplay state transitions and input in a single frame tick.
         // ── Pause ─────────────────────────────────────────────────────────────
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             screenManager.push(new PauseScreen(screenManager));
@@ -127,9 +130,16 @@ public class WordGameScreen extends AbstractScreen {
             releaseBlock();
         }
 
-        // ── Update crane movement ─────────────────────────────────────────────
-        if (crane != null) {
-            crane.getMovementStrategy().update(crane, delta);
+        // ── Update crane movement from keyboard input ─────────────────────────
+        if (crane != null && crane.getMovementStrategy() instanceof CraneMovement) {
+            CraneMovement craneMovement = (CraneMovement) crane.getMovementStrategy();
+            craneMovement.setMovingLeft(
+                Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)
+            );
+            craneMovement.setMovingRight(
+                Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)
+            );
+            craneMovement.update(crane, delta);
         }
 
         // ── Update rope / falling block ───────────────────────────────────────
@@ -172,6 +182,7 @@ public class WordGameScreen extends AbstractScreen {
 
     @Override
     protected void draw(float delta) {
+        // Renders background/geometry first, then text overlays.
         // 1. Clear
         Gdx.gl.glClearColor(0.12f, 0.16f, 0.22f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -210,20 +221,23 @@ public class WordGameScreen extends AbstractScreen {
 
     // ── Private helpers ───────────────────────────────────────────────────────
 
+    /** Creates the crane entity and assigns keyboard-controlled movement. */
     private void spawnCrane() {
         crane = new CraneArm(SW / 2f - 60f, CRANE_Y);
         crane.setMovementStrategy(new CraneMovement(CRANE_MIN_X, CRANE_MAX_X));
     }
 
+    /** Spawns the next letter block as a hanging pendulum attached to the crane hook. */
     private void spawnNextHangingBlock() {
         hangingBlock = blockFactory.createHangingBlock();
         hangingBlock.setMovementStrategy(
-            new RopeSwingMovement(ROPE_LEN, 0.35f, crane.getHookX(), crane.getHookY())
+            new RopeSwingMovement(ROPE_LEN, 0f, crane.getHookX(), crane.getHookY())
         );
         blockReleased = false;
         fallingBlock  = null;
     }
 
+    /** Detaches the current hanging block and switches it to free-fall physics. */
     private void releaseBlock() {
         fallingBlock = hangingBlock;
         fallingBlock.setMovementStrategy(new FallMovement());
@@ -231,6 +245,7 @@ public class WordGameScreen extends AbstractScreen {
         blockReleased = true;
     }
 
+    /** Sends the current hanging block to the bin and applies garbage-game rules. */
     private void discardHangingBlock() {
         // Move the hanging block to the bin position and trigger garbage rule
         hangingBlock.setX(BIN_X + 10f);
@@ -240,11 +255,13 @@ public class WordGameScreen extends AbstractScreen {
         scheduleNextBlock(0.3f);
     }
 
+    /** Starts a short wait period before the next block is spawned. */
     private void scheduleNextBlock(float delay) {
         awaitingNext = true;
         awaitTimer   = delay;
     }
 
+    /** Applies post-drop/discard progression (game over, level up, next spawn). */
     private void handlePostBlockAction() {
         if (state.isGameOver()) {
             screenManager.set(new WordGameEndScreen(screenManager, state.getLevel() - 1));
@@ -257,6 +274,7 @@ public class WordGameScreen extends AbstractScreen {
         spawnNextHangingBlock();
     }
 
+    /** Clears screen-only block visuals when moving to a fresh level/round state. */
     private void resetVisuals() {
         stackedBlocks.clear();
         landingRule.resetStack();
@@ -267,6 +285,7 @@ public class WordGameScreen extends AbstractScreen {
 
     // ── Draw helpers ──────────────────────────────────────────────────────────
 
+    /** Draws the soil/ground strip used as the base line for landed blocks. */
     private void drawGround() {
         shapeRenderer.setColor(new Color(0.3f, 0.22f, 0.1f, 1f));
         shapeRenderer.rect(0, 0, SW, GROUND_Y);
@@ -274,6 +293,7 @@ public class WordGameScreen extends AbstractScreen {
         shapeRenderer.rect(0, GROUND_Y - 8f, SW, 8f);
     }
 
+    /** Draws a segmented rope line from crane hook to current hanging block. */
     private void drawRope() {
         if (crane == null || hangingBlock == null || blockReleased) return;
         shapeRenderer.setColor(Color.TAN);
@@ -294,6 +314,7 @@ public class WordGameScreen extends AbstractScreen {
         }
     }
 
+    /** Draws level/category/lives and a quick controls hint. */
     private void drawHUD() {
         font.setColor(Color.WHITE);
         font.draw(batch, "Level: " + state.getLevel(), 20, SH - 20);
@@ -308,9 +329,10 @@ public class WordGameScreen extends AbstractScreen {
 
         // Controls reminder
         font.setColor(Color.LIGHT_GRAY);
-        font.draw(batch, "SPACE = drop block   G = discard block   ESC = pause", 20, 30);
+        font.draw(batch, "A/D or LEFT/RIGHT = move crane   SPACE = drop   G = discard   ESC = pause", 20, 30);
     }
 
+    /** Draws the current target word/progress near the top center of the screen. */
     private void drawWordDisplay() {
         String display = state.getDisplayWord();
 
@@ -324,6 +346,7 @@ public class WordGameScreen extends AbstractScreen {
         font.getData().setScale(1f); // reset scale
     }
 
+    /** Labels the garbage can target area. */
     private void drawBinLabel() {
         font.setColor(Color.LIGHT_GRAY);
         font.draw(batch, "BIN", BIN_X + 18f, BIN_Y - 6f);
