@@ -22,10 +22,10 @@ import java.util.List;
 
 /**
  * Main gameplay screen for the word-building crane game.
- *
+
  * Template Method pattern:
  *   render() → update() → draw()   (defined in AbstractScreen)
- *
+
  * Design patterns used here:
  *   - Factory Method  : LetterBlockFactory
  *   - Strategy        : CraneMovement, FallMovement, RopeSwingMovement
@@ -128,8 +128,15 @@ public class WordGameScreen extends AbstractScreen {
         }
 
         // ── Update crane movement ─────────────────────────────────────────────
-        if (crane != null) {
-            crane.getMovementStrategy().update(crane, delta);
+        if (crane != null && crane.getMovementStrategy() instanceof CraneMovement) {
+            CraneMovement craneMovement = (CraneMovement) crane.getMovementStrategy();
+
+            boolean leftPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A);
+            boolean rightPressed = Gdx.input.isButtonPressed(Input.Keys.RIGHT) || Gdx.input.isButtonPressed(Input.Keys.D);
+
+            craneMovement.setMovingLeft(leftPressed);
+            craneMovement.setMovingRight(rightPressed);
+            craneMovement.update(crane, delta);
         }
 
         // ── Update rope / falling block ───────────────────────────────────────
