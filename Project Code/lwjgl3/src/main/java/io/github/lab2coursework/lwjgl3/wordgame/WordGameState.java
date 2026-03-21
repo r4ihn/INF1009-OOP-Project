@@ -37,16 +37,17 @@ public class WordGameState {
         targetWords.clear();
         stackedLettersPerWord.clear();
 
-        // Load 3 different words for this level
-        int totalPerCategory = 10;
-        int catIndex = (level / totalPerCategory) % wordBank.getCategories().size();
+        // Get a random category each level for variety
+        int categoryIndex = (int)(Math.random() * wordBank.getCategories().size());
+        WordCategory cat = wordBank.getCategory(categoryIndex);
+        List<String> words = new ArrayList<>(cat.getWords());
 
-        WordCategory cat = wordBank.getCategory(catIndex);
-        List<String> words = cat.getWords();
+        // Shuffle to get random words
+        java.util.Collections.shuffle(words);
 
-        // Pick 3 distinct words from the category
-        for (int i = 0; i < 3; i++) {
-            String word = words.get((level + i) % words.size()).toUpperCase();
+        // Pick 3 distinct random words from the shuffled list
+        for (int i = 0; i < 3 && i < words.size(); i++) {
+            String word = words.get(i).toUpperCase();
             targetWords.add(word);
             stackedLettersPerWord.add(new ArrayList<>());
         }
@@ -82,6 +83,8 @@ public class WordGameState {
 
     /**
      * Try to place a letter onto any of the 3 word stacks.
+     * IMPORTANT: Each letter can only match ONE word. If multiple words need the same letter,
+     * only the FIRST incomplete word in the loop will accept it. Other words cannot use it.
      * Returns the index of the word it matched (0-2), or -1 if no match.
      * If wrong, costs a life.
      */
@@ -89,6 +92,7 @@ public class WordGameState {
         letter = Character.toUpperCase(letter);
 
         // Try to match against any of the 3 words
+        // ONLY the first word that needs this letter will accept it
         for (int wordIdx = 0; wordIdx < 3; wordIdx++) {
             if (gameScore.isWordCompleted(wordIdx)) {
                 continue; // skip already-completed words
@@ -100,6 +104,7 @@ public class WordGameState {
             if (stacked.size() < word.length()) {
                 char expected = word.charAt(stacked.size());
                 if (letter == expected) {
+                    // MATCH! Add to this word's stack
                     stacked.add(expected);
 
                     // Check if this word is now complete
@@ -107,12 +112,13 @@ public class WordGameState {
                         gameScore.completeWord(wordIdx);
                     }
 
-                    return wordIdx; // success
+                    return wordIdx; // success - letter used by this word
                 }
             }
         }
 
-        // No word matched this letter
+        // No word matched this letter - it's wrong!
+        // Even if other words need this letter later, this drop is rejected
         loseLife();
         return -1;
     }
