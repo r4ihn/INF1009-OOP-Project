@@ -1,49 +1,46 @@
 package io.github.lab2coursework.lwjgl3.movement;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import io.github.lab2coursework.lwjgl3.entities.Entity;
 
 /**
- * Strategy: moves the crane arm left/right from user input within X boundaries.
+ * Strategy: allows player to control crane arm movement with A/D or LEFT/RIGHT keys.
+ * Replaces the previous auto-bounce behavior with keyboard input.
  */
 public class CraneMovement extends Movement {
 
     private final float minX;
     private final float maxX;
-    private boolean movingLeft;
-    private boolean movingRight;
-    private float direction; // +1 = right, -1 = left, 0 = idle
+    private final float moveSpeed;
 
     public CraneMovement(float minX, float maxX) {
         this.minX = minX;
         this.maxX = maxX;
+        this.moveSpeed = 300f; // pixels per second
     }
 
-    /**
-     * Applies horizontal movement for this frame using current input flags,
-     * then clamps the crane inside configured bounds.
-     */
     @Override
     public void update(Entity entity, float deltaTime) {
-        if (movingLeft == movingRight) {
-            direction = 0f;
-        } else {
-            direction = movingLeft ? -1f : 1f;
+        float direction = 0f;
+
+        // Check keyboard input (A/LEFT = move left, D/RIGHT = move right)
+        if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            direction = -1f;
+        } else if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            direction = 1f;
         }
 
-        float nextX = entity.getX() + entity.getSpeed() * direction * deltaTime;
-        if (nextX < minX) {
-            nextX = minX;
-        } else if (nextX > maxX) {
-            nextX = maxX;
+        // Update position
+        float newX = entity.getX() + moveSpeed * direction * deltaTime;
+
+        // Clamp to boundaries
+        if (newX < minX) {
+            newX = minX;
+        } else if (newX > maxX) {
+            newX = maxX;
         }
-        entity.setX(nextX);
+
+        entity.setX(newX);
     }
-
-    /** Sets whether leftward motion should be applied this frame. */
-    public void setMovingLeft(boolean movingLeft) { this.movingLeft = movingLeft; }
-    /** Sets whether rightward motion should be applied this frame. */
-    public void setMovingRight(boolean movingRight) { this.movingRight = movingRight; }
-
-    /** Returns -1, 0, or +1 representing last applied movement direction. */
-    public float getDirection() { return direction; }
 }
