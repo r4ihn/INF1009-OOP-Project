@@ -110,6 +110,20 @@ public class WordGameState {
         return -1;
     }
 
+
+    public void resetWordProgress(int wordIndex) {
+        if (wordIndex < 0 || wordIndex >= stackedLettersPerWord.size()) return;
+
+        List<Character> stack = stackedLettersPerWord.get(wordIndex);
+        if (stack.isEmpty() && !gameScore.isWordCompleted(wordIndex)) {
+            return;
+        }
+
+        stack.clear();
+        gameScore.getWordPoints().set(wordIndex, 0);
+        gameScore.getWordCompleted().set(wordIndex, false);
+    }
+
     public int placeNextLetter(char letter) {
         letter = Character.toUpperCase(letter);
 

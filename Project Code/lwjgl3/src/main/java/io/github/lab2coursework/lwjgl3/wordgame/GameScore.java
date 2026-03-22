@@ -13,6 +13,7 @@ public class GameScore {
     private static final int COMBO_THRESHOLD = 3;  // every 3 words = combo bonus
     private static final int BASE_WORD_POINTS = 100;
     private static final int COMBO_BONUS = 150;
+    private static final int TOWER_FALL_PENALTY = 50;
 
     // Track the 3 target words and their completion status
     private List<String> targetWords;
@@ -64,6 +65,23 @@ public class GameScore {
     }
 
     /**
+     * Deduct points when a tower falls.
+     * Allows score to go negative.
+     */
+    public void applyTowerFallPenalty() {
+        totalScore -= TOWER_FALL_PENALTY;
+    }
+
+    /**
+     * General-purpose score adjustment.
+     * Positive adds points, negative deducts points.
+     * Allows negative total score.
+     */
+    public void addScore(int points) {
+        totalScore += points;
+    }
+
+    /**
      * Reset for next level
      */
     public void resetForNextLevel() {
@@ -99,10 +117,12 @@ public class GameScore {
     public List<String> getTargetWords() { return targetWords; }
     public List<Boolean> getWordCompleted() { return wordCompleted; }
     public List<Integer> getWordPoints() { return wordPoints; }
+
     public String getTargetWord(int index) {
         if (index < 0 || index >= 3) return "";
         return targetWords.get(index);
     }
+
     public boolean isWordCompleted(int index) {
         if (index < 0 || index >= 3) return false;
         return wordCompleted.get(index);

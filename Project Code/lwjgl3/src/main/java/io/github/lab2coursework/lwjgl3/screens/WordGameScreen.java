@@ -110,8 +110,8 @@ public class WordGameScreen extends AbstractScreen {
         if (landingRule.isSettling()) {
             landingRule.update(delta);
 
-            if (landingRule.consumeTowerCollapsed()) {
-                stackedBlocks.clear();
+            if (landingRule.consumeWordReset()) {
+                removeBlocksForWord(landingRule.getResetWordIndex());
                 fallingBlock = null;
                 blockReleased = false;
                 scheduleNextBlock(0.6f);
@@ -322,7 +322,14 @@ public class WordGameScreen extends AbstractScreen {
         landingRule.resolve(fallingBlock, collisionTarget);
 
         if (fallingBlock.isDiscarded()) {
-            // Wrong letter: WordGameState already reset the attempt via loseLife().
+            // Improper stacking now resets only the matching word after the sway finishes.
+            if (landingRule.isSettling()) {
+                fallingBlock = null;
+                blockReleased = false;
+                return;
+            }
+
+            // Wrong letter: WordGameState already reset the whole attempt via loseLife().
             stackedBlocks.clear();
             landingRule.resetStack();
             fallingBlock = null;
@@ -340,6 +347,14 @@ public class WordGameScreen extends AbstractScreen {
         }
 
         scheduleNextBlock(0.25f);
+    }
+
+
+    private void removeBlocksForWord(int wordIndex) {
+        if (wordIndex < 0) {
+            return;
+        }
+        stackedBlocks.removeIf(block -> block.getWordIndex() == wordIndex);
     }
 
     private void scheduleNextBlock(float delay) {

@@ -9,10 +9,9 @@ public class BlockLandingRule implements CollisionRule {
     private static final float GROUND_Y = 60f;
     private static final float BLOCK_H = 60f;
 
-    // How far the next block can be from its tower anchor before the whole tower falls.
-    private static final float MAX_HORIZONTAL_ERROR = 70f;
+    // How much horizontal difference is allowed before the stack is considered unstable.
+    private static final float MAX_STACK_OFFSET = 22f;
 
-    // Small offsets will shake, then stabilise.
     private static final float SWAY_TRIGGER_ERROR = 8f;
     private static final float SWAY_DURATION = 0.30f;
     private static final float SWAY_FREQUENCY = 28f;
@@ -24,8 +23,9 @@ public class BlockLandingRule implements CollisionRule {
     private final int[] stackCountPerWord = {0, 0, 0};
     private final float[] stackXPerWord = {-1f, -1f, -1f};
 
-    private boolean towerCollapsed = false;
     private boolean towerStabilized = false;
+    private boolean wordResetPending = false;
+    private int resetWordIndex = -1;
 
     private boolean settling = false;
     private int settlingWordIndex = -1;
@@ -51,7 +51,6 @@ public class BlockLandingRule implements CollisionRule {
 
         int matchedWordIdx = state.peekMatchingWordIndex(falling.getLetter());
 
-        // Ground collision always exists as a fallback.
         if (b == null) {
             return falling.getY() <= GROUND_Y;
         }
@@ -61,12 +60,7 @@ public class BlockLandingRule implements CollisionRule {
         }
 
         LetterBlock stacked = (LetterBlock) b;
-        if (!stacked.isLanded()) {
-            return false;
-        }
-
-        // Wrong letters should not stack on existing towers.
-        if (matchedWordIdx < 0) {
+        if (!stacked.isLanded() || matchedWordIdx < 0) {
             return false;
         }
 
@@ -92,33 +86,39 @@ public class BlockLandingRule implements CollisionRule {
             return;
         }
 
-        if (stackXPerWord[matchedWordIdx] < 0f) {
-            if (b instanceof LetterBlock) {
-                stackXPerWord[matchedWordIdx] = ((LetterBlock) b).getX();
-            } else {
-                // First correct block for this word becomes the tower anchor.
-                stackXPerWord[matchedWordIdx] = block.getX();
+        float landY;
+        float horizontalError;
+
+        if (b instanceof LetterBlock) {
+            LetterBlock stacked = (LetterBlock) b;
+            landY = stacked.getTop();
+            horizontalError = getCenterX(block) - getCenterX(stacked);
+        } else {
+            // First block for a word may start anywhere. Existing towers must not restart on the ground.
+            if (stackCountPerWord[matchedWordIdx] > 0) {
+                startSettlingForReset(matchedWordIdx, estimateGroundError(block, matchedWordIdx));
+                block.setMovementStrategy(null);
+                block.setDiscarded(true);
+                return;
             }
+
+            landY = stackBaseY;
+            horizontalError = 0f;
+            stackXPerWord[matchedWordIdx] = block.getX();
         }
 
-        float targetX = stackXPerWord[matchedWordIdx];
-        float horizontalError = block.getX() - targetX;
-        float landY = stackBaseY + stackCountPerWord[matchedWordIdx] * BLOCK_H;
-
-        // Snap into the tower column, but the whole tower can visibly sway in render.
-        block.setX(targetX);
         block.setY(landY);
         block.setMovementStrategy(null);
         block.setLanded(true);
         block.setWordIndex(matchedWordIdx);
         stackCountPerWord[matchedWordIdx]++;
+        stackXPerWord[matchedWordIdx] = block.getX();
 
-        if (Math.abs(horizontalError) >= SWAY_TRIGGER_ERROR) {
-            settling = true;
-            settlingWordIndex = matchedWordIdx;
-            settlingTimer = SWAY_DURATION;
-            collapseAfterSway = Math.abs(horizontalError) > MAX_HORIZONTAL_ERROR;
-            swayAmplitude = Math.min(Math.abs(horizontalError) * 0.35f, MAX_SWAY_AMPLITUDE);
+        float absError = Math.abs(horizontalError);
+        if (absError > MAX_STACK_OFFSET) {
+            startSettlingForReset(matchedWordIdx, absError);
+        } else if (absError >= SWAY_TRIGGER_ERROR) {
+            startSettlingForStabilize(matchedWordIdx, absError);
         } else {
             towerStabilized = true;
         }
@@ -133,7 +133,11 @@ public class BlockLandingRule implements CollisionRule {
         settling = false;
 
         if (collapseAfterSway) {
-            triggerTowerCollapse();
+            state.getGameScore().applyTowerFallPenalty();
+            resetWordStack(settlingWordIndex);
+            state.resetWordProgress(settlingWordIndex);
+            wordResetPending = true;
+            resetWordIndex = settlingWordIndex;
         } else {
             towerStabilized = true;
         }
@@ -144,12 +148,39 @@ public class BlockLandingRule implements CollisionRule {
         settlingTimer = 0f;
     }
 
-    private void triggerTowerCollapse() {
-        towerCollapsed = true;
+    private void startSettlingForReset(int wordIdx, float absError) {
+        settling = true;
+        settlingWordIndex = wordIdx;
+        settlingTimer = SWAY_DURATION;
+        collapseAfterSway = true;
+        swayAmplitude = Math.min(Math.max(absError * 0.35f, SWAY_TRIGGER_ERROR), MAX_SWAY_AMPLITUDE);
+    }
 
-        // The letter was already accepted into WordGameState, so revert the whole attempt.
-        state.loseLife();
-        resetStack();
+    private void startSettlingForStabilize(int wordIdx, float absError) {
+        settling = true;
+        settlingWordIndex = wordIdx;
+        settlingTimer = SWAY_DURATION;
+        collapseAfterSway = false;
+        swayAmplitude = Math.min(absError * 0.35f, MAX_SWAY_AMPLITUDE);
+    }
+
+    private void resetWordStack(int wordIdx) {
+        if (wordIdx < 0 || wordIdx >= stackCountPerWord.length) {
+            return;
+        }
+        stackCountPerWord[wordIdx] = 0;
+        stackXPerWord[wordIdx] = -1f;
+    }
+
+    private float estimateGroundError(LetterBlock block, int wordIdx) {
+        if (!hasStackX(wordIdx)) {
+            return MAX_STACK_OFFSET + 1f;
+        }
+        return Math.abs(getCenterX(block) - (stackXPerWord[wordIdx] + block.getWidth() / 2f));
+    }
+
+    private float getCenterX(LetterBlock block) {
+        return block.getX() + block.getWidth() / 2f;
     }
 
     private boolean isTopBlock(LetterBlock block, int wordIdx) {
@@ -162,14 +193,8 @@ public class BlockLandingRule implements CollisionRule {
     }
 
     private boolean isTouchingTop(LetterBlock falling, LetterBlock stacked) {
-        float fallingLeft = falling.getX();
-        float fallingRight = falling.getRight();
-        float stackedLeft = stacked.getX();
-        float stackedRight = stacked.getRight();
-
-        boolean overlapsX = fallingRight > stackedLeft && fallingLeft < stackedRight;
+        boolean overlapsX = falling.getRight() > stacked.getX() && falling.getX() < stacked.getRight();
         boolean reachedTop = falling.getY() <= stacked.getTop();
-
         return overlapsX && reachedTop;
     }
 
@@ -187,16 +212,20 @@ public class BlockLandingRule implements CollisionRule {
         return (float) Math.sin(progress * SWAY_FREQUENCY) * swayAmplitude * damping;
     }
 
-    public boolean consumeTowerCollapsed() {
-        boolean result = towerCollapsed;
-        towerCollapsed = false;
-        return result;
-    }
-
     public boolean consumeTowerStabilized() {
         boolean result = towerStabilized;
         towerStabilized = false;
         return result;
+    }
+
+    public boolean consumeWordReset() {
+        boolean result = wordResetPending;
+        wordResetPending = false;
+        return result;
+    }
+
+    public int getResetWordIndex() {
+        return resetWordIndex;
     }
 
     public int getStackCount(int wordIdx) {
@@ -215,19 +244,19 @@ public class BlockLandingRule implements CollisionRule {
     }
 
     public void resetStack() {
-        stackCountPerWord[0] = 0;
-        stackCountPerWord[1] = 0;
-        stackCountPerWord[2] = 0;
-
-        stackXPerWord[0] = -1f;
-        stackXPerWord[1] = -1f;
-        stackXPerWord[2] = -1f;
+        for (int i = 0; i < stackCountPerWord.length; i++) {
+            stackCountPerWord[i] = 0;
+            stackXPerWord[i] = -1f;
+        }
 
         settling = false;
         settlingWordIndex = -1;
         settlingTimer = 0f;
         collapseAfterSway = false;
         swayAmplitude = 0f;
+        wordResetPending = false;
+        resetWordIndex = -1;
+        towerStabilized = false;
     }
 
     public boolean hasStackX(int wordIdx) {
