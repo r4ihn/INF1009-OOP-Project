@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Main gameplay screen for the word-building crane game.
  * Now supports:
- * - Keyboard-controlled crane (LEFT/RIGHT arrows)
+ * - Keyboard-controlled crane (A/D or LEFT/RIGHT)
  * - 3 simultaneous target words
  * - Mouse-click garbage can for discarding
  * - Physics-based block stacking
@@ -261,7 +261,7 @@ public class WordGameScreen extends AbstractScreen {
     private void spawnNextHangingBlock() {
         hangingBlock = blockFactory.createHangingBlock();
         hangingBlock.setMovementStrategy(
-            new RopeSwingMovement(ROPE_LEN, 0.35f, crane.getHookX(), crane.getHookY())
+            new RopeSwingMovement(ROPE_LEN, 0f, crane.getHookX(), crane.getHookY())
         );
         blockReleased = false;
         fallingBlock  = null;
@@ -349,7 +349,7 @@ public class WordGameScreen extends AbstractScreen {
         // Controls reminder at bottom
         font.getData().setScale(0.7f);
         font.setColor(Color.LIGHT_GRAY);
-        font.draw(batch, "LEFT/RIGHT = move crane   SPACE = drop block   CLICK BIN = discard   ESC = pause", 20, 30);
+        font.draw(batch, "A/D or LEFT/RIGHT = move crane   SPACE = drop block   CLICK BIN = discard   ESC = pause", 20, 30);
         font.getData().setScale(1f);
     }
 
