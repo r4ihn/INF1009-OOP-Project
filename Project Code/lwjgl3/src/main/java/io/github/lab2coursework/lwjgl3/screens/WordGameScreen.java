@@ -106,6 +106,28 @@ public class WordGameScreen extends AbstractScreen {
             return;
         }
 
+        // ── Tower sway / settle animation ─────────────────────────────────────
+        if (landingRule.isSettling()) {
+            landingRule.update(delta);
+
+            if (landingRule.consumeTowerCollapsed()) {
+                stackedBlocks.clear();
+                fallingBlock = null;
+                blockReleased = false;
+                scheduleNextBlock(0.6f);
+                return;
+            }
+
+            if (landingRule.consumeTowerStabilized()) {
+                fallingBlock = null;
+                blockReleased = false;
+                scheduleNextBlock(0.25f);
+                return;
+            }
+
+            return;
+        }
+
         // ── Awaiting next block spawn (brief delay after land/discard) ────────
         if (awaitingNext) {
             awaitTimer -= delta;
@@ -162,18 +184,15 @@ public class WordGameScreen extends AbstractScreen {
                 fall.update(fallingBlock, delta);
             }
 
-            // Check landing
+            LetterBlock collisionTarget = findBlockCollisionTarget();
+
+            if (collisionTarget != null) {
+                resolveFallingBlockCollision(collisionTarget);
+                return;
+            }
+
             if (landingRule.matches(fallingBlock, null)) {
-                landingRule.resolve(fallingBlock, null);
-
-                // Only add to stack if it wasn't discarded (wrong letter)
-                if (!fallingBlock.isDiscarded()) {
-                    stackedBlocks.add(fallingBlock);
-                }
-
-                fallingBlock = null;
-                blockReleased = false;
-                scheduleNextBlock(0.4f);
+                resolveFallingBlockCollision(null);
                 return;
             }
         }
@@ -219,7 +238,7 @@ public class WordGameScreen extends AbstractScreen {
         drawWordDisplay();
         if (hangingBlock != null) hangingBlock.drawLabel(batch, font);
         if (fallingBlock != null) fallingBlock.drawLabel(batch, font);
-        for (LetterBlock b : stackedBlocks) b.drawLabel(batch, font);
+        drawStackedBlockLabels();
 
         // Draw visual separators between word sections
         drawStackSeparators();
@@ -282,6 +301,45 @@ public class WordGameScreen extends AbstractScreen {
         hangingBlock = null;
         // Immediately spawn next block instead of waiting
         spawnNextHangingBlock();
+    }
+
+    private LetterBlock findBlockCollisionTarget() {
+        if (fallingBlock == null) {
+            return null;
+        }
+
+        for (int i = stackedBlocks.size() - 1; i >= 0; i--) {
+            LetterBlock stacked = stackedBlocks.get(i);
+            if (landingRule.matches(fallingBlock, stacked)) {
+                return stacked;
+            }
+        }
+
+        return null;
+    }
+
+    private void resolveFallingBlockCollision(LetterBlock collisionTarget) {
+        landingRule.resolve(fallingBlock, collisionTarget);
+
+        if (fallingBlock.isDiscarded()) {
+            // Wrong letter: WordGameState already reset the attempt via loseLife().
+            stackedBlocks.clear();
+            landingRule.resetStack();
+            fallingBlock = null;
+            blockReleased = false;
+            scheduleNextBlock(0.45f);
+            return;
+        }
+
+        stackedBlocks.add(fallingBlock);
+        fallingBlock = null;
+        blockReleased = false;
+
+        if (landingRule.isSettling()) {
+            return;
+        }
+
+        scheduleNextBlock(0.25f);
     }
 
     private void scheduleNextBlock(float delay) {
@@ -399,16 +457,43 @@ public class WordGameScreen extends AbstractScreen {
 
     private void drawSmartStack(ShapeRenderer shapeRenderer) {
         for (LetterBlock b : stackedBlocks) {
-            b.draw(shapeRenderer);
+            drawStackedBlockShape(b, shapeRenderer);
         }
     }
 
-    private void drawStackSeparators() {
-        int[] wordCounts = {0, 0, 0};
+    private void drawStackedBlockLabels() {
         for (LetterBlock b : stackedBlocks) {
-            if (b.getWordIndex() >= 0 && b.getWordIndex() < 3) {
-                wordCounts[b.getWordIndex()]++;
-            }
+            drawStackedBlockLabel(b);
         }
+    }
+
+    private void drawStackedBlockShape(LetterBlock block, ShapeRenderer shapeRenderer) {
+        float originalX = block.getX();
+        block.setX(originalX + landingRule.getTowerSwayOffset(block.getWordIndex()));
+        block.draw(shapeRenderer);
+        block.setX(originalX);
+    }
+
+    private void drawStackedBlockLabel(LetterBlock block) {
+        float originalX = block.getX();
+        block.setX(originalX + landingRule.getTowerSwayOffset(block.getWordIndex()));
+        block.drawLabel(batch, font);
+        block.setX(originalX);
+    }
+
+    private void drawStackSeparators() {
+        font.getData().setScale(0.8f);
+        font.setColor(Color.LIGHT_GRAY);
+
+        for (int i = 0; i < 3; i++) {
+            if (!landingRule.hasStackX(i)) {
+                continue;
+            }
+
+            float x = landingRule.getStackX(i);
+            font.draw(batch, "Word " + (i + 1), x - 4f, GROUND_Y + 22f);
+        }
+
+        font.getData().setScale(1f);
     }
 }

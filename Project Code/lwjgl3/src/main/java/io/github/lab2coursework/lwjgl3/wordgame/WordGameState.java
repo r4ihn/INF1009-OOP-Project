@@ -88,14 +88,12 @@ public class WordGameState {
      * Returns the index of the word it matched (0-2), or -1 if no match.
      * If wrong, costs a life.
      */
-    public int placeNextLetter(char letter) {
+    public int peekMatchingWordIndex(char letter) {
         letter = Character.toUpperCase(letter);
 
-        // Try to match against any of the 3 words
-        // ONLY the first word that needs this letter will accept it
         for (int wordIdx = 0; wordIdx < 3; wordIdx++) {
             if (gameScore.isWordCompleted(wordIdx)) {
-                continue; // skip already-completed words
+                continue;
             }
 
             String word = targetWords.get(wordIdx);
@@ -104,17 +102,32 @@ public class WordGameState {
             if (stacked.size() < word.length()) {
                 char expected = word.charAt(stacked.size());
                 if (letter == expected) {
-                    // MATCH! Add to this word's stack
-                    stacked.add(expected);
-
-                    // Check if this word is now complete
-                    if (stacked.size() == word.length()) {
-                        gameScore.completeWord(wordIdx);
-                    }
-
-                    return wordIdx; // success - letter used by this word
+                    return wordIdx;
                 }
             }
+        }
+
+        return -1;
+    }
+
+    public int placeNextLetter(char letter) {
+        letter = Character.toUpperCase(letter);
+
+        int wordIdx = peekMatchingWordIndex(letter);
+        if (wordIdx >= 0) {
+            List<Character> stacked = stackedLettersPerWord.get(wordIdx);
+            String word = targetWords.get(wordIdx);
+            char expected = word.charAt(stacked.size());
+
+            // MATCH! Add to this word's stack
+            stacked.add(expected);
+
+            // Check if this word is now complete
+            if (stacked.size() == word.length()) {
+                gameScore.completeWord(wordIdx);
+            }
+
+            return wordIdx; // success - letter used by this word
         }
 
         // No word matched this letter - it's wrong!
