@@ -23,15 +23,13 @@ import java.util.List;
 
 /**
  * Main gameplay screen for the word-building crane game.
- *
- * Template Method pattern:
- *   render() → update() → draw()   (defined in AbstractScreen)
- *
- * Design patterns used here:
- *   - Factory Method  : LetterBlockFactory
- *   - Strategy        : CraneMovement, FallMovement, RopeSwingMovement
- *   - Strategy        : BlockLandingRule, GarbageCollectionRule (CollisionRule)
- *   - Dependency Injection : WordBank, WordGameState passed in — no singletons
+ * Now supports:
+ * - Keyboard-controlled crane (A/D or LEFT/RIGHT)
+ * - 3 simultaneous target words
+ * - Mouse-click garbage can for discarding
+ * - Physics-based block stacking
+ * - Combo points every 3 words
+ * - Multiple difficulty levels
  */
 public class WordGameScreen extends AbstractScreen {
 
@@ -108,8 +106,27 @@ public class WordGameScreen extends AbstractScreen {
             return;
         }
 
-        // ── Highlight bin when G held ─────────────────────────────────────────
-        bin.setHighlighted(Gdx.input.isKeyPressed(Input.Keys.G));
+        // ── Tower sway / settle animation ─────────────────────────────────────
+        if (landingRule.isSettling()) {
+            landingRule.update(delta);
+
+            if (landingRule.consumeWordReset()) {
+                removeBlocksForWord(landingRule.getResetWordIndex());
+                fallingBlock = null;
+                blockReleased = false;
+                scheduleNextBlock(0.6f);
+                return;
+            }
+
+            if (landingRule.consumeTowerStabilized()) {
+                fallingBlock = null;
+                blockReleased = false;
+                scheduleNextBlock(0.25f);
+                return;
+            }
+
+            return;
+        }
 
         // ── Awaiting next block spawn (brief delay after land/discard) ────────
         if (awaitingNext) {
@@ -121,11 +138,24 @@ public class WordGameScreen extends AbstractScreen {
             return;
         }
 
-        // ── Discard current hanging block (G key) ─────────────────────────────
+        // ── Mouse click on garbage can ────────────────────────────────────────
         if (!blockReleased && hangingBlock != null
-            && Gdx.input.isKeyJustPressed(Input.Keys.G)) {
-            discardHangingBlock();
-            return;
+            && Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            // Get mouse coordinates
+            float mouseX = Gdx.input.getX();
+            float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();  // Flip Y axis
+
+            // Check if click is within bin bounds
+            float binX = bin.getX();
+            float binY = bin.getY();
+            float binW = bin.getWidth();
+            float binH = bin.getHeight();
+
+            if (mouseX >= binX && mouseX <= binX + binW &&
+                mouseY >= binY && mouseY <= binY + binH) {
+                discardHangingBlock();
+                return;
+            }
         }
 
         // ── Drop block (SPACE) ────────────────────────────────────────────────
@@ -134,7 +164,7 @@ public class WordGameScreen extends AbstractScreen {
             releaseBlock();
         }
 
-        // ── Update crane movement ─────────────────────────────────────────────
+        // ── Update crane movement (keyboard controlled) ────────────────────────
         if (crane != null) {
             crane.getMovementStrategy().update(crane, delta);
         }
@@ -154,13 +184,15 @@ public class WordGameScreen extends AbstractScreen {
                 fall.update(fallingBlock, delta);
             }
 
-            // Check landing
+            LetterBlock collisionTarget = findBlockCollisionTarget();
+
+            if (collisionTarget != null) {
+                resolveFallingBlockCollision(collisionTarget);
+                return;
+            }
+
             if (landingRule.matches(fallingBlock, null)) {
-                landingRule.resolve(fallingBlock, null);
-                stackedBlocks.add(fallingBlock);
-                fallingBlock = null;
-                blockReleased = false;
-                scheduleNextBlock(0.4f);
+                resolveFallingBlockCollision(null);
                 return;
             }
         }
@@ -170,7 +202,7 @@ public class WordGameScreen extends AbstractScreen {
             screenManager.set(new WordGameEndScreen(screenManager, state.getLevel() - 1));
             return;
         }
-        if (state.isWordComplete()) {
+        if (state.isAllWordsComplete()) {
             state.advanceLevel();
             resetVisuals();
             spawnNextHangingBlock();
@@ -191,7 +223,10 @@ public class WordGameScreen extends AbstractScreen {
         if (crane != null)       crane.draw(shapeRenderer);
         if (hangingBlock != null) hangingBlock.draw(shapeRenderer);
         if (fallingBlock != null) fallingBlock.draw(shapeRenderer);
-        for (LetterBlock b : stackedBlocks) b.draw(shapeRenderer);
+
+        // Draw stacked blocks with Smart Stacking visualization
+        drawSmartStack(shapeRenderer);
+
         bin.draw(shapeRenderer);
 
         shapeRenderer.end();
@@ -203,13 +238,17 @@ public class WordGameScreen extends AbstractScreen {
         drawWordDisplay();
         if (hangingBlock != null) hangingBlock.drawLabel(batch, font);
         if (fallingBlock != null) fallingBlock.drawLabel(batch, font);
-        for (LetterBlock b : stackedBlocks) b.drawLabel(batch, font);
+        drawStackedBlockLabels();
+
+        // Draw visual separators between word sections
+        drawStackSeparators();
+
         drawBinLabel();
 
         // Draw lives as hearts
         float heartX = 80;
         float heartY = SH - 85;
-        float heartSize = 25; // Adjust size as needed
+        float heartSize = 25;
         float heartSpacing = 5;
 
         for (int i = 0; i < WordGameState.MAX_LIVES; i++) {
@@ -241,7 +280,7 @@ public class WordGameScreen extends AbstractScreen {
     private void spawnNextHangingBlock() {
         hangingBlock = blockFactory.createHangingBlock();
         hangingBlock.setMovementStrategy(
-            new RopeSwingMovement(ROPE_LEN, 0.35f, crane.getHookX(), crane.getHookY())
+            new RopeSwingMovement(ROPE_LEN, 0f, crane.getHookX(), crane.getHookY())
         );
         blockReleased = false;
         fallingBlock  = null;
@@ -260,7 +299,62 @@ public class WordGameScreen extends AbstractScreen {
         hangingBlock.setY(BIN_Y + 10f);
         garbageRule.resolve(hangingBlock, null);
         hangingBlock = null;
-        scheduleNextBlock(0.3f);
+        // Immediately spawn next block instead of waiting
+        spawnNextHangingBlock();
+    }
+
+    private LetterBlock findBlockCollisionTarget() {
+        if (fallingBlock == null) {
+            return null;
+        }
+
+        for (int i = stackedBlocks.size() - 1; i >= 0; i--) {
+            LetterBlock stacked = stackedBlocks.get(i);
+            if (landingRule.matches(fallingBlock, stacked)) {
+                return stacked;
+            }
+        }
+
+        return null;
+    }
+
+    private void resolveFallingBlockCollision(LetterBlock collisionTarget) {
+        landingRule.resolve(fallingBlock, collisionTarget);
+
+        if (fallingBlock.isDiscarded()) {
+            // Improper stacking now resets only the matching word after the sway finishes.
+            if (landingRule.isSettling()) {
+                fallingBlock = null;
+                blockReleased = false;
+                return;
+            }
+
+            // Wrong letter: WordGameState already reset the whole attempt via loseLife().
+            stackedBlocks.clear();
+            landingRule.resetStack();
+            fallingBlock = null;
+            blockReleased = false;
+            scheduleNextBlock(0.45f);
+            return;
+        }
+
+        stackedBlocks.add(fallingBlock);
+        fallingBlock = null;
+        blockReleased = false;
+
+        if (landingRule.isSettling()) {
+            return;
+        }
+
+        scheduleNextBlock(0.25f);
+    }
+
+
+    private void removeBlocksForWord(int wordIndex) {
+        if (wordIndex < 0) {
+            return;
+        }
+        stackedBlocks.removeIf(block -> block.getWordIndex() == wordIndex);
     }
 
     private void scheduleNextBlock(float delay) {
@@ -273,7 +367,7 @@ public class WordGameScreen extends AbstractScreen {
             screenManager.set(new WordGameEndScreen(screenManager, state.getLevel() - 1));
             return;
         }
-        if (state.isWordComplete()) {
+        if (state.isAllWordsComplete()) {
             state.advanceLevel();
             resetVisuals();
         }
@@ -318,31 +412,103 @@ public class WordGameScreen extends AbstractScreen {
     }
 
     private void drawHUD() {
+        // Left side: Level, Score, Combo (moved down to avoid overlap with hearts)
+        font.getData().setScale(0.9f);
         font.setColor(Color.WHITE);
-        font.draw(batch, "Level: " + state.getLevel(), 20, SH - 20);
-        font.draw(batch, "Category: " + state.getCategoryName(), 20, SH - 45);
-        font.draw(batch, "Lives:", 20, SH - 70);
+        font.draw(batch, "Level: " + state.getLevel(), 20, SH - 120);
+        font.draw(batch, "Score: " + state.getTotalScore(), 20, SH - 140);
+        font.draw(batch, "Combo: " + state.getComboCount(), 20, SH - 160);
 
-        // Controls reminder
+        // Controls reminder at bottom
+        font.getData().setScale(0.7f);
         font.setColor(Color.LIGHT_GRAY);
-        font.draw(batch, "SPACE = drop block   G = discard block   ESC = pause", 20, 30);
+        font.draw(batch, "A/D or LEFT/RIGHT = move crane   SPACE = drop block   CLICK BIN = discard   ESC = pause", 20, 30);
+        font.getData().setScale(1f);
     }
 
     private void drawWordDisplay() {
-        String display = state.getDisplayWord();
+        // Draw 3 target words at the top with clean layout
+        List<String> displays = state.getDisplayWords();
+        List<String> targetWords = state.getTargetWords();
+        float topY = SH - 50;  // Higher up to avoid overlap
+        float spacing = SW / 3.2f;
+        float startX = 80;
 
-        font.getData().setScale(2.5f);
-        font.setColor(Color.CYAN);
+        for (int i = 0; i < 3; i++) {
+            String display = displays.get(i);
+            String targetWord = targetWords.get(i);
+            boolean completed = state.getGameScore().isWordCompleted(i);
+            int points = state.getGameScore().getWordPoints().get(i);
 
-        GlyphLayout layout = new GlyphLayout(font, display);
-        float textX = (SW - layout.width) / 2f;
-        font.draw(batch, display, textX, SH - 20);
+            // Set color based on completion
+            if (completed) {
+                font.setColor(Color.LIME);
+            } else {
+                font.setColor(Color.WHITE);
+            }
+
+            // Draw target word (the goal) - larger and clear
+            font.getData().setScale(1.8f);
+            font.draw(batch, targetWord, startX + i * spacing, topY);
+
+            // Draw progress below target - smaller
+            font.getData().setScale(1.3f);
+            font.setColor(Color.CYAN);
+            font.draw(batch, display, startX + i * spacing, topY - 35);
+
+            // Draw points - small and yellow
+            font.getData().setScale(0.9f);
+            font.setColor(Color.YELLOW);
+            font.draw(batch, points + " pts", startX + i * spacing + 5, topY - 60);
+        }
 
         font.getData().setScale(1f); // reset scale
     }
 
     private void drawBinLabel() {
         font.setColor(Color.LIGHT_GRAY);
-        font.draw(batch, "BIN", BIN_X + 18f, BIN_Y - 6f);
+        font.draw(batch, "CLICK TO\nDISCARD", BIN_X + 8f, BIN_Y + 30f);
+    }
+
+    private void drawSmartStack(ShapeRenderer shapeRenderer) {
+        for (LetterBlock b : stackedBlocks) {
+            drawStackedBlockShape(b, shapeRenderer);
+        }
+    }
+
+    private void drawStackedBlockLabels() {
+        for (LetterBlock b : stackedBlocks) {
+            drawStackedBlockLabel(b);
+        }
+    }
+
+    private void drawStackedBlockShape(LetterBlock block, ShapeRenderer shapeRenderer) {
+        float originalX = block.getX();
+        block.setX(originalX + landingRule.getTowerSwayOffset(block.getWordIndex()));
+        block.draw(shapeRenderer);
+        block.setX(originalX);
+    }
+
+    private void drawStackedBlockLabel(LetterBlock block) {
+        float originalX = block.getX();
+        block.setX(originalX + landingRule.getTowerSwayOffset(block.getWordIndex()));
+        block.drawLabel(batch, font);
+        block.setX(originalX);
+    }
+
+    private void drawStackSeparators() {
+        font.getData().setScale(0.8f);
+        font.setColor(Color.LIGHT_GRAY);
+
+        for (int i = 0; i < 3; i++) {
+            if (!landingRule.hasStackX(i)) {
+                continue;
+            }
+
+            float x = landingRule.getStackX(i);
+            font.draw(batch, "Word " + (i + 1), x - 4f, GROUND_Y + 22f);
+        }
+
+        font.getData().setScale(1f);
     }
 }
