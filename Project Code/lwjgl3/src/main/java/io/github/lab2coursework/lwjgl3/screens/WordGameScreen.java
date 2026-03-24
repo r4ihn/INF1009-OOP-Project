@@ -21,13 +21,15 @@ import io.github.lab2coursework.lwjgl3.wordgame.WordGameState;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.lab2coursework.lwjgl3.collision.CollisionRule;
+
 /**
  * Main gameplay screen for the word-building crane game.
  * Now supports:
  * - Keyboard-controlled crane (A/D or LEFT/RIGHT)
  * - 3 simultaneous target words
  * - Mouse-click garbage can for discarding
- * - Physics-based block stacking
+ * - Rule-based block stacking
  * - Combo points every 3 words
  * - Multiple difficulty levels
  */
@@ -59,9 +61,10 @@ public class WordGameScreen extends AbstractScreen {
     private final List<LetterBlock> stackedBlocks = new ArrayList<>();
 
     // Managers (local to this screen, consistent with existing code style)
-    private final EntityManager  entityManager;
+    private final EntityManager   entityManager;
     private final MovementManager movementManager;
-    private final ShapeRenderer  shapeRenderer;
+    private final CollisionManager collisionManager;
+    private final ShapeRenderer   shapeRenderer;
 
     private Texture heartFullTexture;
     private Texture heartEmptyTexture;
@@ -81,8 +84,11 @@ public class WordGameScreen extends AbstractScreen {
         landingRule   = new BlockLandingRule(state);
         garbageRule   = new GarbageCollectionRule(bin, state);
 
-        entityManager  = new EntityManager();
-        shapeRenderer  = new ShapeRenderer();
+        entityManager   = new EntityManager();
+        shapeRenderer   = new ShapeRenderer();
+        collisionManager = new CollisionManager(new ArrayList<CollisionRule>());
+        collisionManager.addRule(garbageRule);
+        collisionManager.addRule(landingRule);
         movementManager = new MovementManager(entityManager.getEntities());
 
         heartFullTexture  = new Texture("heart_full.png");
@@ -184,15 +190,7 @@ public class WordGameScreen extends AbstractScreen {
                 fall.update(fallingBlock, delta);
             }
 
-            LetterBlock collisionTarget = findBlockCollisionTarget();
-
-            if (collisionTarget != null) {
-                resolveFallingBlockCollision(collisionTarget);
-                return;
-            }
-
-            if (landingRule.matches(fallingBlock, null)) {
-                resolveFallingBlockCollision(null);
+            if (tryResolveFallingBlockCollision()) {
                 return;
             }
         }
@@ -294,32 +292,38 @@ public class WordGameScreen extends AbstractScreen {
     }
 
     private void discardHangingBlock() {
-        // Move the hanging block to the bin position and trigger garbage rule
+        // Move the hanging block to the bin position and let CollisionManager apply rules.
         hangingBlock.setX(BIN_X + 10f);
         hangingBlock.setY(BIN_Y + 10f);
-        garbageRule.resolve(hangingBlock, null);
+        collisionManager.applyTo(hangingBlock, null);
         hangingBlock = null;
-        // Immediately spawn next block instead of waiting
         spawnNextHangingBlock();
     }
 
-    private LetterBlock findBlockCollisionTarget() {
+    private boolean tryResolveFallingBlockCollision() {
         if (fallingBlock == null) {
-            return null;
+            return false;
         }
 
         for (int i = stackedBlocks.size() - 1; i >= 0; i--) {
             LetterBlock stacked = stackedBlocks.get(i);
-            if (landingRule.matches(fallingBlock, stacked)) {
-                return stacked;
+            collisionManager.applyTo(fallingBlock, stacked);
+            if (fallingBlock.isLanded() || fallingBlock.isDiscarded()) {
+                resolveFallingBlockOutcome();
+                return true;
             }
         }
 
-        return null;
+        collisionManager.applyTo(fallingBlock, null);
+        if (fallingBlock.isLanded() || fallingBlock.isDiscarded()) {
+            resolveFallingBlockOutcome();
+            return true;
+        }
+
+        return false;
     }
 
-    private void resolveFallingBlockCollision(LetterBlock collisionTarget) {
-        landingRule.resolve(fallingBlock, collisionTarget);
+    private void resolveFallingBlockOutcome() {
 
         if (fallingBlock.isDiscarded()) {
             // Improper stacking now resets only the matching word after the sway finishes.

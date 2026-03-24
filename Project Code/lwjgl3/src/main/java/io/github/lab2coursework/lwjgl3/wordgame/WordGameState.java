@@ -71,6 +71,11 @@ public class WordGameState {
         resetAttempt();
     }
 
+    /** Lose one life without clearing all word progress. */
+    public void loseLifeOnly() {
+        lives--;
+    }
+
     /** Clears the current stacked progress for a fresh attempt. */
     public void resetAttempt() {
         for (List<Character> stack : stackedLettersPerWord) {
@@ -82,10 +87,6 @@ public class WordGameState {
     // ── Letter stacking ───────────────────────────────────────────────────────
 
     /**
-     * Try to place a letter onto any of the 3 word stacks.
-     * IMPORTANT: Each letter can only match ONE word. If multiple words need the same letter,
-     * only the FIRST incomplete word in the loop will accept it. Other words cannot use it.
-     * Returns the index of the word it matched (0-2), or -1 if no match.
      * If wrong, costs a life.
      */
     public int peekMatchingWordIndex(char letter) {
@@ -109,7 +110,6 @@ public class WordGameState {
 
         return -1;
     }
-
 
     public void resetWordProgress(int wordIndex) {
         if (wordIndex < 0 || wordIndex >= stackedLettersPerWord.size()) return;
