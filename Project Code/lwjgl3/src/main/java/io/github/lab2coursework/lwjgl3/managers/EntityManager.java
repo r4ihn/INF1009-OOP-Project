@@ -4,6 +4,7 @@ import java.util.List;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import io.github.lab2coursework.lwjgl3.entities.Entity;
+import io.github.lab2coursework.lwjgl3.entities.LetterBlock;
 
 public class EntityManager {
     private List<Entity> entityList = new ArrayList<>();
@@ -34,6 +35,12 @@ public class EntityManager {
     public void update() {
         for (Entity entity : entityList) {
             entity.update(); // Call individual entity logic if defined
+        }
+    }
+
+    public void removeEntities(Entity entity) {
+        if (entity != null){
+            entityList.remove(entity);
         }
     }
 }

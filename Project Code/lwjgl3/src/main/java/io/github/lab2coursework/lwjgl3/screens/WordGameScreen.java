@@ -5,11 +5,12 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import io.github.lab2coursework.lwjgl3.collision.BlockLandingRule;
 import io.github.lab2coursework.lwjgl3.collision.GarbageCollectionRule;
 import io.github.lab2coursework.lwjgl3.entities.*;
+import io.github.lab2coursework.lwjgl3.input.KeyboardInput;
+import io.github.lab2coursework.lwjgl3.input.Key;
 import io.github.lab2coursework.lwjgl3.managers.*;
 import io.github.lab2coursework.lwjgl3.movement.CraneMovement;
 import io.github.lab2coursework.lwjgl3.movement.FallMovement;
@@ -62,6 +63,7 @@ public class WordGameScreen extends AbstractScreen {
     private final EntityManager  entityManager;
     private final MovementManager movementManager;
     private final ShapeRenderer  shapeRenderer;
+    private final IOManager ioManager = new IOManager();
 
     private Texture heartFullTexture;
     private Texture heartEmptyTexture;
@@ -71,10 +73,12 @@ public class WordGameScreen extends AbstractScreen {
     private boolean awaitingNext;    // brief pause before spawning next block
     private float   awaitTimer;
 
+
     public WordGameScreen(ScreenManager screenManager, WordBank wordBank) {
         super(screenManager);
         this.state        = new WordGameState(wordBank);
         this.blockFactory = new LetterBlockFactory(state);
+        this.ioManager.setCurrentInput(new KeyboardInput());
 
         // Entities
         bin           = new GarbageCan(BIN_X, BIN_Y);
@@ -87,14 +91,21 @@ public class WordGameScreen extends AbstractScreen {
 
         heartFullTexture  = new Texture("heart_full.png");
         heartEmptyTexture = new Texture("heart_empty.png");
+
+        spawnCrane();
+        CraneMovement craneLogic = (CraneMovement) crane.getMovementStrategy();
+        // 1. Check BOTH keys for the Left movement
+        ioManager.bindKey(Key.A, () -> craneLogic.setMovingLeft(Gdx.input.isKeyPressed(Input.Keys.A)));
+
+        // 2. Check BOTH keys for the Right movement
+        ioManager.bindKey(Key.D, () -> craneLogic.setMovingRight(Gdx.input.isKeyPressed(Input.Keys.D)));
     }
 
     // ── AbstractScreen lifecycle ──────────────────────────────────────────────
 
     @Override
     public void show() {
-        super.show(); // creates batch + font from AbstractScreen fix
-        spawnCrane();
+        super.show();
         spawnNextHangingBlock();
     }
 
@@ -104,6 +115,19 @@ public class WordGameScreen extends AbstractScreen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             screenManager.push(new PauseScreen(screenManager));
             return;
+        }
+
+        ioManager.processInput(Key.A.getCode());
+        ioManager.processInput(Key.D.getCode());
+
+        // The MovementManager iterates through all entities and calls their strategies
+        movementManager.updateMovement(delta);
+        // 2. Handle Rope/Anchor (Game-specific connection logic)
+        if (!blockReleased && hangingBlock != null) {
+            RopeSwingMovement swing = (RopeSwingMovement) hangingBlock.getMovementStrategy();
+            if (swing != null) {
+                swing.setAnchor(crane.getHookX(), crane.getHookY());
+            }
         }
 
         // ── Tower sway / settle animation ─────────────────────────────────────
@@ -162,11 +186,6 @@ public class WordGameScreen extends AbstractScreen {
         if (!blockReleased && hangingBlock != null
             && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             releaseBlock();
-        }
-
-        // ── Update crane movement (keyboard controlled) ────────────────────────
-        if (crane != null) {
-            crane.getMovementStrategy().update(crane, delta);
         }
 
         // ── Update rope / falling block ───────────────────────────────────────
@@ -275,6 +294,9 @@ public class WordGameScreen extends AbstractScreen {
     private void spawnCrane() {
         crane = new CraneArm(SW / 2f - 60f, CRANE_Y);
         crane.setMovementStrategy(new CraneMovement(CRANE_MIN_X, CRANE_MAX_X));
+        crane.setSpeed(300f);
+        // Add to Entity Manager
+        entityManager.addEntities(crane);
     }
 
     private void spawnNextHangingBlock() {
@@ -284,6 +306,9 @@ public class WordGameScreen extends AbstractScreen {
         );
         blockReleased = false;
         fallingBlock  = null;
+
+        // Add block to Entity Manager
+        entityManager.addEntities(hangingBlock);
     }
 
     private void releaseBlock() {
@@ -298,6 +323,10 @@ public class WordGameScreen extends AbstractScreen {
         hangingBlock.setX(BIN_X + 10f);
         hangingBlock.setY(BIN_Y + 10f);
         garbageRule.resolve(hangingBlock, null);
+
+        // Remove from Entity Manager
+        entityManager.removeEntities(hangingBlock);
+
         hangingBlock = null;
         // Immediately spawn next block instead of waiting
         spawnNextHangingBlock();
@@ -314,7 +343,6 @@ public class WordGameScreen extends AbstractScreen {
                 return stacked;
             }
         }
-
         return null;
     }
 
@@ -332,6 +360,7 @@ public class WordGameScreen extends AbstractScreen {
             // Wrong letter: WordGameState already reset the whole attempt via loseLife().
             stackedBlocks.clear();
             landingRule.resetStack();
+            entityManager.removeEntities(fallingBlock);
             fallingBlock = null;
             blockReleased = false;
             scheduleNextBlock(0.45f);
@@ -354,7 +383,13 @@ public class WordGameScreen extends AbstractScreen {
         if (wordIndex < 0) {
             return;
         }
-        stackedBlocks.removeIf(block -> block.getWordIndex() == wordIndex);
+        stackedBlocks.removeIf(block -> {
+            if (block.getWordIndex() == wordIndex) {
+                entityManager.removeEntities(block);
+                return true;
+            }
+            return false;
+        });
     }
 
     private void scheduleNextBlock(float delay) {
@@ -375,6 +410,14 @@ public class WordGameScreen extends AbstractScreen {
     }
 
     private void resetVisuals() {
+
+        // Clear entities
+        for (LetterBlock block : stackedBlocks) {
+            entityManager.removeEntities(block);
+        }
+        if (fallingBlock != null) entityManager.removeEntities(fallingBlock);
+        if (hangingBlock != null) entityManager.removeEntities(hangingBlock);
+
         stackedBlocks.clear();
         landingRule.resetStack();
         hangingBlock  = null;
