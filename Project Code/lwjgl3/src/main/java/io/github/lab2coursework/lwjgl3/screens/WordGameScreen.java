@@ -5,15 +5,18 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import io.github.lab2coursework.lwjgl3.collision.BlockLandingRule;
 import io.github.lab2coursework.lwjgl3.collision.GarbageCollectionRule;
-import io.github.lab2coursework.lwjgl3.entities.*;
-import io.github.lab2coursework.lwjgl3.managers.*;
+import io.github.lab2coursework.lwjgl3.entities.CraneArm;
+import io.github.lab2coursework.lwjgl3.entities.GarbageCan;
+import io.github.lab2coursework.lwjgl3.entities.LetterBlock;
+import io.github.lab2coursework.lwjgl3.managers.CollisionManager;
+import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
 import io.github.lab2coursework.lwjgl3.movement.CraneMovement;
 import io.github.lab2coursework.lwjgl3.movement.FallMovement;
 import io.github.lab2coursework.lwjgl3.movement.RopeSwingMovement;
+import io.github.lab2coursework.lwjgl3.wordgame.GameScore;
 import io.github.lab2coursework.lwjgl3.wordgame.LetterBlockFactory;
 import io.github.lab2coursework.lwjgl3.wordgame.WordBank;
 import io.github.lab2coursework.lwjgl3.wordgame.WordGameState;
@@ -21,7 +24,6 @@ import io.github.lab2coursework.lwjgl3.wordgame.WordGameState;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.lab2coursework.lwjgl3.collision.CollisionRule;
 
 /**
  * Main gameplay screen for the word-building crane game.
@@ -60,11 +62,8 @@ public class WordGameScreen extends AbstractScreen {
     // All stacked (landed) blocks — for drawing only
     private final List<LetterBlock> stackedBlocks = new ArrayList<>();
 
-    // Managers (local to this screen, consistent with existing code style)
-    private final EntityManager   entityManager;
-    private final MovementManager movementManager;
     private final CollisionManager collisionManager;
-    private final ShapeRenderer   shapeRenderer;
+    private final ShapeRenderer shapeRenderer;
 
     private Texture heartFullTexture;
     private Texture heartEmptyTexture;
@@ -84,12 +83,10 @@ public class WordGameScreen extends AbstractScreen {
         landingRule   = new BlockLandingRule(state);
         garbageRule   = new GarbageCollectionRule(bin, state);
 
-        entityManager   = new EntityManager();
-        shapeRenderer   = new ShapeRenderer();
-        collisionManager = new CollisionManager(new ArrayList<CollisionRule>());
+        shapeRenderer = new ShapeRenderer();
+        collisionManager = new CollisionManager();
         collisionManager.addRule(garbageRule);
         collisionManager.addRule(landingRule);
-        movementManager = new MovementManager(entityManager.getEntities());
 
         heartFullTexture  = new Texture("heart_full.png");
         heartEmptyTexture = new Texture("heart_empty.png");
@@ -116,8 +113,8 @@ public class WordGameScreen extends AbstractScreen {
         if (landingRule.isSettling()) {
             landingRule.update(delta);
 
-            if (landingRule.consumeWordReset()) {
-                removeBlocksForWord(landingRule.getResetWordIndex());
+            if (landingRule.consumeWordResetPending()) {
+                removeBlocksForWord(landingRule.consumeResetWordIndex());
                 fallingBlock = null;
                 blockReleased = false;
                 scheduleNextBlock(0.6f);
@@ -438,11 +435,11 @@ public class WordGameScreen extends AbstractScreen {
         float spacing = SW / 3.2f;
         float startX = 80;
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < GameScore.TARGET_WORD_COUNT; i++) {
             String display = displays.get(i);
             String targetWord = targetWords.get(i);
             boolean completed = state.getGameScore().isWordCompleted(i);
-            int points = state.getGameScore().getWordPoints().get(i);
+            int points = state.getGameScore().getWordPoints(i);
 
             // Set color based on completion
             if (completed) {
@@ -504,7 +501,7 @@ public class WordGameScreen extends AbstractScreen {
         font.getData().setScale(0.8f);
         font.setColor(Color.LIGHT_GRAY);
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < GameScore.TARGET_WORD_COUNT; i++) {
             if (!landingRule.hasStackX(i)) {
                 continue;
             }

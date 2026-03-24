@@ -55,12 +55,11 @@ public class LetterBlockFactory {
         // Collect all remaining letters from all 3 incomplete words
         StringBuilder remaining = new StringBuilder();
 
-        for (int wordIdx = 0; wordIdx < 3; wordIdx++) {
+        for (int wordIdx = 0; wordIdx < GameScore.TARGET_WORD_COUNT; wordIdx++) {
             if (state.getGameScore().isWordCompleted(wordIdx)) {
-                continue; // skip completed words
+                continue;
             }
 
-            String word = state.getTargetWords().get(wordIdx);
             char nextExpected = state.getNextExpectedLetter(wordIdx);
             if (nextExpected != 0) {
                 remaining.append(nextExpected);
@@ -75,7 +74,4 @@ public class LetterBlockFactory {
         return remaining.charAt(rng.nextInt(remaining.length()));
     }
 
-    // ── Colour coding ─────────────────────────────────────────────────────────
-
-
-}
+    }

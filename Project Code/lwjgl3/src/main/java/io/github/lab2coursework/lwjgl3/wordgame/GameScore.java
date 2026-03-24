@@ -1,24 +1,26 @@
 package io.github.lab2coursework.lwjgl3.wordgame;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * Tracks score, combo multiplier, and multiple target words for simultaneous spelling.
+ * Tracks score, combo multiplier, and target word progress.
  */
 public class GameScore {
 
-    private int totalScore;
-    private int comboCount;           // number of consecutive successful words
-    private static final int COMBO_THRESHOLD = 3;  // every 3 words = combo bonus
+    public static final int TARGET_WORD_COUNT = 3;
+
+    private static final int COMBO_THRESHOLD = 3;
     private static final int BASE_WORD_POINTS = 100;
     private static final int COMBO_BONUS = 150;
     private static final int TOWER_FALL_PENALTY = 50;
 
-    // Track the 3 target words and their completion status
-    private List<String> targetWords;
-    private List<Boolean> wordCompleted;
-    private List<Integer> wordPoints;
+    private int totalScore;
+    private int comboCount;
+    private final List<String> targetWords;
+    private final List<Boolean> wordCompleted;
+    private final List<Integer> wordPoints;
 
     public GameScore() {
         this.totalScore = 0;
@@ -28,33 +30,30 @@ public class GameScore {
         this.wordPoints = new ArrayList<>();
     }
 
-    /**
-     * Initialize with 3 target words
-     */
     public void setTargetWords(List<String> words) {
-        if (words.size() != 3) {
-            throw new IllegalArgumentException("Must provide exactly 3 target words");
+        if (words.size() != TARGET_WORD_COUNT) {
+            throw new IllegalArgumentException("Must provide exactly " + TARGET_WORD_COUNT + " target words");
         }
-        this.targetWords = new ArrayList<>(words);
-        this.wordCompleted = new ArrayList<>();
-        this.wordPoints = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
+
+        targetWords.clear();
+        targetWords.addAll(words);
+        wordCompleted.clear();
+        wordPoints.clear();
+
+        for (int i = 0; i < TARGET_WORD_COUNT; i++) {
             wordCompleted.add(false);
             wordPoints.add(BASE_WORD_POINTS);
         }
     }
 
-    /**
-     * Mark a word as completed and add points
-     */
     public void completeWord(int wordIndex) {
-        if (wordIndex < 0 || wordIndex >= 3) return;
-        if (wordCompleted.get(wordIndex)) return; // already completed
+        if (!isValidWordIndex(wordIndex) || wordCompleted.get(wordIndex)) {
+            return;
+        }
 
         wordCompleted.set(wordIndex, true);
         int points = BASE_WORD_POINTS;
 
-        // Apply combo bonus
         comboCount++;
         if (comboCount % COMBO_THRESHOLD == 0) {
             points += COMBO_BONUS;
@@ -64,67 +63,70 @@ public class GameScore {
         wordPoints.set(wordIndex, points);
     }
 
-    /**
-     * Deduct points when a tower falls.
-     * Allows score to go negative.
-     */
+    public void resetWordProgress(int wordIndex) {
+        if (!isValidWordIndex(wordIndex)) {
+            return;
+        }
+        wordCompleted.set(wordIndex, false);
+        wordPoints.set(wordIndex, 0);
+    }
+
     public void applyTowerFallPenalty() {
         totalScore -= TOWER_FALL_PENALTY;
     }
 
-    /**
-     * General-purpose score adjustment.
-     * Positive adds points, negative deducts points.
-     * Allows negative total score.
-     */
     public void addScore(int points) {
         totalScore += points;
     }
 
-    /**
-     * Reset for next level
-     */
     public void resetForNextLevel() {
         comboCount = 0;
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < TARGET_WORD_COUNT; i++) {
             wordCompleted.set(i, false);
             wordPoints.set(i, BASE_WORD_POINTS);
         }
     }
 
-    /**
-     * Check if all 3 words are completed
-     */
     public boolean allWordsCompleted() {
-        return wordCompleted.get(0) && wordCompleted.get(1) && wordCompleted.get(2);
-    }
-
-    /**
-     * Get the index of the first incomplete word, or -1 if all done
-     */
-    public int getFirstIncompleteWordIndex() {
-        for (int i = 0; i < 3; i++) {
-            if (!wordCompleted.get(i)) {
-                return i;
+        for (boolean completed : wordCompleted) {
+            if (!completed) {
+                return false;
             }
         }
-        return -1;
+        return true;
     }
 
-    // Getters
-    public int getTotalScore() { return totalScore; }
-    public int getComboCount() { return comboCount; }
-    public List<String> getTargetWords() { return targetWords; }
-    public List<Boolean> getWordCompleted() { return wordCompleted; }
-    public List<Integer> getWordPoints() { return wordPoints; }
+    public int getTotalScore() {
+        return totalScore;
+    }
+
+    public int getComboCount() {
+        return comboCount;
+    }
+
+    public List<String> getTargetWords() {
+        return Collections.unmodifiableList(targetWords);
+    }
+
+    public int getWordPoints(int index) {
+        if (!isValidWordIndex(index)) {
+            return 0;
+        }
+        return wordPoints.get(index);
+    }
 
     public String getTargetWord(int index) {
-        if (index < 0 || index >= 3) return "";
+        if (!isValidWordIndex(index)) {
+            return "";
+        }
         return targetWords.get(index);
     }
 
     public boolean isWordCompleted(int index) {
-        if (index < 0 || index >= 3) return false;
-        return wordCompleted.get(index);
+        return isValidWordIndex(index) && wordCompleted.get(index);
+    }
+
+    private boolean isValidWordIndex(int index) {
+        return index >= 0 && index < TARGET_WORD_COUNT;
     }
 }

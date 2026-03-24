@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
-import io.github.lab2coursework.lwjgl3.*;
 import io.github.lab2coursework.lwjgl3.entities.Circle;
 import io.github.lab2coursework.lwjgl3.entities.Entity;
 import io.github.lab2coursework.lwjgl3.entities.Triangle;

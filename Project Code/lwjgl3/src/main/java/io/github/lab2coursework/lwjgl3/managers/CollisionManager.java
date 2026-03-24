@@ -13,21 +13,19 @@ public class CollisionManager {
     private final List<CollisionRule> rules;
 
     public CollisionManager() {
-        this.rules = new ArrayList<>();
+        this(new ArrayList<>());
     }
 
     public CollisionManager(List<CollisionRule> rules) {
         this.rules = new ArrayList<>(rules);
     }
 
-    // Add a new collision rule
     public void addRule(CollisionRule rule) {
         if (rule != null) {
             rules.add(rule);
         }
     }
 
-    // Apply all matching rules to a pair of entities
     public void applyTo(Entity first, Entity second) {
         for (CollisionRule rule : rules) {
             if (rule.matches(first, second)) {
@@ -36,22 +34,20 @@ public class CollisionManager {
         }
     }
 
-    // Apply boundary handling to one entity
-    public void applyBounds(Entity entity, float worldW, float worldH) {
-        CollisionRule boundsRule = new KeepInBoundsRule(worldW, worldH);
+    public void applyBounds(Entity entity, CollisionRule boundsRule) {
         if (boundsRule.matches(entity, null)) {
             boundsRule.resolve(entity, null);
         }
     }
 
-    // Apply bounds first, then pairwise collision rules
     public void applyAll(List<Entity> entities, float worldW, float worldH) {
         if (entities == null || entities.isEmpty()) {
             return;
         }
 
+        CollisionRule boundsRule = new KeepInBoundsRule(worldW, worldH);
         for (Entity entity : entities) {
-            applyBounds(entity, worldW, worldH);
+            applyBounds(entity, boundsRule);
         }
 
         for (int i = 0; i < entities.size(); i++) {

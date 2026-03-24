@@ -2,6 +2,7 @@ package io.github.lab2coursework.lwjgl3.collision;
 
 import io.github.lab2coursework.lwjgl3.entities.Entity;
 import io.github.lab2coursework.lwjgl3.entities.LetterBlock;
+import io.github.lab2coursework.lwjgl3.wordgame.GameScore;
 import io.github.lab2coursework.lwjgl3.wordgame.WordGameState;
 
 /** Handles landing, stacking, sway, and reset for letter blocks. */
@@ -292,7 +293,7 @@ public class BlockLandingRule implements CollisionRule {
     }
 
     public void resetStack() {
-        for (int i = 0; i < stackCountPerWord.length; i++) {
+        for (int i = 0; i < GameScore.TARGET_WORD_COUNT; i++) {
             stackCountPerWord[i] = 0;
             stackXPerWord[i] = -1f;
         }
@@ -306,13 +307,6 @@ public class BlockLandingRule implements CollisionRule {
         swayAmplitude = 0f;
     }
 
-    public boolean consumeWordReset() {
-        return consumeWordResetPending();
-    }
-
-    public int getResetWordIndex() {
-        return consumeResetWordIndex();
-    }
 
     public boolean hasStackX(int wordIdx) {
         return wordIdx >= 0
