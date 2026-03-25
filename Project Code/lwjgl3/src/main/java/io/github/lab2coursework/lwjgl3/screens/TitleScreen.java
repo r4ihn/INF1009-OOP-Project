@@ -60,9 +60,6 @@ public class TitleScreen extends AbstractScreen {
 
     @Override
     protected void update(float delta) {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            screenManager.push(new GameScreen(screenManager));  // original game
-        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
             screenManager.push(new WordGameScreen(screenManager, new WordBank())); // word game
         }
@@ -87,7 +84,6 @@ public class TitleScreen extends AbstractScreen {
 
         // Drawing the labellings on screen with blocks to make it more readable
         drawLabelWithBlock(" P4-5 OOP Game Simulation ", centreX, 600);
-        drawLabelWithBlock(">> Press ENTER to play the original game <<", centreX, 300);
         drawLabelWithBlock(">>  Press W to play the word game <<", centreX, 200);
         drawLabelWithBlock(">> Press ESC to Exit <<", centreX, 100);
 
