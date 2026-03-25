@@ -44,6 +44,13 @@ public class GameMaster extends ApplicationAdapter {
         }
     }
 
+    @Override // Override method to resize the screen
+    public void resize(int width, int height) {
+        if (screenManager != null) {
+            screenManager.resize(width, height);
+        }
+    }
+
     @Override
     public void dispose() {
         if (screenManager != null) {

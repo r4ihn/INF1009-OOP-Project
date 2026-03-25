@@ -16,7 +16,7 @@ public class WordGameEndScreen extends AbstractScreen {
     public WordGameEndScreen(ScreenManager screenManager, int levelReached) {
         super(screenManager);
         this.levelReached = levelReached;
-        this.background   = new Texture("GameOver.JPG");
+        this.background   = new Texture("GameOver.jpg");
     }
 
     @Override
