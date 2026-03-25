@@ -1,6 +1,7 @@
 package io.github.lab2coursework.lwjgl3.managers;
 
 // Import statements
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -16,6 +17,7 @@ public class ScreenManager {
         }
         screenStack.push(screen);
         screen.show(); // Show new screen
+        screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     // Pop current screen from stack
@@ -23,8 +25,11 @@ public class ScreenManager {
         if (screenStack.isEmpty()) return;
         Screen top = screenStack.pop();
         top.hide(); // Hide popped screen
+
         if (!screenStack.isEmpty()) {
+            Screen resumed = screenStack.peek();
             screenStack.peek().resume(); // Resume previous screen
+            resumed.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()); // Resize resumed screen
         }
     }
 
@@ -37,6 +42,7 @@ public class ScreenManager {
         if (screen != null) {
             screenStack.push(screen);
             screen.show();
+            screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         }
     }
 

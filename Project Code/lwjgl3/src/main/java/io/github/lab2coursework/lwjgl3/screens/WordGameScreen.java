@@ -56,7 +56,7 @@ public class WordGameScreen extends AbstractScreen {
     private final GarbageCollectionRule garbageRule;
 
     private CraneArm    crane;
-    private GarbageCan  bin;
+    private final GarbageCan  bin;
     private LetterBlock hangingBlock;    // block currently on the rope
     private LetterBlock fallingBlock;    // block after SPACE is pressed (in free-fall)
 
@@ -98,6 +98,7 @@ public class WordGameScreen extends AbstractScreen {
     @Override
     public void show() {
         super.show(); // creates batch + font from AbstractScreen fix
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true); // Safeguard in case viewport does not work on other screens
         spawnCrane();
         spawnNextHangingBlock();
     }
@@ -247,7 +248,7 @@ public class WordGameScreen extends AbstractScreen {
         viewport.unproject(mouse);
         float mouseX = mouse.x;
         float mouseY = mouse.y;
-        
+
         // Draw lives as hearts
         float heartX = 80;
         float heartY = SH - 85;
