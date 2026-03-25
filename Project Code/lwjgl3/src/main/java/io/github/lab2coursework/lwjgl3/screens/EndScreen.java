@@ -3,21 +3,24 @@ package io.github.lab2coursework.lwjgl3.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
+import io.github.lab2coursework.lwjgl3.managers.AudioManager;
 import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
 
 public class EndScreen extends AbstractScreen {
+    private final AudioManager audioManager;
 
-    public EndScreen(ScreenManager screenManager) {
+    public EndScreen(ScreenManager screenManager, AudioManager audioManager) {
         super(screenManager);
+        this.audioManager = audioManager;
     }
 
     @Override
     protected void update(float delta) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-            screenManager.set(new GameScreen(screenManager));
+            screenManager.set(new GameScreen(screenManager, audioManager));
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            screenManager.set(new TitleScreen(screenManager));
+            screenManager.set(new TitleScreen(screenManager, audioManager));
         }
     }
 

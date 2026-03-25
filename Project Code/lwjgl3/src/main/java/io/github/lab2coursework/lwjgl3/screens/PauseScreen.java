@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import io.github.lab2coursework.lwjgl3.managers.AudioManager;
 import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
 
 public class PauseScreen extends AbstractScreen {
@@ -17,10 +18,11 @@ public class PauseScreen extends AbstractScreen {
     private final Texture panelTexture; // setting background image
     private final Texture grayPixel;     // for dark overlay rectangle
     private final GlyphLayout layout = new GlyphLayout();
+    private final AudioManager audioManager;
 
-    public PauseScreen(ScreenManager screenManager) {
+    public PauseScreen(ScreenManager screenManager, AudioManager audioManager) {
         super(screenManager);
-
+        this.audioManager = audioManager;
         panelTexture = new Texture("pauseScreen.jpg");
 
         Pixmap p = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -44,7 +46,7 @@ public class PauseScreen extends AbstractScreen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            screenManager.set(new TitleScreen(screenManager));
+            screenManager.set(new TitleScreen(screenManager, audioManager));;
         }
     }
 
@@ -54,10 +56,10 @@ public class PauseScreen extends AbstractScreen {
                 screenManager.pop();
                 break;
             case 1: // RESTART (example: return to title or restart current game)
-                screenManager.set(new TitleScreen(screenManager));
+                screenManager.set(new TitleScreen(screenManager, audioManager));
                 break;
             case 2: // QUIT TO MENU
-                screenManager.set(new TitleScreen(screenManager));
+                screenManager.set(new TitleScreen(screenManager, audioManager));
                 break;
             default:
                 break;
@@ -126,5 +128,16 @@ public class PauseScreen extends AbstractScreen {
         super.dispose();
         panelTexture.dispose();
         grayPixel.dispose();
+    }
+
+    @Override
+    public void show() {
+        audioManager.playSound("pause");
+        audioManager.stopMusic("game_bgm");
+    }
+
+    @Override
+    public void hide() {
+        audioManager.playMusic("game_bgm", true);
     }
 }

@@ -12,7 +12,8 @@ public class GameMaster extends ApplicationAdapter {
     protected EntityManager    entityManager;
     protected ScreenManager    screenManager;
     protected CollisionManager collisionManager;
-    protected MovementManager  movementManager;   // FIX: now properly instantiated
+    protected MovementManager  movementManager;
+    protected AudioManager audioManager;
 
     // Engine State
     protected boolean isRunning;
@@ -24,6 +25,7 @@ public class GameMaster extends ApplicationAdapter {
         entityManager    = new EntityManager();
         screenManager    = new ScreenManager();
         collisionManager = new CollisionManager();
+        audioManager = new AudioManager();
 
         // FIX: instantiate with the engine-level entity list.
         // Each Screen also creates its own local EntityManager + MovementManager,
@@ -33,7 +35,7 @@ public class GameMaster extends ApplicationAdapter {
         isRunning = true;
 
         // Set initial screen to TitleScreen
-        screenManager.set(new TitleScreen(screenManager));
+        screenManager.set(new TitleScreen(screenManager, audioManager));
     }
 
     @Override
@@ -55,6 +57,9 @@ public class GameMaster extends ApplicationAdapter {
     public void dispose() {
         if (screenManager != null) {
             screenManager.dispose();
+        }
+        if (audioManager != null) {
+            audioManager.dispose();
         }
     }
 }

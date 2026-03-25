@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import io.github.lab2coursework.lwjgl3.managers.AudioManager;
 import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
 import io.github.lab2coursework.lwjgl3.wordgame.WordBank;
 
@@ -16,13 +17,15 @@ public class TitleScreen extends AbstractScreen {
     private final Texture titleBackground;
     private final Texture whitePixel; // Drawing solid rectangles behind the words
     private final GlyphLayout layout = new  GlyphLayout();
+    private final AudioManager audioManager;
 
     // Constant variables
     private static final Color textColour = new Color(Color.WHITE);
     private static final Color blockColour = new Color(Color.DARK_GRAY);
 
-    public TitleScreen(ScreenManager screenManager) {
+    public TitleScreen(ScreenManager screenManager, AudioManager audioManager) {
         super(screenManager);
+        this.audioManager = audioManager;
         titleBackground = new Texture("titleBackground.jpg");
 
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -61,10 +64,10 @@ public class TitleScreen extends AbstractScreen {
     @Override
     protected void update(float delta) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            screenManager.push(new GameScreen(screenManager));  // original game
+            screenManager.push(new GameScreen(screenManager, audioManager));  // original game
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
-            screenManager.push(new WordGameScreen(screenManager, new WordBank())); // word game
+            screenManager.push(new WordGameScreen(screenManager, new WordBank(), audioManager)); // word game
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();
@@ -99,5 +102,15 @@ public class TitleScreen extends AbstractScreen {
         super.dispose();
         titleBackground.dispose();
         whitePixel.dispose();
+    }
+
+    @Override
+    public void show() {
+        audioManager.playMusic("title_bgm", true);
+    }
+
+    @Override
+    public void hide() {
+        audioManager.stopMusic("title_bgm");
     }
 }

@@ -13,6 +13,7 @@ import io.github.lab2coursework.lwjgl3.collision.GarbageCollectionRule;
 import io.github.lab2coursework.lwjgl3.entities.CraneArm;
 import io.github.lab2coursework.lwjgl3.entities.GarbageCan;
 import io.github.lab2coursework.lwjgl3.entities.LetterBlock;
+import io.github.lab2coursework.lwjgl3.managers.AudioManager;
 import io.github.lab2coursework.lwjgl3.managers.CollisionManager;
 import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
 import io.github.lab2coursework.lwjgl3.movement.CraneMovement;
@@ -79,10 +80,17 @@ public class WordGameScreen extends AbstractScreen {
     private boolean awaitingNext;    // brief pause before spawning next block
     private float   awaitTimer;
 
-    public WordGameScreen(ScreenManager screenManager, WordBank wordBank) {
+    private final AudioManager audioManager;
+
+    public WordGameScreen(ScreenManager screenManager, WordBank wordBank, AudioManager audioManager) {
         super(screenManager);
         this.state        = new WordGameState(wordBank);
+        this.audioManager = audioManager;
         this.blockFactory = new LetterBlockFactory(state);
+
+        audioManager.loadSound("correct", "correct.wav");
+        audioManager.loadSound("wrong", "wrong.wav");
+        audioManager.loadSound("complete", "complete.wav");
 
         // background image
         backgroundImage = new Texture("gameScreenImage.jpg");
@@ -109,6 +117,21 @@ public class WordGameScreen extends AbstractScreen {
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true); // Safeguard in case viewport does not work on other screens
         spawnCrane();
         spawnNextHangingBlock();
+
+        // Bgm
+        audioManager.playMusic("game_bgm", true);
+
+        // Correct letter placed
+        audioManager.playSound("correct");
+
+        // Wrong letter / lose life
+        audioManager.playSound("wrong");
+
+        // Word completed
+        audioManager.playSound("complete");
+
+        // All words complete / level up
+        audioManager.playSound("levelup");
     }
 
     @Override
@@ -120,7 +143,7 @@ public class WordGameScreen extends AbstractScreen {
     protected void update(float delta) {
         // ── Pause ─────────────────────────────────────────────────────────────
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            screenManager.push(new PauseScreen(screenManager));
+            screenManager.push(new PauseScreen(screenManager, audioManager));
             return;
         }
 

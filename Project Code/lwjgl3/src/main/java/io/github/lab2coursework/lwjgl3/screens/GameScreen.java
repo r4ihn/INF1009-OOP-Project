@@ -25,14 +25,15 @@ public class GameScreen extends AbstractScreen {
     private final EntityManager entityManager;
     private final CollisionManager collisionManager;
     private final MovementManager movementManager;
+    private final AudioManager audioManager;
 
     private final SpriteBatch spriteBatch;
     private final ShapeRenderer shapeRenderer;
     private final Texture backgroundTexture = new Texture("GameBG.jpg");
 
-    public GameScreen(ScreenManager screenManager) {
+    public GameScreen(ScreenManager screenManager, AudioManager audioManager) {
         super(screenManager);
-
+        this.audioManager = audioManager;
         ioManager = new IOManager();
         entityManager = new EntityManager();
         collisionManager = new CollisionManager();
@@ -84,7 +85,7 @@ public class GameScreen extends AbstractScreen {
     @Override
     protected void update(float delta) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-            screenManager.push(new PauseScreen(screenManager));
+            screenManager.push(new PauseScreen(screenManager, audioManager));
         }
 
         ioManager.processInput(Key.W.getCode());

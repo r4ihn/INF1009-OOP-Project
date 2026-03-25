@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import io.github.lab2coursework.lwjgl3.managers.AudioManager;
 import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
 import io.github.lab2coursework.lwjgl3.wordgame.WordBank;
 
@@ -12,20 +13,22 @@ public class WordGameEndScreen extends AbstractScreen {
 
     private final int levelReached;
     private final Texture background;
+    private final AudioManager audioManager;
 
     public WordGameEndScreen(ScreenManager screenManager, int levelReached) {
         super(screenManager);
         this.levelReached = levelReached;
         this.background   = new Texture("GameOver.jpg");
+        this.audioManager   = new AudioManager();
     }
 
     @Override
     protected void update(float delta) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-            screenManager.set(new WordGameScreen(screenManager, new WordBank()));
+            screenManager.set(new WordGameScreen(screenManager, new WordBank(), audioManager));
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            screenManager.set(new TitleScreen(screenManager));
+            screenManager.set(new TitleScreen(screenManager, audioManager));
         }
     }
 
@@ -54,5 +57,11 @@ public class WordGameEndScreen extends AbstractScreen {
     public void dispose() {
         super.dispose();
         background.dispose();
+    }
+
+    @Override
+    public void show() {
+        audioManager.stopMusic("game_bgm");
+        audioManager.playMusic("gameover_bgm", false);
     }
 }
