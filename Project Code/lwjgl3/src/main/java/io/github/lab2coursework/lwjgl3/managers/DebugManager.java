@@ -1,5 +1,8 @@
 package io.github.lab2coursework.lwjgl3.managers;
 
+/**
+ * Holds runtime debug toggles used by optional debug overlays/tools.
+ */
 public class DebugManager {
 
     private boolean debugRenderingEnabled;

@@ -7,7 +7,9 @@ import io.github.lab2coursework.lwjgl3.entities.Entity;
 import java.util.ArrayList;
 import java.util.List;
 
-// Coordinates collision rules without storing collision logic itself
+/**
+ * Applies collision rules to entities without embedding rule logic itself.
+ */
 public class CollisionManager {
 
     private final List<CollisionRule> rules;
@@ -27,6 +29,7 @@ public class CollisionManager {
     }
 
     public void applyTo(Entity first, Entity second) {
+        // Multiple rules can react to the same pair if needed.
         for (CollisionRule rule : rules) {
             if (rule.matches(first, second)) {
                 rule.resolve(first, second);

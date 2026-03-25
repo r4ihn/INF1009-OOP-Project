@@ -1,5 +1,8 @@
 package io.github.lab2coursework.lwjgl3.input;
 
+/**
+ * Logical input keys used by the custom input binding system.
+ */
 public enum Key {
     // Keyboard keys
     W(87), A(65), S(83), D(68),
@@ -16,6 +19,7 @@ public enum Key {
     }
 
     public static Key fromCode(int code) {
+        // Linear scan is fine because the enum is small.
         for (Key key : values()) {
             if (key.code == code) {
                 return key;

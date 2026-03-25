@@ -8,6 +8,9 @@ import com.badlogic.gdx.graphics.Texture;
 import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
 import io.github.lab2coursework.lwjgl3.wordgame.WordBank;
 
+/**
+ * End-of-run screen that shows the highest level reached.
+ */
 public class WordGameEndScreen extends AbstractScreen {
 
     private final int levelReached;

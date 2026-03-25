@@ -2,9 +2,13 @@ package io.github.lab2coursework.lwjgl3.collision;
 
 import io.github.lab2coursework.lwjgl3.entities.LetterBlock;
 
+/**
+ * Applies final placement/discard transforms after landing decisions are made.
+ */
 public class BlockPlacementService {
 
     public void markDiscarded(LetterBlock block) {
+        // Null movement freezes the block so gravity/swing no longer updates it.
         block.setDiscarded(true);
         block.setMovementStrategy(null);
     }

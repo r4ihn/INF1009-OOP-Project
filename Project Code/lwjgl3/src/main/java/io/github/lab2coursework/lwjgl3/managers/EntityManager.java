@@ -7,6 +7,9 @@ import io.github.lab2coursework.lwjgl3.entities.Entity;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Owns active entities and forwards update/draw calls to each one.
+ */
 public class EntityManager {
     private final List<Entity> entityList = new ArrayList<>();
 
@@ -25,6 +28,7 @@ public class EntityManager {
     }
 
     public void draw(SpriteBatch batch, ShapeRenderer shape) {
+        // Supports shape-only, batch-only, or mixed render passes.
         for (Entity entity : entityList) {
             if (batch != null && batch.isDrawing()) {
                 entity.draw(batch);

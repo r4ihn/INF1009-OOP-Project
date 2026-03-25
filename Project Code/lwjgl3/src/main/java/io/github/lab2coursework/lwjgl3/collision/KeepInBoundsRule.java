@@ -2,7 +2,9 @@ package io.github.lab2coursework.lwjgl3.collision;
 
 import io.github.lab2coursework.lwjgl3.entities.Entity;
 
-// Keeps an entity inside the world bounds
+/**
+ * Clamps an entity's position so it stays inside the configured world bounds.
+ */
 public class KeepInBoundsRule implements CollisionRule {
 
     private final float worldW;

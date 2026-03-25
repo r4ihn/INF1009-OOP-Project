@@ -2,6 +2,9 @@ package io.github.lab2coursework.lwjgl3.collision;
 
 import io.github.lab2coursework.lwjgl3.entities.LetterBlock;
 
+/**
+ * Pure geometry checks used by landing rules.
+ */
 public class BlockLandingValidator {
 
     public float getCenterX(LetterBlock block) {

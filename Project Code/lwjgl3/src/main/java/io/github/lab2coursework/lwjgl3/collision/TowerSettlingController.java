@@ -1,5 +1,9 @@
 package io.github.lab2coursework.lwjgl3.collision;
 
+/**
+ * Tracks short tower settle animations after imperfect landings.
+ * It also tells the caller whether the settle should end in collapse.
+ */
 public class TowerSettlingController {
 
     private static final float SWAY_DURATION = 0.30f;
@@ -13,6 +17,7 @@ public class TowerSettlingController {
     private float swayAmplitude = 0f;
 
     public void startSettlingForReset(int wordIdx, float error) {
+        // Collapse mode: sway first, then signal reset when duration completes.
         settling = true;
         settlingWordIndex = wordIdx;
         settlingTimer = 0f;
@@ -21,6 +26,7 @@ public class TowerSettlingController {
     }
 
     public void startSettlingForStabilize(int wordIdx) {
+        // Stabilize mode: sway briefly, then keep stack intact.
         settling = true;
         settlingWordIndex = wordIdx;
         settlingTimer = 0f;
@@ -41,6 +47,7 @@ public class TowerSettlingController {
     public float getSwayOffset() {
         if (!settling) return 0f;
 
+        // Sin wave gives a readable side-to-side wobble.
         return (float) Math.sin(settlingTimer * SWAY_FREQUENCY) * swayAmplitude;
     }
 

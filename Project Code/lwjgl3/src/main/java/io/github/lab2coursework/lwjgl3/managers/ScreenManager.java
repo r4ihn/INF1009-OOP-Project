@@ -6,10 +6,13 @@ import com.badlogic.gdx.Screen;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+/**
+ * Manages screens as a stack so gameplay can pause and resume cleanly.
+ */
 public class ScreenManager {
     private final Deque<Screen> screenStack = new ArrayDeque<>();
 
-    // Push new screen onto stack
+    /** Places a new screen on top and pauses the previous one. */
     public void push(Screen screen) {
         if (screen == null) return;
         if (!screenStack.isEmpty()) {
@@ -20,7 +23,7 @@ public class ScreenManager {
         screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
-    // Pop current screen from stack
+    /** Removes the current screen and resumes the previous one if present. */
     public void pop() {
         if (screenStack.isEmpty()) return;
         Screen top = screenStack.pop();
@@ -33,6 +36,7 @@ public class ScreenManager {
         }
     }
 
+    /** Replaces the whole stack with a single screen. */
     public void set(Screen screen) {
         while (!screenStack.isEmpty()) {
             Screen top = screenStack.pop();
@@ -46,10 +50,12 @@ public class ScreenManager {
         }
     }
 
+    /** Returns the current top screen without removing it. */
     public Screen peak() {
         return screenStack.peek();
     }
 
+    /** Forwards frame rendering to the top screen only. */
     public void render(float delta) {
         Screen top = screenStack.peek();
         if (top != null) {

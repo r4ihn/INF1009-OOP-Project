@@ -2,6 +2,9 @@ package io.github.lab2coursework.lwjgl3.movement;
 
 import io.github.lab2coursework.lwjgl3.entities.Entity;
 
+/**
+ * Simple downward AI movement that respawns entities at the top.
+ */
 public class AIMovement extends Movement {
 
     @Override

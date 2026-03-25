@@ -1,5 +1,8 @@
 package io.github.lab2coursework.lwjgl3.input;
 
+/**
+ * Keyboard implementation of the generic input binding map.
+ */
 public class KeyboardInput extends Input {
 
     @Override

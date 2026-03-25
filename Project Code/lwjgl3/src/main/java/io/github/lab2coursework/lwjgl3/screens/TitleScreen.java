@@ -11,6 +11,9 @@ import io.github.lab2coursework.lwjgl3.wordgame.WordBank;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
+/**
+ * Main menu screen that shows controls and starts the game.
+ */
 public class TitleScreen extends AbstractScreen {
 
     private final Texture titleBackground;

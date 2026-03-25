@@ -15,6 +15,10 @@ import io.github.lab2coursework.lwjgl3.wordgame.WordGameState;
 
 import java.util.List;
 
+/**
+ * Handles all visual output for the gameplay screen.
+ * Uses separate passes for textures, shapes, and text.
+ */
 public class WordGameRenderer {
     private final WordGameController controller;
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
@@ -28,6 +32,7 @@ public class WordGameRenderer {
     }
 
     public void draw(float worldW, float worldH, SpriteBatch batch, BitmapFont font, Matrix4 projection) {
+        // Pass 1: clear and draw full-screen background texture.
         Gdx.gl.glClearColor(0.12f, 0.16f, 0.22f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -35,6 +40,7 @@ public class WordGameRenderer {
         batch.draw(backgroundImage, 0, 0, worldW, worldH);
         batch.end();
 
+        // Pass 2: draw geometric gameplay bodies.
         shapeRenderer.setProjectionMatrix(projection);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         drawGround();
@@ -42,6 +48,7 @@ public class WordGameRenderer {
         drawBodies();
         shapeRenderer.end();
 
+        // Pass 3: draw HUD and labels on top.
         batch.begin();
         drawHUD(batch, font);
         drawWordDisplay(batch, font);
@@ -85,6 +92,7 @@ public class WordGameRenderer {
         if (controller.getHangingBlock() != null) controller.getHangingBlock().draw(shapeRenderer);
         if (controller.getFallingBlock() != null) controller.getFallingBlock().draw(shapeRenderer);
 
+        // Apply temporary sway offset while a tower is settling, then restore real X.
         for (LetterBlock b : controller.getStackedBlocks()) {
             float originalX = b.getX();
             b.setX(originalX + controller.getLandingRule().getTowerSwayOffset(b.getWordIndex()));
@@ -136,6 +144,7 @@ public class WordGameRenderer {
         if (controller.getHangingBlock() != null) controller.getHangingBlock().drawLabel(batch, font);
         if (controller.getFallingBlock() != null) controller.getFallingBlock().drawLabel(batch, font);
 
+        // Mirror sway offset for text so labels stay aligned to moving blocks.
         for (LetterBlock b : controller.getStackedBlocks()) {
             float originalX = b.getX();
             b.setX(originalX + controller.getLandingRule().getTowerSwayOffset(b.getWordIndex()));

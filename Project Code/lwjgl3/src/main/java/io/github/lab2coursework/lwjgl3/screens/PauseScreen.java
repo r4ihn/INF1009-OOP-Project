@@ -9,6 +9,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
 
+/**
+ * Pause overlay screen with resume/restart/menu options.
+ */
 public class PauseScreen extends AbstractScreen {
 
     private final String[] menu = { "RESUME", "RESTART", "QUIT TO MENU" };

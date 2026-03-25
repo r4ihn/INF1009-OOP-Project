@@ -3,6 +3,10 @@ package io.github.lab2coursework.lwjgl3.collision;
 import io.github.lab2coursework.lwjgl3.entities.LetterBlock;
 import io.github.lab2coursework.lwjgl3.wordgame.GameScore;
 
+/**
+ * Stores per-word stack height and last landed X position.
+ * This keeps landing rules small and focused on decision-making.
+ */
 public class BlockStackTracker {
 
     private final float stackBaseY;
@@ -69,6 +73,7 @@ public class BlockStackTracker {
             return false;
         }
 
+        // Expected Y for the current top-most block in this tower.
         float expectedTopY = stackBaseY + (stackCountPerWord[wordIdx] - 1) * blockHeight;
         return Math.abs(block.getY() - expectedTopY) < 0.5f;
     }

@@ -27,6 +27,10 @@ import io.github.lab2coursework.lwjgl3.movement.AnchoredMovement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Owns gameplay state transitions for the word-crane round.
+ * Rendering is handled separately by {@link WordGameRenderer}.
+ */
 public class WordGameController {
     public static final int SW = 1280;
     public static final int SH = 720;
@@ -74,16 +78,19 @@ public class WordGameController {
     }
 
     public void onShow() {
+        // Start each screen entry with a fresh crane and first hanging letter.
         spawnCrane();
         spawnNextHangingBlock();
     }
 
     public void update(float delta) {
+        // 1) Global screen-level actions.
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             screenManager.push(new PauseScreen(screenManager));
             return;
         }
 
+        // 2) Let current tower settling animation finish before accepting new actions.
         if (landingRule.isSettling()) {
             landingRule.update(delta);
 
@@ -104,6 +111,7 @@ public class WordGameController {
             return;
         }
 
+        // 3) Delay spawning after collisions so transitions feel readable.
         if (awaitingNext) {
             awaitTimer -= delta;
             if (awaitTimer <= 0f) {
@@ -113,6 +121,7 @@ public class WordGameController {
             return;
         }
 
+        // 4) Optional discard by clicking inside the bin bounds.
         if (!blockReleased && hangingBlock != null && Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
             viewport.unproject(mouse);
@@ -128,10 +137,12 @@ public class WordGameController {
             }
         }
 
+        // 5) Drop currently hanging block.
         if (!blockReleased && hangingBlock != null && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             releaseBlock();
         }
 
+        // 6) Update crane movement and attached rope movement.
         if (crane != null && crane.getMovementStrategy() != null) {
             crane.getMovementStrategy().update(crane, delta);
         }
@@ -145,6 +156,7 @@ public class WordGameController {
             }
         }
 
+        // 7) Apply falling physics and resolve collisions once dropped.
         if (blockReleased && fallingBlock != null) {
             Movement m = fallingBlock.getMovementStrategy();
             if (m instanceof FallMovement) {
@@ -154,6 +166,7 @@ public class WordGameController {
             if (tryResolveFallingBlockCollision()) return;
         }
 
+        // 8) Final state checks for screen transition or level advance.
         if (state.isGameOver()) {
             screenManager.set(new WordGameEndScreen(screenManager, state.getLevel() - 1));
             return;
@@ -167,6 +180,7 @@ public class WordGameController {
     }
 
     private void spawnCrane() {
+        // Crane starts near centre so both side stacks are reachable.
         crane = new CraneArm(SW / 2f - 60f, CRANE_Y);
         crane.setMovementStrategy(new CraneMovement(CRANE_MIN_X, CRANE_MAX_X));
     }
@@ -186,6 +200,7 @@ public class WordGameController {
     }
 
     private void discardHangingBlock() {
+        // Teleport into bin and let collision rules handle score/life side effects.
         hangingBlock.setX(BIN_X + 10f);
         hangingBlock.setY(BIN_Y + 10f);
         collisionManager.applyTo(hangingBlock, null);
@@ -194,6 +209,7 @@ public class WordGameController {
     }
 
     private boolean tryResolveFallingBlockCollision() {
+        // Try tower collisions first so top-on-stack landings win over ground checks.
         if (fallingBlock == null) return false;
 
         for (int i = stackedBlocks.size() - 1; i >= 0; i--) {
@@ -215,6 +231,7 @@ public class WordGameController {
     }
 
     private void resolveFallingBlockOutcome() {
+        // Discarded blocks can either trigger tower reset flow or immediate respawn.
         if (fallingBlock.isDiscarded()) {
             if (landingRule.isSettling()) {
                 fallingBlock = null;
@@ -249,6 +266,7 @@ public class WordGameController {
     }
 
     private void handlePostBlockAction() {
+        // Centralized post-delay transition logic keeps update() easier to read.
         if (state.isGameOver()) {
             screenManager.set(new WordGameEndScreen(screenManager, state.getLevel() - 1));
             return;

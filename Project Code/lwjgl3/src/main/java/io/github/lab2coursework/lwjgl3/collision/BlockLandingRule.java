@@ -72,6 +72,7 @@ public class BlockLandingRule implements CollisionRule {
     }
 
     private void handleStackCollision(LetterBlock block, LetterBlock stacked, int matchedWordIdx) {
+        // A valid stack hit must match the same word tower and land on its top block.
         boolean validTopLanding =
             matchedWordIdx >= 0
                 && stacked.getWordIndex() == matchedWordIdx
@@ -87,6 +88,7 @@ public class BlockLandingRule implements CollisionRule {
     }
 
     private void handleValidTopLanding(LetterBlock block, LetterBlock stacked) {
+        // Score/state advance is decided first so visual placement reflects the accepted word.
         int placedWordIdx = state.placeNextLetter(block.getLetter());
         if (placedWordIdx < 0) {
             placementService.markDiscarded(block);
@@ -100,6 +102,7 @@ public class BlockLandingRule implements CollisionRule {
         stackTracker.recordLanding(placedWordIdx, block);
 
         float absError = Math.abs(horizontalError);
+        // Large error collapses tower, medium error triggers a temporary sway, small error is stable.
         if (absError > MAX_STACK_OFFSET) {
             settlingController.startSettlingForReset(placedWordIdx, absError);
         } else if (absError >= SWAY_TRIGGER_ERROR) {
@@ -122,6 +125,7 @@ public class BlockLandingRule implements CollisionRule {
     }
 
     private void handleGroundCollision(LetterBlock block, int matchedWordIdx) {
+        // Wrong letter on ground is an immediate life loss and reset.
         if (matchedWordIdx < 0) {
             state.loseLife();
             placementService.markDiscarded(block);
@@ -162,6 +166,7 @@ public class BlockLandingRule implements CollisionRule {
     }
 
     public void update(float delta) {
+        // Preserve previous state so we can emit one-shot events when settling ends.
         boolean wasSettling = settlingController.isSettling();
 
         settlingController.update(delta);
@@ -170,6 +175,7 @@ public class BlockLandingRule implements CollisionRule {
             int wordIdx = settlingController.getSettlingWordIndex();
 
             if (settlingController.shouldCollapse()) {
+                // Collapse flow resets only the affected word tower.
                 stackTracker.resetWordStack(wordIdx);
                 state.resetWordProgress(wordIdx);
                 wordResetPending = true;

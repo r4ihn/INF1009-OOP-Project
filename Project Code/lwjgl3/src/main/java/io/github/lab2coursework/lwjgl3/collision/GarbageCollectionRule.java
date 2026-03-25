@@ -5,7 +5,9 @@ import io.github.lab2coursework.lwjgl3.entities.GarbageCan;
 import io.github.lab2coursework.lwjgl3.entities.LetterBlock;
 import io.github.lab2coursework.lwjgl3.wordgame.WordGameState;
 
-// Discards a falling block when it enters the garbage can
+/**
+ * Handles block disposal when a falling letter overlaps the garbage can.
+ */
 public class GarbageCollectionRule implements CollisionRule {
 
     private final GarbageCan bin;

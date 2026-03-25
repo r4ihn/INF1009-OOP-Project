@@ -1,5 +1,8 @@
 package io.github.lab2coursework.lwjgl3.input;
 
+/**
+ * Mouse-button implementation of the generic input binding map.
+ */
 public class MouseInput extends Input {
 
     @Override

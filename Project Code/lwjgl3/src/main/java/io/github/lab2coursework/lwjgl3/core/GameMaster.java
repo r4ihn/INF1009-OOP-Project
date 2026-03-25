@@ -5,6 +5,10 @@ import com.badlogic.gdx.Gdx;
 import io.github.lab2coursework.lwjgl3.managers.*;
 import io.github.lab2coursework.lwjgl3.screens.TitleScreen;
 
+/**
+ * Main LibGDX application entry point for the desktop module.
+ * It wires engine managers once, then forwards frame events to the active screen.
+ */
 public class GameMaster extends ApplicationAdapter {
 
     // Managers
@@ -20,6 +24,7 @@ public class GameMaster extends ApplicationAdapter {
 
     @Override
     public void create() {
+        // Build shared services before any screen starts using them.
         ioManager        = new IOManager();
         entityManager    = new EntityManager();
         screenManager    = new ScreenManager();
@@ -38,6 +43,7 @@ public class GameMaster extends ApplicationAdapter {
 
     @Override
     public void render() {
+        // Keep delta time centralized so the active screen gets consistent frame timing.
         deltaTime = Gdx.graphics.getDeltaTime();
         if (isRunning) {
             screenManager.render(deltaTime);

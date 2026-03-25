@@ -3,6 +3,9 @@ package io.github.lab2coursework.lwjgl3.wordgame;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * In-memory dictionary grouped by themed categories.
+ */
 public class WordBank {
     private final List<WordCategory> categories;
 
@@ -45,10 +48,12 @@ public class WordBank {
     public List<WordCategory> getCategories() { return categories; }
 
     public WordCategory getCategory(int index) {
+        // Wrap index so callers can request categories without bounds checks.
         return categories.get(index % categories.size());
     }
 
     public String getCategoryNameForWord(String word) {
+        // Linear scan is fine here because the dictionary is small and static.
         for (WordCategory cat : categories) {
             for (String w : cat.getWords()) {
                 if (w.equalsIgnoreCase(word)) return cat.getName();

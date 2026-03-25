@@ -5,6 +5,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import io.github.lab2coursework.lwjgl3.entities.Entity;
 
+/**
+ * Simple entity that renders a texture at its world position.
+ */
 public class TextureObject extends Entity {
     private Texture tex;
 

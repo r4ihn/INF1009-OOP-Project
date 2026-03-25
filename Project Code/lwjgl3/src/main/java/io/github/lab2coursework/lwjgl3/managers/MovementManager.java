@@ -5,6 +5,9 @@ import io.github.lab2coursework.lwjgl3.movement.Movement;
 
 import java.util.List;
 
+/**
+ * Updates each entity using its assigned movement strategy.
+ */
 public class MovementManager {
 
     private final List<Entity> entities;

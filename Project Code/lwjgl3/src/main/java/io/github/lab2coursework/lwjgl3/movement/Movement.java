@@ -2,6 +2,10 @@ package io.github.lab2coursework.lwjgl3.movement;
 
 import io.github.lab2coursework.lwjgl3.entities.Entity;
 
+/**
+ * Base strategy for entity movement.
+ * Concrete implementations decide which directional helpers to apply.
+ */
 public abstract class Movement {
 
     public abstract void update(Entity entity, float deltaTime);

@@ -5,6 +5,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import io.github.lab2coursework.lwjgl3.movement.Movement;
 
+/**
+ * Base game object with shared position, color, speed, and movement strategy.
+ */
 public abstract class Entity {
     // Private attributes for Encapsulation
     private float x, y, speed;

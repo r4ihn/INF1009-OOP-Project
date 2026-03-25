@@ -9,6 +9,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+/**
+ * Base class for all screens using a shared camera/viewport setup.
+ * Subclasses implement update logic and draw logic separately.
+ */
 public abstract class AbstractScreen extends ScreenAdapter {
     protected static final float WORLD_WIDTH = 1280f;
     protected static final float WORLD_HEIGHT = 720f;
@@ -35,6 +39,7 @@ public abstract class AbstractScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
+        // Template flow: update first, then draw only if this screen is still active.
         update(delta);
         // If update() switched screens, this screen may have been disposed.
         if (disposed || screenManager.peak() != this) {

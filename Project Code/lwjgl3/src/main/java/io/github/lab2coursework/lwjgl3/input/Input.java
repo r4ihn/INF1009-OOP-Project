@@ -3,6 +3,9 @@ package io.github.lab2coursework.lwjgl3.input;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Base input binding map that converts raw key/button codes into actions.
+ */
 public abstract class Input {
     protected Map<Key, Action> inputBindings;
 
