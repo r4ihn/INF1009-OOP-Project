@@ -1,9 +1,12 @@
 package io.github.lab2coursework.lwjgl3.screens;
 
+// Import statements for LibGDX
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+// Import statements for external classes
 import io.github.lab2coursework.lwjgl3.collision.BlockLandingRule;
 import io.github.lab2coursework.lwjgl3.collision.GarbageCollectionRule;
 import io.github.lab2coursework.lwjgl3.entities.CraneArm;
@@ -18,7 +21,9 @@ import io.github.lab2coursework.lwjgl3.movement.RopeSwingMovement;
 import io.github.lab2coursework.lwjgl3.wordgame.LetterBlockFactory;
 import io.github.lab2coursework.lwjgl3.wordgame.WordBank;
 import io.github.lab2coursework.lwjgl3.wordgame.WordGameState;
+import io.github.lab2coursework.lwjgl3.movement.AnchoredMovement;
 
+// Import statements for java utilities
 import java.util.ArrayList;
 import java.util.List;
 
@@ -134,7 +139,7 @@ public class WordGameController {
         if (!blockReleased && hangingBlock != null) {
             Movement m = hangingBlock.getMovementStrategy();
             if (m instanceof RopeSwingMovement) {
-                RopeSwingMovement swing =  (RopeSwingMovement) m;
+                RopeSwingMovement swing = (RopeSwingMovement) m;
                 swing.setAnchor(crane.getHookX(), crane.getHookY());
                 swing.update(hangingBlock, delta);
             }

@@ -10,7 +10,7 @@ import io.github.lab2coursework.lwjgl3.entities.LetterBlock;
  * θ'' = -(g/L)sin(θ) - (x¨pivot/L)cos(θ) - cθ'
  * Block position is then computed from crane hook + rope vector.
  */
-public class RopeSwingMovement extends Movement {
+public class RopeSwingMovement extends Movement implements AnchoredMovement {
 
     private static final float GRAVITY_PX      = 1200f; // pixels/s^2
     // Higher values make rope react more strongly to crane movement (arcade feel).
@@ -46,6 +46,7 @@ public class RopeSwingMovement extends Movement {
     }
 
     /** Call every frame BEFORE update() to keep the anchor tracking the crane. */
+    @Override
     public void setAnchor(float x, float y) {
         this.anchorX = x;
         this.anchorY = y;
