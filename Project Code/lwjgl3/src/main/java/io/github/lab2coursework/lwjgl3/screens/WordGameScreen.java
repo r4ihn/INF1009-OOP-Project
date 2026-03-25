@@ -1,5 +1,6 @@
 package io.github.lab2coursework.lwjgl3.screens;
 
+// Import statements
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -60,6 +61,10 @@ public class WordGameScreen extends AbstractScreen {
     private LetterBlock hangingBlock;    // block currently on the rope
     private LetterBlock fallingBlock;    // block after SPACE is pressed (in free-fall)
 
+    // ── Background image ─────────────────────────────────────────────────────────
+    private final Texture backgroundImage;
+
+
     // All stacked (landed) blocks — for drawing only
     private final List<LetterBlock> stackedBlocks = new ArrayList<>();
 
@@ -78,6 +83,9 @@ public class WordGameScreen extends AbstractScreen {
         super(screenManager);
         this.state        = new WordGameState(wordBank);
         this.blockFactory = new LetterBlockFactory(state);
+
+        // background image
+        backgroundImage = new Texture("gameScreenImage.jpg");
 
         // Entities
         bin           = new GarbageCan(BIN_X, BIN_Y);
@@ -212,7 +220,12 @@ public class WordGameScreen extends AbstractScreen {
         Gdx.gl.glClearColor(0.12f, 0.16f, 0.22f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // 2. Shapes pass
+        // 2. Batch pass 1 - Draw background first
+        batch.begin();
+        batch.draw(backgroundImage, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+        batch.end();
+
+        // 2. Shapes pass - Draw the game objects above the background
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
@@ -229,9 +242,10 @@ public class WordGameScreen extends AbstractScreen {
 
         shapeRenderer.end();
 
-        // 3. SpriteBatch pass (text labels and heart icons)
+        // 3. Batch pass 2 - Draw labels and UI on top of shapes
         batch.begin();
 
+        // Then other UI elements on top of background
         drawHUD();
         drawWordDisplay();
         if (hangingBlock != null) hangingBlock.drawLabel(batch, font);
@@ -249,9 +263,9 @@ public class WordGameScreen extends AbstractScreen {
         float mouseX = mouse.x;
         float mouseY = mouse.y;
 
-        // Draw lives as hearts
-        float heartX = 80;
-        float heartY = SH - 85;
+        // Draw lives as hearts (coordinates)
+        float heartX = 50;
+        float heartY = SH - 670;
         float heartSize = 25;
         float heartSpacing = 5;
 
@@ -272,6 +286,7 @@ public class WordGameScreen extends AbstractScreen {
         if (shapeRenderer != null) shapeRenderer.dispose();
         if (heartFullTexture != null) heartFullTexture.dispose();
         if (heartEmptyTexture != null) heartEmptyTexture.dispose();
+        backgroundImage.dispose();
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
