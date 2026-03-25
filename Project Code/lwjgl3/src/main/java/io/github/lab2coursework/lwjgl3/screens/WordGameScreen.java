@@ -112,6 +112,11 @@ public class WordGameScreen extends AbstractScreen {
     }
 
     @Override
+    public void resize(int width, int height) {
+        viewport.update(width, height, true);
+    }
+
+    @Override
     protected void update(float delta) {
         // ── Pause ─────────────────────────────────────────────────────────────
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
@@ -154,9 +159,11 @@ public class WordGameScreen extends AbstractScreen {
         // ── Mouse click on garbage can ────────────────────────────────────────
         if (!blockReleased && hangingBlock != null
             && Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-            // Get mouse coordinates
-            float mouseX = Gdx.input.getX();
-            float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();  // Flip Y axis
+            // FIX: Use viewport to unproject mouse coordinates
+            Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
+            viewport.unproject(mouse);
+            float mouseX = mouse.x;
+            float mouseY = mouse.y;
 
             // Check if click is within bin bounds
             float binX = bin.getX();
@@ -256,12 +263,6 @@ public class WordGameScreen extends AbstractScreen {
         drawStackSeparators();
 
         drawBinLabel();
-
-        // update() mouse click selection
-        Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
-        viewport.unproject(mouse);
-        float mouseX = mouse.x;
-        float mouseY = mouse.y;
 
         // Draw lives as hearts (coordinates)
         float heartX = 50;
