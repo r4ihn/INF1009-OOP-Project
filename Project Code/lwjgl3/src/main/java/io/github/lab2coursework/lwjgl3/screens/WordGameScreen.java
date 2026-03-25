@@ -1,11 +1,13 @@
 package io.github.lab2coursework.lwjgl3.screens;
 
+// Import statements
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector3;
 import io.github.lab2coursework.lwjgl3.collision.BlockLandingRule;
 import io.github.lab2coursework.lwjgl3.collision.GarbageCollectionRule;
 import io.github.lab2coursework.lwjgl3.entities.CraneArm;
@@ -55,9 +57,13 @@ public class WordGameScreen extends AbstractScreen {
     private final GarbageCollectionRule garbageRule;
 
     private CraneArm    crane;
-    private GarbageCan  bin;
+    private final GarbageCan  bin;
     private LetterBlock hangingBlock;    // block currently on the rope
     private LetterBlock fallingBlock;    // block after SPACE is pressed (in free-fall)
+
+    // ── Background image ─────────────────────────────────────────────────────────
+    private final Texture backgroundImage;
+
 
     // All stacked (landed) blocks — for drawing only
     private final List<LetterBlock> stackedBlocks = new ArrayList<>();
@@ -65,8 +71,8 @@ public class WordGameScreen extends AbstractScreen {
     private final CollisionManager collisionManager;
     private final ShapeRenderer shapeRenderer;
 
-    private Texture heartFullTexture;
-    private Texture heartEmptyTexture;
+    private final Texture heartFullTexture;
+    private final Texture heartEmptyTexture;
 
     // ── State flags ───────────────────────────────────────────────────────────
     private boolean blockReleased;   // true while block is in free-fall
@@ -77,6 +83,9 @@ public class WordGameScreen extends AbstractScreen {
         super(screenManager);
         this.state        = new WordGameState(wordBank);
         this.blockFactory = new LetterBlockFactory(state);
+
+        // background image
+        backgroundImage = new Texture("gameScreenImage.jpg");
 
         // Entities
         bin           = new GarbageCan(BIN_X, BIN_Y);
@@ -97,6 +106,7 @@ public class WordGameScreen extends AbstractScreen {
     @Override
     public void show() {
         super.show(); // creates batch + font from AbstractScreen fix
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true); // Safeguard in case viewport does not work on other screens
         spawnCrane();
         spawnNextHangingBlock();
     }
@@ -210,7 +220,13 @@ public class WordGameScreen extends AbstractScreen {
         Gdx.gl.glClearColor(0.12f, 0.16f, 0.22f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // 2. Shapes pass
+        // 2. Batch pass 1 - Draw background first
+        batch.begin();
+        batch.draw(backgroundImage, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+        batch.end();
+
+        // 2. Shapes pass - Draw the game objects above the background
+        shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         drawGround();
@@ -226,9 +242,10 @@ public class WordGameScreen extends AbstractScreen {
 
         shapeRenderer.end();
 
-        // 3. SpriteBatch pass (text labels and heart icons)
+        // 3. Batch pass 2 - Draw labels and UI on top of shapes
         batch.begin();
 
+        // Then other UI elements on top of background
         drawHUD();
         drawWordDisplay();
         if (hangingBlock != null) hangingBlock.drawLabel(batch, font);
@@ -240,9 +257,15 @@ public class WordGameScreen extends AbstractScreen {
 
         drawBinLabel();
 
-        // Draw lives as hearts
-        float heartX = 80;
-        float heartY = SH - 85;
+        // update() mouse click selection
+        Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
+        viewport.unproject(mouse);
+        float mouseX = mouse.x;
+        float mouseY = mouse.y;
+
+        // Draw lives as hearts (coordinates)
+        float heartX = 50;
+        float heartY = SH - 670;
         float heartSize = 25;
         float heartSpacing = 5;
 
@@ -263,6 +286,7 @@ public class WordGameScreen extends AbstractScreen {
         if (shapeRenderer != null) shapeRenderer.dispose();
         if (heartFullTexture != null) heartFullTexture.dispose();
         if (heartEmptyTexture != null) heartEmptyTexture.dispose();
+        backgroundImage.dispose();
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
