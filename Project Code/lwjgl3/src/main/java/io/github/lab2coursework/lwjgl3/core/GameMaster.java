@@ -27,9 +27,14 @@ public class GameMaster extends ApplicationAdapter {
         collisionManager = new CollisionManager();
         audioManager = new AudioManager();
 
-        // FIX: instantiate with the engine-level entity list.
-        // Each Screen also creates its own local EntityManager + MovementManager,
-        // so this engine-level one is a fallback / extension point.
+        // Load music and sounds before setting the screen
+        audioManager.loadMusic("title_bgm", "title_bgm.mp3");
+        audioManager.loadMusic("game_bgm", "game_bgm.mp3");
+        audioManager.loadSound("correct", "correct.wav");
+        audioManager.loadSound("wrong", "wrong.wav");
+        audioManager.loadSound("levelup", "levelup.wav");
+        audioManager.loadSound("pause", "pause.wav");
+
         movementManager  = new MovementManager(entityManager.getEntities());
 
         isRunning = true;
