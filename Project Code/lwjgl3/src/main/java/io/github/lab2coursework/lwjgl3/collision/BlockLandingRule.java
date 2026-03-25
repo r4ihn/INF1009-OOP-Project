@@ -2,40 +2,44 @@ package io.github.lab2coursework.lwjgl3.collision;
 
 import io.github.lab2coursework.lwjgl3.entities.Entity;
 import io.github.lab2coursework.lwjgl3.entities.LetterBlock;
+import io.github.lab2coursework.lwjgl3.wordgame.GameScore;
 import io.github.lab2coursework.lwjgl3.wordgame.WordGameState;
 
+/** Handles landing, stacking, sway, and reset for letter blocks. */
 public class BlockLandingRule implements CollisionRule {
 
     private static final float GROUND_Y = 60f;
     private static final float BLOCK_H = 60f;
 
-    // How much horizontal difference is allowed before the stack is considered unstable.
+    // Max horizontal error before the tower collapses
     private static final float MAX_STACK_OFFSET = 22f;
 
+    // Error range that causes sway before stabilizing
     private static final float SWAY_TRIGGER_ERROR = 8f;
-    private static final float SWAY_DURATION = 0.30f;
-    private static final float SWAY_FREQUENCY = 28f;
-    private static final float MAX_SWAY_AMPLITUDE = 18f;
 
     private final WordGameState state;
     private final float stackBaseY;
 
-    private final int[] stackCountPerWord = {0, 0, 0};
-    private final float[] stackXPerWord = {-1f, -1f, -1f};
+    // Track tower height and x-position for each word
+    private final BlockStackTracker stackTracker;
+
+    private final BlockLandingValidator landingValidator;
+    private final BlockPlacementService placementService;
+
+    // Settling state for sway / collapse animation
+    private final TowerSettlingController settlingController;
 
     private boolean towerStabilized = false;
     private boolean wordResetPending = false;
     private int resetWordIndex = -1;
 
-    private boolean settling = false;
-    private int settlingWordIndex = -1;
-    private float settlingTimer = 0f;
-    private boolean collapseAfterSway = false;
-    private float swayAmplitude = 0f;
-
     public BlockLandingRule(WordGameState state) {
         this.state = state;
         this.stackBaseY = GROUND_Y;
+        this.stackTracker = new BlockStackTracker(stackBaseY, BLOCK_H);
+        this.landingValidator = new BlockLandingValidator();
+        this.settlingController = new TowerSettlingController();
+        this.placementService = new BlockPlacementService();
     }
 
     @Override
@@ -49,167 +53,147 @@ public class BlockLandingRule implements CollisionRule {
             return false;
         }
 
-        int matchedWordIdx = state.peekMatchingWordIndex(falling.getLetter());
-
+        // Ground check
         if (b == null) {
             return falling.getY() <= GROUND_Y;
         }
 
+        // Any landed letter block is solid now
         if (!(b instanceof LetterBlock)) {
             return false;
         }
 
         LetterBlock stacked = (LetterBlock) b;
-        if (!stacked.isLanded() || matchedWordIdx < 0) {
+        if (!stacked.isLanded()) {
             return false;
         }
 
-        if (stacked.getWordIndex() != matchedWordIdx) {
-            return false;
+        // If the falling block overlaps any landed block, that counts as collision.
+        return landingValidator.isOverlapping(falling, stacked);
+    }
+
+    private void handleStackCollision(LetterBlock block, LetterBlock stacked, int matchedWordIdx) {
+        boolean validTopLanding =
+            matchedWordIdx >= 0
+                && stacked.getWordIndex() == matchedWordIdx
+                && stackTracker.isTopBlock(stacked, matchedWordIdx)
+                && landingValidator.isLandingOnTop(block, stacked);
+
+        if (validTopLanding) {
+            handleValidTopLanding(block, stacked);
+            return;
         }
 
-        if (!isTopBlock(stacked, matchedWordIdx)) {
-            return false;
+        handleInvalidStackCollision(block, stacked, matchedWordIdx);
+    }
+
+    private void handleValidTopLanding(LetterBlock block, LetterBlock stacked) {
+        int placedWordIdx = state.placeNextLetter(block.getLetter());
+        if (placedWordIdx < 0) {
+            placementService.markDiscarded(block);
+            return;
         }
 
-        return isTouchingTop(falling, stacked);
+        float horizontalError =
+            landingValidator.getCenterX(block) - landingValidator.getCenterX(stacked);
+
+        placementService.placeOnTopOfBlock(block, stacked, placedWordIdx);
+        stackTracker.recordLanding(placedWordIdx, block);
+
+        float absError = Math.abs(horizontalError);
+        if (absError > MAX_STACK_OFFSET) {
+            settlingController.startSettlingForReset(placedWordIdx, absError);
+        } else if (absError >= SWAY_TRIGGER_ERROR) {
+            settlingController.startSettlingForStabilize(placedWordIdx);
+        } else {
+            towerStabilized = true;
+        }
+    }
+
+    private void handleInvalidStackCollision(LetterBlock block, LetterBlock stacked, int matchedWordIdx) {
+        placementService.stopAtTopAndDiscard(block, stacked);
+
+        if (matchedWordIdx >= 0 && stacked.getWordIndex() == matchedWordIdx) {
+            settlingController.startSettlingForReset(matchedWordIdx, MAX_STACK_OFFSET + 1f);
+        } else {
+            int hitWordIdx = stacked.getWordIndex();
+            state.loseLifeOnly();
+            settlingController.startSettlingForReset(hitWordIdx, MAX_STACK_OFFSET + 1f);
+        }
+    }
+
+    private void handleGroundCollision(LetterBlock block, int matchedWordIdx) {
+        if (matchedWordIdx < 0) {
+            state.loseLife();
+            placementService.markDiscarded(block);
+            return;
+        }
+
+        if (stackTracker.hasStack(matchedWordIdx)) {
+            placementService.markDiscarded(block);
+            settlingController.startSettlingForReset(
+                matchedWordIdx,
+                stackTracker.estimateGroundError(block, matchedWordIdx)
+            );
+            return;
+        }
+
+        int placedWordIdx = state.placeNextLetter(block.getLetter());
+        if (placedWordIdx < 0) {
+            placementService.markDiscarded(block);
+            return;
+        }
+
+        placementService.placeOnGround(block, stackBaseY, placedWordIdx);
+        stackTracker.recordLanding(placedWordIdx, block);
+        towerStabilized = true;
     }
 
     @Override
     public void resolve(Entity a, Entity b) {
         LetterBlock block = (LetterBlock) a;
+        int matchedWordIdx = state.peekMatchingWordIndex(block.getLetter());
 
-        int matchedWordIdx = state.placeNextLetter(block.getLetter());
-        if (matchedWordIdx < 0) {
-            block.setDiscarded(true);
-            block.setMovementStrategy(null);
+        if (b instanceof LetterBlock) {
+            handleStackCollision(block, (LetterBlock) b, matchedWordIdx);
             return;
         }
 
-        float landY;
-        float horizontalError;
-
-        if (b instanceof LetterBlock) {
-            LetterBlock stacked = (LetterBlock) b;
-            landY = stacked.getTop();
-            horizontalError = getCenterX(block) - getCenterX(stacked);
-        } else {
-            // First block for a word may start anywhere. Existing towers must not restart on the ground.
-            if (stackCountPerWord[matchedWordIdx] > 0) {
-                startSettlingForReset(matchedWordIdx, estimateGroundError(block, matchedWordIdx));
-                block.setMovementStrategy(null);
-                block.setDiscarded(true);
-                return;
-            }
-
-            landY = stackBaseY;
-            horizontalError = 0f;
-            stackXPerWord[matchedWordIdx] = block.getX();
-        }
-
-        block.setY(landY);
-        block.setMovementStrategy(null);
-        block.setLanded(true);
-        block.setWordIndex(matchedWordIdx);
-        stackCountPerWord[matchedWordIdx]++;
-        stackXPerWord[matchedWordIdx] = block.getX();
-
-        float absError = Math.abs(horizontalError);
-        if (absError > MAX_STACK_OFFSET) {
-            startSettlingForReset(matchedWordIdx, absError);
-        } else if (absError >= SWAY_TRIGGER_ERROR) {
-            startSettlingForStabilize(matchedWordIdx, absError);
-        } else {
-            towerStabilized = true;
-        }
+        handleGroundCollision(block, matchedWordIdx);
     }
 
     public void update(float delta) {
-        if (!settling) return;
+        boolean wasSettling = settlingController.isSettling();
 
-        settlingTimer -= delta;
-        if (settlingTimer > 0f) return;
+        settlingController.update(delta);
 
-        settling = false;
+        if (wasSettling && !settlingController.isSettling()) {
+            int wordIdx = settlingController.getSettlingWordIndex();
 
-        if (collapseAfterSway) {
-            state.getGameScore().applyTowerFallPenalty();
-            resetWordStack(settlingWordIndex);
-            state.resetWordProgress(settlingWordIndex);
-            wordResetPending = true;
-            resetWordIndex = settlingWordIndex;
-        } else {
-            towerStabilized = true;
+            if (settlingController.shouldCollapse()) {
+                stackTracker.resetWordStack(wordIdx);
+                state.resetWordProgress(wordIdx);
+                wordResetPending = true;
+                resetWordIndex = wordIdx;
+            } else {
+                towerStabilized = true;
+            }
+
+            settlingController.reset();
         }
-
-        collapseAfterSway = false;
-        swayAmplitude = 0f;
-        settlingWordIndex = -1;
-        settlingTimer = 0f;
-    }
-
-    private void startSettlingForReset(int wordIdx, float absError) {
-        settling = true;
-        settlingWordIndex = wordIdx;
-        settlingTimer = SWAY_DURATION;
-        collapseAfterSway = true;
-        swayAmplitude = Math.min(Math.max(absError * 0.35f, SWAY_TRIGGER_ERROR), MAX_SWAY_AMPLITUDE);
-    }
-
-    private void startSettlingForStabilize(int wordIdx, float absError) {
-        settling = true;
-        settlingWordIndex = wordIdx;
-        settlingTimer = SWAY_DURATION;
-        collapseAfterSway = false;
-        swayAmplitude = Math.min(absError * 0.35f, MAX_SWAY_AMPLITUDE);
-    }
-
-    private void resetWordStack(int wordIdx) {
-        if (wordIdx < 0 || wordIdx >= stackCountPerWord.length) {
-            return;
-        }
-        stackCountPerWord[wordIdx] = 0;
-        stackXPerWord[wordIdx] = -1f;
-    }
-
-    private float estimateGroundError(LetterBlock block, int wordIdx) {
-        if (!hasStackX(wordIdx)) {
-            return MAX_STACK_OFFSET + 1f;
-        }
-        return Math.abs(getCenterX(block) - (stackXPerWord[wordIdx] + block.getWidth() / 2f));
-    }
-
-    private float getCenterX(LetterBlock block) {
-        return block.getX() + block.getWidth() / 2f;
-    }
-
-    private boolean isTopBlock(LetterBlock block, int wordIdx) {
-        if (stackCountPerWord[wordIdx] <= 0) {
-            return false;
-        }
-
-        float expectedTopY = stackBaseY + (stackCountPerWord[wordIdx] - 1) * BLOCK_H;
-        return Math.abs(block.getY() - expectedTopY) < 0.5f;
-    }
-
-    private boolean isTouchingTop(LetterBlock falling, LetterBlock stacked) {
-        boolean overlapsX = falling.getRight() > stacked.getX() && falling.getX() < stacked.getRight();
-        boolean reachedTop = falling.getY() <= stacked.getTop();
-        return overlapsX && reachedTop;
     }
 
     public boolean isSettling() {
-        return settling;
+        return settlingController.isSettling();
     }
 
     public float getTowerSwayOffset(int wordIdx) {
-        if (!settling || wordIdx != settlingWordIndex) {
+        if (!settlingController.isSettling()
+            || wordIdx != settlingController.getSettlingWordIndex()) {
             return 0f;
         }
 
-        float progress = 1f - (settlingTimer / SWAY_DURATION);
-        float damping = 1f - progress;
-        return (float) Math.sin(progress * SWAY_FREQUENCY) * swayAmplitude * damping;
+        return settlingController.getSwayOffset();
     }
 
     public boolean consumeTowerStabilized() {
@@ -218,55 +202,31 @@ public class BlockLandingRule implements CollisionRule {
         return result;
     }
 
-    public boolean consumeWordReset() {
+    public boolean consumeWordResetPending() {
         boolean result = wordResetPending;
         wordResetPending = false;
         return result;
     }
 
-    public int getResetWordIndex() {
-        return resetWordIndex;
-    }
-
-    public int getStackCount(int wordIdx) {
-        if (wordIdx >= 0 && wordIdx < 3) {
-            return stackCountPerWord[wordIdx];
-        }
-        return 0;
-    }
-
-    public int getTotalStackCount() {
-        int total = 0;
-        for (int count : stackCountPerWord) {
-            total += count;
-        }
-        return total;
+    public int consumeResetWordIndex() {
+        int result = resetWordIndex;
+        resetWordIndex = -1;
+        return result;
     }
 
     public void resetStack() {
-        for (int i = 0; i < stackCountPerWord.length; i++) {
-            stackCountPerWord[i] = 0;
-            stackXPerWord[i] = -1f;
-        }
-
-        settling = false;
-        settlingWordIndex = -1;
-        settlingTimer = 0f;
-        collapseAfterSway = false;
-        swayAmplitude = 0f;
+        stackTracker.resetAll();
+        towerStabilized = false;
         wordResetPending = false;
         resetWordIndex = -1;
-        towerStabilized = false;
+        settlingController.reset();
     }
 
     public boolean hasStackX(int wordIdx) {
-        return wordIdx >= 0 && wordIdx < 3 && stackXPerWord[wordIdx] >= 0f;
+        return stackTracker.hasStackX(wordIdx);
     }
 
     public float getStackX(int wordIdx) {
-        if (wordIdx >= 0 && wordIdx < 3) {
-            return stackXPerWord[wordIdx];
-        }
-        return 0f;
+        return stackTracker.getStackX(wordIdx);
     }
 }

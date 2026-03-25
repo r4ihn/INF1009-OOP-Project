@@ -1,14 +1,8 @@
 package io.github.lab2coursework.lwjgl3.collision;
 
-import io.github.lab2coursework.lwjgl3.entities.Circle;
 import io.github.lab2coursework.lwjgl3.entities.Entity;
-import io.github.lab2coursework.lwjgl3.entities.Triangle;
-import io.github.lab2coursework.lwjgl3.entities.Raindrop;
 
-import io.github.lab2coursework.lwjgl3.entities.Circle;
-import io.github.lab2coursework.lwjgl3.entities.Entity;
-import io.github.lab2coursework.lwjgl3.entities.Triangle;
-
+// Keeps an entity inside the world bounds
 public class KeepInBoundsRule implements CollisionRule {
 
     private final float worldW;
@@ -21,32 +15,19 @@ public class KeepInBoundsRule implements CollisionRule {
 
     @Override
     public boolean matches(Entity a, Entity b) {
-        return (a != null && b == null && !(a instanceof Raindrop));
+        // Used for one entity at a time
+        return a != null && b == null;
     }
 
     @Override
     public void resolve(Entity a, Entity b) {
-        float minX = 0, minY = 0;
-        float maxX = worldW, maxY = worldH;
-
-        if (a instanceof Circle) {
-            Circle c = (Circle) a;
-            float r = c.getRadius();
-            minX = r; minY = r;
-            maxX = worldW - r;
-            maxY = worldH - r;
-        } else if (a instanceof Triangle) {
-            // Triangle drawn as 100x100 footprint
-            minX = 0; minY = 0;
-            maxX = worldW - 100f;
-            maxY = worldH - 100f;
-        }
-
-        a.setX(clamp(a.getX(), minX, maxX));
-        a.setY(clamp(a.getY(), minY, maxY));
+        // Clamp x and y within the world
+        a.setX(clamp(a.getX(), 0f, worldW));
+        a.setY(clamp(a.getY(), 0f, worldH));
     }
 
-    private float clamp(float v, float min, float max) {
-        return Math.max(min, Math.min(max, v));
+    // Restrict a value between min and max
+    private float clamp(float value, float min, float max) {
+        return Math.max(min, Math.min(max, value));
     }
 }

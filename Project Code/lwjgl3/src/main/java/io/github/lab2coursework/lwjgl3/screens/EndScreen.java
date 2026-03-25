@@ -25,11 +25,12 @@ public class EndScreen extends AbstractScreen {
     protected void draw(float delta) {
         Gdx.gl.glClearColor(0.2f, 0.05f, 0.05f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        float cx = WORLD_WIDTH / 2f; // centre of x-axis definition
 
         batch.begin();
-        font.draw(batch, "END SCREEN", 100, 300);
-        font.draw(batch, "Press R to Restart", 100, 260);
-        font.draw(batch, "Press ESC to Title", 100, 230);
+        font.draw(batch, "END SCREEN", cx - 100, WORLD_HEIGHT / 2f + 40);
+        font.draw(batch, "Press R to Restart", cx - 100, WORLD_HEIGHT / 2f);
+        font.draw(batch, "Press ESC to Title", cx - 100, WORLD_HEIGHT / 2f);
         batch.end();
     }
 }

@@ -1,20 +1,24 @@
 package io.github.lab2coursework.lwjgl3.screens;
 
+// Import statements
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector3;
 import io.github.lab2coursework.lwjgl3.collision.BlockLandingRule;
 import io.github.lab2coursework.lwjgl3.collision.GarbageCollectionRule;
-import io.github.lab2coursework.lwjgl3.entities.*;
-import io.github.lab2coursework.lwjgl3.input.KeyboardInput;
-import io.github.lab2coursework.lwjgl3.input.Key;
-import io.github.lab2coursework.lwjgl3.managers.*;
+import io.github.lab2coursework.lwjgl3.entities.CraneArm;
+import io.github.lab2coursework.lwjgl3.entities.GarbageCan;
+import io.github.lab2coursework.lwjgl3.entities.LetterBlock;
+import io.github.lab2coursework.lwjgl3.managers.CollisionManager;
+import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
 import io.github.lab2coursework.lwjgl3.movement.CraneMovement;
 import io.github.lab2coursework.lwjgl3.movement.FallMovement;
 import io.github.lab2coursework.lwjgl3.movement.RopeSwingMovement;
+import io.github.lab2coursework.lwjgl3.wordgame.GameScore;
 import io.github.lab2coursework.lwjgl3.wordgame.LetterBlockFactory;
 import io.github.lab2coursework.lwjgl3.wordgame.WordBank;
 import io.github.lab2coursework.lwjgl3.wordgame.WordGameState;
@@ -22,13 +26,14 @@ import io.github.lab2coursework.lwjgl3.wordgame.WordGameState;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Main gameplay screen for the word-building crane game.
  * Now supports:
  * - Keyboard-controlled crane (A/D or LEFT/RIGHT)
  * - 3 simultaneous target words
  * - Mouse-click garbage can for discarding
- * - Physics-based block stacking
+ * - Rule-based block stacking
  * - Combo points every 3 words
  * - Multiple difficulty levels
  */
@@ -52,61 +57,63 @@ public class WordGameScreen extends AbstractScreen {
     private final GarbageCollectionRule garbageRule;
 
     private CraneArm    crane;
-    private GarbageCan  bin;
+    private final GarbageCan  bin;
     private LetterBlock hangingBlock;    // block currently on the rope
     private LetterBlock fallingBlock;    // block after SPACE is pressed (in free-fall)
+
+    // ── Background image ─────────────────────────────────────────────────────────
+    private final Texture backgroundImage;
+
 
     // All stacked (landed) blocks — for drawing only
     private final List<LetterBlock> stackedBlocks = new ArrayList<>();
 
-    // Managers (local to this screen, consistent with existing code style)
-    private final EntityManager  entityManager;
-    private final MovementManager movementManager;
-    private final ShapeRenderer  shapeRenderer;
-    private final IOManager ioManager = new IOManager();
+    private final CollisionManager collisionManager;
+    private final ShapeRenderer shapeRenderer;
 
-    private Texture heartFullTexture;
-    private Texture heartEmptyTexture;
+    private final Texture heartFullTexture;
+    private final Texture heartEmptyTexture;
 
     // ── State flags ───────────────────────────────────────────────────────────
     private boolean blockReleased;   // true while block is in free-fall
     private boolean awaitingNext;    // brief pause before spawning next block
     private float   awaitTimer;
 
-
     public WordGameScreen(ScreenManager screenManager, WordBank wordBank) {
         super(screenManager);
         this.state        = new WordGameState(wordBank);
         this.blockFactory = new LetterBlockFactory(state);
-        this.ioManager.setCurrentInput(new KeyboardInput());
+
+        // background image
+        backgroundImage = new Texture("gameScreenImage.jpg");
 
         // Entities
         bin           = new GarbageCan(BIN_X, BIN_Y);
         landingRule   = new BlockLandingRule(state);
         garbageRule   = new GarbageCollectionRule(bin, state);
 
-        entityManager  = new EntityManager();
-        shapeRenderer  = new ShapeRenderer();
-        movementManager = new MovementManager(entityManager.getEntities());
+        shapeRenderer = new ShapeRenderer();
+        collisionManager = new CollisionManager();
+        collisionManager.addRule(garbageRule);
+        collisionManager.addRule(landingRule);
 
         heartFullTexture  = new Texture("heart_full.png");
         heartEmptyTexture = new Texture("heart_empty.png");
-
-        spawnCrane();
-        CraneMovement craneLogic = (CraneMovement) crane.getMovementStrategy();
-        // 1. Check BOTH keys for the Left movement
-        ioManager.bindKey(Key.A, () -> craneLogic.setMovingLeft(Gdx.input.isKeyPressed(Input.Keys.A)));
-
-        // 2. Check BOTH keys for the Right movement
-        ioManager.bindKey(Key.D, () -> craneLogic.setMovingRight(Gdx.input.isKeyPressed(Input.Keys.D)));
     }
 
     // ── AbstractScreen lifecycle ──────────────────────────────────────────────
 
     @Override
     public void show() {
-        super.show();
+        super.show(); // creates batch + font from AbstractScreen fix
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true); // Safeguard in case viewport does not work on other screens
+        spawnCrane();
         spawnNextHangingBlock();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        viewport.update(width, height, true);
     }
 
     @Override
@@ -117,25 +124,12 @@ public class WordGameScreen extends AbstractScreen {
             return;
         }
 
-        ioManager.processInput(Key.A.getCode());
-        ioManager.processInput(Key.D.getCode());
-
-        // The MovementManager iterates through all entities and calls their strategies
-        movementManager.updateMovement(delta);
-        // 2. Handle Rope/Anchor (Game-specific connection logic)
-        if (!blockReleased && hangingBlock != null) {
-            RopeSwingMovement swing = (RopeSwingMovement) hangingBlock.getMovementStrategy();
-            if (swing != null) {
-                swing.setAnchor(crane.getHookX(), crane.getHookY());
-            }
-        }
-
         // ── Tower sway / settle animation ─────────────────────────────────────
         if (landingRule.isSettling()) {
             landingRule.update(delta);
 
-            if (landingRule.consumeWordReset()) {
-                removeBlocksForWord(landingRule.getResetWordIndex());
+            if (landingRule.consumeWordResetPending()) {
+                removeBlocksForWord(landingRule.consumeResetWordIndex());
                 fallingBlock = null;
                 blockReleased = false;
                 scheduleNextBlock(0.6f);
@@ -165,9 +159,11 @@ public class WordGameScreen extends AbstractScreen {
         // ── Mouse click on garbage can ────────────────────────────────────────
         if (!blockReleased && hangingBlock != null
             && Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-            // Get mouse coordinates
-            float mouseX = Gdx.input.getX();
-            float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();  // Flip Y axis
+            // FIX: Use viewport to unproject mouse coordinates
+            Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
+            viewport.unproject(mouse);
+            float mouseX = mouse.x;
+            float mouseY = mouse.y;
 
             // Check if click is within bin bounds
             float binX = bin.getX();
@@ -188,6 +184,11 @@ public class WordGameScreen extends AbstractScreen {
             releaseBlock();
         }
 
+        // ── Update crane movement (keyboard controlled) ────────────────────────
+        if (crane != null) {
+            crane.getMovementStrategy().update(crane, delta);
+        }
+
         // ── Update rope / falling block ───────────────────────────────────────
         if (!blockReleased && hangingBlock != null) {
             RopeSwingMovement swing = (RopeSwingMovement) hangingBlock.getMovementStrategy();
@@ -203,15 +204,7 @@ public class WordGameScreen extends AbstractScreen {
                 fall.update(fallingBlock, delta);
             }
 
-            LetterBlock collisionTarget = findBlockCollisionTarget();
-
-            if (collisionTarget != null) {
-                resolveFallingBlockCollision(collisionTarget);
-                return;
-            }
-
-            if (landingRule.matches(fallingBlock, null)) {
-                resolveFallingBlockCollision(null);
+            if (tryResolveFallingBlockCollision()) {
                 return;
             }
         }
@@ -234,7 +227,13 @@ public class WordGameScreen extends AbstractScreen {
         Gdx.gl.glClearColor(0.12f, 0.16f, 0.22f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // 2. Shapes pass
+        // 2. Batch pass 1 - Draw background first
+        batch.begin();
+        batch.draw(backgroundImage, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+        batch.end();
+
+        // 2. Shapes pass - Draw the game objects above the background
+        shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         drawGround();
@@ -250,9 +249,10 @@ public class WordGameScreen extends AbstractScreen {
 
         shapeRenderer.end();
 
-        // 3. SpriteBatch pass (text labels and heart icons)
+        // 3. Batch pass 2 - Draw labels and UI on top of shapes
         batch.begin();
 
+        // Then other UI elements on top of background
         drawHUD();
         drawWordDisplay();
         if (hangingBlock != null) hangingBlock.drawLabel(batch, font);
@@ -264,9 +264,9 @@ public class WordGameScreen extends AbstractScreen {
 
         drawBinLabel();
 
-        // Draw lives as hearts
-        float heartX = 80;
-        float heartY = SH - 85;
+        // Draw lives as hearts (coordinates)
+        float heartX = 50;
+        float heartY = SH - 670;
         float heartSize = 25;
         float heartSpacing = 5;
 
@@ -287,6 +287,7 @@ public class WordGameScreen extends AbstractScreen {
         if (shapeRenderer != null) shapeRenderer.dispose();
         if (heartFullTexture != null) heartFullTexture.dispose();
         if (heartEmptyTexture != null) heartEmptyTexture.dispose();
+        backgroundImage.dispose();
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
@@ -294,9 +295,6 @@ public class WordGameScreen extends AbstractScreen {
     private void spawnCrane() {
         crane = new CraneArm(SW / 2f - 60f, CRANE_Y);
         crane.setMovementStrategy(new CraneMovement(CRANE_MIN_X, CRANE_MAX_X));
-        crane.setSpeed(300f);
-        // Add to Entity Manager
-        entityManager.addEntities(crane);
     }
 
     private void spawnNextHangingBlock() {
@@ -306,9 +304,6 @@ public class WordGameScreen extends AbstractScreen {
         );
         blockReleased = false;
         fallingBlock  = null;
-
-        // Add block to Entity Manager
-        entityManager.addEntities(hangingBlock);
     }
 
     private void releaseBlock() {
@@ -319,35 +314,38 @@ public class WordGameScreen extends AbstractScreen {
     }
 
     private void discardHangingBlock() {
-        // Move the hanging block to the bin position and trigger garbage rule
+        // Move the hanging block to the bin position and let CollisionManager apply rules.
         hangingBlock.setX(BIN_X + 10f);
         hangingBlock.setY(BIN_Y + 10f);
-        garbageRule.resolve(hangingBlock, null);
-
-        // Remove from Entity Manager
-        entityManager.removeEntities(hangingBlock);
-
+        collisionManager.applyTo(hangingBlock, null);
         hangingBlock = null;
-        // Immediately spawn next block instead of waiting
         spawnNextHangingBlock();
     }
 
-    private LetterBlock findBlockCollisionTarget() {
+    private boolean tryResolveFallingBlockCollision() {
         if (fallingBlock == null) {
-            return null;
+            return false;
         }
 
         for (int i = stackedBlocks.size() - 1; i >= 0; i--) {
             LetterBlock stacked = stackedBlocks.get(i);
-            if (landingRule.matches(fallingBlock, stacked)) {
-                return stacked;
+            collisionManager.applyTo(fallingBlock, stacked);
+            if (fallingBlock.isLanded() || fallingBlock.isDiscarded()) {
+                resolveFallingBlockOutcome();
+                return true;
             }
         }
-        return null;
+
+        collisionManager.applyTo(fallingBlock, null);
+        if (fallingBlock.isLanded() || fallingBlock.isDiscarded()) {
+            resolveFallingBlockOutcome();
+            return true;
+        }
+
+        return false;
     }
 
-    private void resolveFallingBlockCollision(LetterBlock collisionTarget) {
-        landingRule.resolve(fallingBlock, collisionTarget);
+    private void resolveFallingBlockOutcome() {
 
         if (fallingBlock.isDiscarded()) {
             // Improper stacking now resets only the matching word after the sway finishes.
@@ -360,7 +358,6 @@ public class WordGameScreen extends AbstractScreen {
             // Wrong letter: WordGameState already reset the whole attempt via loseLife().
             stackedBlocks.clear();
             landingRule.resetStack();
-            entityManager.removeEntities(fallingBlock);
             fallingBlock = null;
             blockReleased = false;
             scheduleNextBlock(0.45f);
@@ -383,13 +380,7 @@ public class WordGameScreen extends AbstractScreen {
         if (wordIndex < 0) {
             return;
         }
-        stackedBlocks.removeIf(block -> {
-            if (block.getWordIndex() == wordIndex) {
-                entityManager.removeEntities(block);
-                return true;
-            }
-            return false;
-        });
+        stackedBlocks.removeIf(block -> block.getWordIndex() == wordIndex);
     }
 
     private void scheduleNextBlock(float delay) {
@@ -410,14 +401,6 @@ public class WordGameScreen extends AbstractScreen {
     }
 
     private void resetVisuals() {
-
-        // Clear entities
-        for (LetterBlock block : stackedBlocks) {
-            entityManager.removeEntities(block);
-        }
-        if (fallingBlock != null) entityManager.removeEntities(fallingBlock);
-        if (hangingBlock != null) entityManager.removeEntities(hangingBlock);
-
         stackedBlocks.clear();
         landingRule.resetStack();
         hangingBlock  = null;
@@ -477,11 +460,11 @@ public class WordGameScreen extends AbstractScreen {
         float spacing = SW / 3.2f;
         float startX = 80;
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < GameScore.TARGET_WORD_COUNT; i++) {
             String display = displays.get(i);
             String targetWord = targetWords.get(i);
             boolean completed = state.getGameScore().isWordCompleted(i);
-            int points = state.getGameScore().getWordPoints().get(i);
+            int points = state.getGameScore().getWordPoints(i);
 
             // Set color based on completion
             if (completed) {
@@ -543,7 +526,7 @@ public class WordGameScreen extends AbstractScreen {
         font.getData().setScale(0.8f);
         font.setColor(Color.LIGHT_GRAY);
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < GameScore.TARGET_WORD_COUNT; i++) {
             if (!landingRule.hasStackX(i)) {
                 continue;
             }
