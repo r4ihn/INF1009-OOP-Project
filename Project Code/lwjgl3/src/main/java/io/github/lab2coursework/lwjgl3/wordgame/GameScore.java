@@ -14,7 +14,6 @@ public class GameScore {
     private static final int COMBO_THRESHOLD = 3;
     private static final int BASE_WORD_POINTS = 100;
     private static final int COMBO_BONUS = 150;
-    private static final int TOWER_FALL_PENALTY = 50;
 
     private int totalScore;
     private int comboCount;
@@ -71,9 +70,6 @@ public class GameScore {
         wordPoints.set(wordIndex, 0);
     }
 
-    public void applyTowerFallPenalty() {
-        totalScore -= TOWER_FALL_PENALTY;
-    }
 
     public void addScore(int points) {
         totalScore += points;

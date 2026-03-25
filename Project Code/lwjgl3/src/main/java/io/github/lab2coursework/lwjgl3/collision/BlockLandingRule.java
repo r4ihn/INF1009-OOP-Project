@@ -185,7 +185,6 @@ public class BlockLandingRule implements CollisionRule {
         settling = false;
 
         if (collapseAfterSway) {
-            state.getGameScore().applyTowerFallPenalty();
             resetWordStack(settlingWordIndex);
             state.resetWordProgress(settlingWordIndex);
             wordResetPending = true;
