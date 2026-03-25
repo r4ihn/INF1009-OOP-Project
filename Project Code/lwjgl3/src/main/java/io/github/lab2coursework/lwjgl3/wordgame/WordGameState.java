@@ -1,134 +1,203 @@
 package io.github.lab2coursework.lwjgl3.wordgame;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Holds all mutable state for one playthrough of the word game.
- * Passed by reference into the screen and factory — no globals needed.
  */
 public class WordGameState {
 
     public static final int MAX_LIVES = 3;
 
     private final WordBank wordBank;
-    private int level;           // 0-based index into words across categories
+    private final GameScore gameScore;
+    private int level;
     private int lives;
-    private String targetWord;
-    private String categoryName;
 
-    // Letters the player has successfully stacked so far this attempt
-    private final List<Character> stackedLetters = new ArrayList<>();
-
-    // How many blocks the player has discarded this attempt
-    private int discardedThisAttempt;
+    private final List<String> targetWords = new ArrayList<>();
+    private final List<List<Character>> stackedLettersPerWord = new ArrayList<>();
 
     public WordGameState(WordBank wordBank) {
         this.wordBank = wordBank;
+        this.gameScore = new GameScore();
         this.level = 0;
         this.lives = MAX_LIVES;
-        loadWordForLevel();
+        loadWordsForLevel();
     }
 
-    // Level management
+    private void loadWordsForLevel() {
+        targetWords.clear();
+        stackedLettersPerWord.clear();
 
-    private void loadWordForLevel() {
-        // Walk through all categories in order
-        int totalPerCategory = 10;
-        int catIndex  = (level / totalPerCategory) % wordBank.getCategories().size();
-        int wordIndex = level % totalPerCategory;
+        int categoryIndex = (int) (Math.random() * wordBank.getCategories().size());
+        WordCategory category = wordBank.getCategory(categoryIndex);
+        List<String> words = new ArrayList<>(category.getWords());
+        java.util.Collections.shuffle(words);
 
-        WordCategory cat = wordBank.getCategory(catIndex);
-        List<String> words = cat.getWords();
-        targetWord    = words.get(wordIndex % words.size()).toUpperCase();
-        categoryName  = cat.getName();
-        stackedLetters.clear();
-        discardedThisAttempt = 0;
+        for (int i = 0; i < GameScore.TARGET_WORD_COUNT && i < words.size(); i++) {
+            targetWords.add(words.get(i).toUpperCase());
+            stackedLettersPerWord.add(new ArrayList<>());
+        }
+
+        gameScore.setTargetWords(targetWords);
     }
 
     public void advanceLevel() {
         level++;
-        lives = MAX_LIVES;   // restore lives for new level
-        loadWordForLevel();
+        lives = MAX_LIVES;
+        gameScore.resetForNextLevel();
+        loadWordsForLevel();
     }
 
-    // Attempt management
-
-    /** Called when the player discards a NEEDED letter or stacks a wrong one. */
     public void loseLife() {
         lives--;
         resetAttempt();
     }
 
-    /** Clears the current stacked progress for a fresh attempt. */
+    public void loseLifeOnly() {
+        lives--;
+    }
+
     public void resetAttempt() {
-        stackedLetters.clear();
-        discardedThisAttempt = 0;
-    }
-
-    // Letter stacking
-
-    /**
-     * Try to place a letter onto the stack.
-     * Returns true if the letter is the next correct letter.
-     * Returns false (and costs a life) if it is wrong.
-     */
-    public boolean placeNextLetter(char letter) {
-        char expected = targetWord.charAt(stackedLetters.size());
-        if (Character.toUpperCase(letter) == expected) {
-            stackedLetters.add(expected);
-            return true;
-        } else {
-            loseLife();
-            return false;
+        for (List<Character> stack : stackedLettersPerWord) {
+            stack.clear();
         }
     }
 
-    /**
-     * Discard a block. If its letter was actually needed next, lose a life.
-     */
+    public int peekMatchingWordIndex(char letter) {
+        letter = Character.toUpperCase(letter);
+
+        for (int wordIdx = 0; wordIdx < GameScore.TARGET_WORD_COUNT; wordIdx++) {
+            if (gameScore.isWordCompleted(wordIdx)) {
+                continue;
+            }
+
+            String word = targetWords.get(wordIdx);
+            List<Character> stacked = stackedLettersPerWord.get(wordIdx);
+
+            if (stacked.size() < word.length() && letter == word.charAt(stacked.size())) {
+                return wordIdx;
+            }
+        }
+
+        return -1;
+    }
+
+    public void resetWordProgress(int wordIndex) {
+        if (!isValidWordIndex(wordIndex)) {
+            return;
+        }
+
+        List<Character> stack = stackedLettersPerWord.get(wordIndex);
+        if (stack.isEmpty() && !gameScore.isWordCompleted(wordIndex)) {
+            return;
+        }
+
+        stack.clear();
+        gameScore.resetWordProgress(wordIndex);
+    }
+
+    public int placeNextLetter(char letter) {
+        letter = Character.toUpperCase(letter);
+
+        int wordIdx = peekMatchingWordIndex(letter);
+        if (wordIdx >= 0) {
+            List<Character> stacked = stackedLettersPerWord.get(wordIdx);
+            stacked.add(letter);
+
+            if (stacked.size() == targetWords.get(wordIdx).length()) {
+                gameScore.completeWord(wordIdx);
+            }
+
+            return wordIdx;
+        }
+
+        loseLife();
+        return -1;
+    }
+
     public void discardLetter(char letter) {
-        discardedThisAttempt++;
-        char expected = targetWord.charAt(stackedLetters.size());
-        if (Character.toUpperCase(letter) == expected) {
-            loseLife(); // penalise throwing away a needed letter
-        }
+        // Discarding is intentionally free in this game mode.
     }
 
-    // Queries
-
-    public boolean isWordComplete() {
-        return stackedLetters.size() == targetWord.length();
+    public boolean isAllWordsComplete() {
+        return gameScore.allWordsCompleted();
     }
 
     public boolean isGameOver() {
         return lives <= 0;
     }
 
-    /** Returns e.g. "_ _ A T" when "CAT" is the word and 'A','T' stacked. */
-    public String getDisplayWord() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < targetWord.length(); i++) {
-            if (i < stackedLetters.size()) {
-                sb.append(stackedLetters.get(i));
-            } else {
-                sb.append('_');
-            }
-            if (i < targetWord.length() - 1) sb.append(' ');
+    public List<String> getDisplayWords() {
+        List<String> displays = new ArrayList<>();
+        for (int i = 0; i < GameScore.TARGET_WORD_COUNT; i++) {
+            displays.add(getDisplayWord(i));
         }
-        return sb.toString();
+        return displays;
     }
 
-    // Getters
+    public String getDisplayWord(int wordIndex) {
+        if (!isValidWordIndex(wordIndex)) {
+            return "";
+        }
 
-    public String getTargetWord()   { return targetWord; }
-    public String getCategoryName() { return categoryName; }
-    public int    getLives()        { return lives; }
-    public int    getLevel()        { return level + 1; } // 1-based for display
-    public List<Character> getStackedLetters() { return stackedLetters; }
-    public int    getNextLetterIndex() { return stackedLetters.size(); }
-    public char   getNextExpectedLetter() {
-        if (isWordComplete()) return 0;
-        return targetWord.charAt(stackedLetters.size());
+        String word = targetWords.get(wordIndex);
+        List<Character> stacked = stackedLettersPerWord.get(wordIndex);
+        StringBuilder display = new StringBuilder();
+
+        for (int i = 0; i < word.length(); i++) {
+            display.append(i < stacked.size() ? stacked.get(i) : '_');
+            if (i < word.length() - 1) {
+                display.append(' ');
+            }
+        }
+        return display.toString();
+    }
+
+    public char getNextExpectedLetter(int wordIndex) {
+        if (!isValidWordIndex(wordIndex) || gameScore.isWordCompleted(wordIndex)) {
+            return 0;
+        }
+
+        String word = targetWords.get(wordIndex);
+        List<Character> stacked = stackedLettersPerWord.get(wordIndex);
+        return stacked.size() < word.length() ? word.charAt(stacked.size()) : 0;
+    }
+
+    public String getTargetWord(int wordIndex) {
+        if (!isValidWordIndex(wordIndex)) {
+            return "";
+        }
+        return targetWords.get(wordIndex);
+    }
+
+    public List<String> getTargetWords() {
+        return Collections.unmodifiableList(targetWords);
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public int getLevel() {
+        return level + 1;
+    }
+
+    public GameScore getGameScore() {
+        return gameScore;
+    }
+
+    public int getTotalScore() {
+        return gameScore.getTotalScore();
+    }
+
+    public int getComboCount() {
+        return gameScore.getComboCount();
+    }
+
+    private boolean isValidWordIndex(int wordIndex) {
+        return wordIndex >= 0 && wordIndex < GameScore.TARGET_WORD_COUNT;
     }
 }

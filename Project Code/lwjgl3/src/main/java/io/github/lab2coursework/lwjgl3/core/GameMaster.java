@@ -8,43 +8,52 @@ import io.github.lab2coursework.lwjgl3.screens.TitleScreen;
 public class GameMaster extends ApplicationAdapter {
 
     // Managers
-    protected IOManager ioManager;
-    protected EntityManager entityManager;
-    protected ScreenManager screenManager;
+    protected IOManager        ioManager;
+    protected EntityManager    entityManager;
+    protected ScreenManager    screenManager;
     protected CollisionManager collisionManager;
-    protected MovementManager movementManager;
+    protected MovementManager  movementManager;   // FIX: now properly instantiated
 
     // Engine State
     protected boolean isRunning;
-    protected float deltaTime;
+    protected float   deltaTime;
 
-
-    // Engine Lifecycle (THe new methods should be inside constructor)
+    @Override
     public void create() {
-        ioManager = new IOManager();
-        entityManager = new EntityManager();
-        screenManager = new ScreenManager();
+        ioManager        = new IOManager();
+        entityManager    = new EntityManager();
+        screenManager    = new ScreenManager();
         collisionManager = new CollisionManager();
+
+        // FIX: instantiate with the engine-level entity list.
+        // Each Screen also creates its own local EntityManager + MovementManager,
+        // so this engine-level one is a fallback / extension point.
+        movementManager  = new MovementManager(entityManager.getEntities());
 
         isRunning = true;
 
-        // set initial screen to TitleScreen
+        // Set initial screen to TitleScreen
         screenManager.set(new TitleScreen(screenManager));
     }
 
-
+    @Override
     public void render() {
         deltaTime = Gdx.graphics.getDeltaTime();
-
-
         if (isRunning) {
             screenManager.render(deltaTime);
         }
     }
 
-    // Cleanup
+    @Override // Override method to resize the screen
+    public void resize(int width, int height) {
+        if (screenManager != null) {
+            screenManager.resize(width, height);
+        }
+    }
+
+    @Override
     public void dispose() {
-        if(screenManager != null){
+        if (screenManager != null) {
             screenManager.dispose();
         }
     }

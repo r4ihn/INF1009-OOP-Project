@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
-import io.github.lab2coursework.lwjgl3.*;
 import io.github.lab2coursework.lwjgl3.entities.Circle;
 import io.github.lab2coursework.lwjgl3.entities.Entity;
 import io.github.lab2coursework.lwjgl3.entities.Triangle;
@@ -101,8 +100,8 @@ public class GameScreen extends AbstractScreen {
 
         collisionManager.applyAll(
             entityManager.getEntities(),
-            (float) Gdx.graphics.getWidth(),
-            (float) Gdx.graphics.getHeight()
+            WORLD_WIDTH,
+            WORLD_HEIGHT
         );
     }
 
@@ -114,16 +113,13 @@ public class GameScreen extends AbstractScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // 2. Draw the background first
-        spriteBatch.begin();
-        spriteBatch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        spriteBatch.end();
+        batch.begin();
+        batch.draw(backgroundTexture, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+        entityManager.draw(batch, null);
+        batch.end();
 
-        // 3. Draw other sprites/textures on top
-        spriteBatch.begin();
-        entityManager.draw(spriteBatch, null);
-        spriteBatch.end();
-
-        // 4. Draw shapes (circles/triangles)
+        // Make ShapeRenderer use same responsive camera
+        shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         entityManager.draw(null, shapeRenderer);
         shapeRenderer.end();

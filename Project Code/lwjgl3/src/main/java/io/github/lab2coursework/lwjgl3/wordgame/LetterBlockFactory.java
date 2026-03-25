@@ -7,11 +7,8 @@ import java.util.Random;
 
 /**
  * Factory Method pattern.
- *
- * Produces LetterBlock entities whose letters are biased toward the target
- * word so the game is playable, while still injecting random noise blocks.
- *
- * Receives WordGameState by constructor injection — no global access.
+ * Produces LetterBlock entities whose letters are biased toward the 3 target words
+ * so the game is playable, while still injecting random noise blocks.
  */
 public class LetterBlockFactory {
 
@@ -20,8 +17,8 @@ public class LetterBlockFactory {
     private static final float SPAWN_X  = 600f; // centre of screen, under crane
     private static final float SPAWN_Y  = 580f; // just below the crane arm
 
-    // Probability that the spawned letter belongs to the target word
-    private static final float WORD_BIAS = 0.65f;
+    // Probability that the spawned letter belongs to one of the 3 target words
+    private static final float WORD_BIAS = 0.70f;
 
     private final WordGameState state;
     private final Random rng;
@@ -36,48 +33,45 @@ public class LetterBlockFactory {
     /** Creates the block that hangs from the crane. */
     public LetterBlock createHangingBlock() {
         char letter = pickLetter();
-        Color color = colorForLetter(letter);
+        Color color = Color.LIGHT_GRAY;  // Neutral color - no hints
         return new LetterBlock(letter, SPAWN_X, SPAWN_Y, BLOCK_W, BLOCK_H, color);
     }
 
-    /** Creates a replacement block after the previous one is placed or discarded. */
-    public LetterBlock createNextBlock() {
-        return createHangingBlock(); // same logic, just semantically named
-    }
+
 
     // ── Letter selection ──────────────────────────────────────────────────────
 
     private char pickLetter() {
-        String word = state.getTargetWord();
-
-        if (rng.nextFloat() < WORD_BIAS && !state.isWordComplete()) {
-            // Pick a random unplaced letter from the target word
-            int remaining = word.length() - state.getNextLetterIndex();
-            int offset    = rng.nextInt(remaining);
-            return word.charAt(state.getNextLetterIndex() + offset);
+        if (rng.nextFloat() < WORD_BIAS) {
+            // Pick a random unplaced letter from one of the 3 target words
+            return pickFromTargetWords();
         } else {
             // Random A-Z noise letter
             return (char) ('A' + rng.nextInt(26));
         }
     }
 
-    // ── Colour coding ─────────────────────────────────────────────────────────
+    private char pickFromTargetWords() {
+        // Collect all remaining letters from all 3 incomplete words
+        StringBuilder remaining = new StringBuilder();
 
-    /**
-     * GREEN  = this is exactly the next needed letter
-     * YELLOW = this letter appears in the word but is not next
-     * WHITE  = not in the word at all (noise)
-     */
-    private Color colorForLetter(char letter) {
-        String word = state.getTargetWord();
-        char   next = state.getNextExpectedLetter();
+        for (int wordIdx = 0; wordIdx < GameScore.TARGET_WORD_COUNT; wordIdx++) {
+            if (state.getGameScore().isWordCompleted(wordIdx)) {
+                continue;
+            }
 
-        if (letter == next) {
-            return Color.GREEN;
-        } else if (word.indexOf(letter) >= 0) {
-            return Color.YELLOW;
-        } else {
-            return Color.WHITE;
+            char nextExpected = state.getNextExpectedLetter(wordIdx);
+            if (nextExpected != 0) {
+                remaining.append(nextExpected);
+            }
         }
+
+        if (remaining.length() == 0) {
+            // All words complete, pick random
+            return (char) ('A' + rng.nextInt(26));
+        }
+
+        return remaining.charAt(rng.nextInt(remaining.length()));
     }
-}
+
+    }

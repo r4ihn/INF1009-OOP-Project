@@ -4,16 +4,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
 import io.github.lab2coursework.lwjgl3.wordgame.WordBank;
 
 public class WordGameEndScreen extends AbstractScreen {
 
     private final int levelReached;
+    private final Texture background;
 
     public WordGameEndScreen(ScreenManager screenManager, int levelReached) {
         super(screenManager);
         this.levelReached = levelReached;
+        this.background   = new Texture("GameOver.jpg");
     }
 
     @Override
@@ -32,21 +35,24 @@ public class WordGameEndScreen extends AbstractScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
-
-        font.getData().setScale(2f);
-        font.setColor(Color.RED);
-        font.draw(batch, "GAME OVER", 460, 440);
+        batch.draw(background, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
         font.getData().setScale(1.2f);
-        font.setColor(Color.WHITE);
-        font.draw(batch, "You reached Level " + levelReached, 480, 370);
+        font.setColor(Color.GOLD);
+        font.draw(batch, "You reached Level " + levelReached, 540, 185);
 
         font.getData().setScale(1f);
         font.setColor(Color.LIGHT_GRAY);
-        font.draw(batch, "Press R to Play Again", 490, 300);
-        font.draw(batch, "Press ESC to Title Screen", 470, 265);
+        font.draw(batch, "Press R to Play Again", 550, 140);
+        font.draw(batch, "Press ESC to Title Screen", 535, 110);
 
         font.getData().setScale(1f);
         batch.end();
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        background.dispose();
     }
 }

@@ -2,10 +2,12 @@ package io.github.lab2coursework.lwjgl3.collision;
 
 import io.github.lab2coursework.lwjgl3.entities.Entity;
 
+// Common interface for all collision rules
 public interface CollisionRule {
-    // Decides the entities affected
+
+    // Check whether this rule applies
     boolean matches(Entity a, Entity b);
 
-    // Decides what to do when collision occurs
+    // Apply the collision behaviour
     void resolve(Entity a, Entity b);
 }
