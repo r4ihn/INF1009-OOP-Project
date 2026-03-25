@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector3;
 import io.github.lab2coursework.lwjgl3.collision.BlockLandingRule;
 import io.github.lab2coursework.lwjgl3.collision.GarbageCollectionRule;
 import io.github.lab2coursework.lwjgl3.entities.CraneArm;
@@ -65,8 +66,8 @@ public class WordGameScreen extends AbstractScreen {
     private final CollisionManager collisionManager;
     private final ShapeRenderer shapeRenderer;
 
-    private Texture heartFullTexture;
-    private Texture heartEmptyTexture;
+    private final Texture heartFullTexture;
+    private final Texture heartEmptyTexture;
 
     // ── State flags ───────────────────────────────────────────────────────────
     private boolean blockReleased;   // true while block is in free-fall
@@ -211,6 +212,7 @@ public class WordGameScreen extends AbstractScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // 2. Shapes pass
+        shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         drawGround();
@@ -240,6 +242,12 @@ public class WordGameScreen extends AbstractScreen {
 
         drawBinLabel();
 
+        // update() mouse click selection
+        Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
+        viewport.unproject(mouse);
+        float mouseX = mouse.x;
+        float mouseY = mouse.y;
+        
         // Draw lives as hearts
         float heartX = 80;
         float heartY = SH - 85;

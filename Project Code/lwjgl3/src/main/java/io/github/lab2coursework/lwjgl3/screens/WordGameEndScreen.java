@@ -35,7 +35,7 @@ public class WordGameEndScreen extends AbstractScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
-        batch.draw(background, 0, 0, 1280, 720);
+        batch.draw(background, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
         font.getData().setScale(1.2f);
         font.setColor(Color.GOLD);

@@ -26,11 +26,12 @@ public class PauseScreen extends AbstractScreen {
     protected void draw(float delta) {
         Gdx.gl.glClearColor(0.05f, 0.05f, 0.05f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        float cx = WORLD_WIDTH  / 2f; // centre of x-axis definition
 
         batch.begin();
-        font.draw(batch, "PAUSED", 100, 300);
-        font.draw(batch, "Press P to Resume", 100, 260);
-        font.draw(batch, "Press ESC to Title", 100, 230);
+        font.draw(batch, "PAUSED", cx - 45f, WORLD_HEIGHT / 2f + 40);
+        font.draw(batch, "Press P to Resume", cx - 90f, WORLD_HEIGHT / 2f);
+        font.draw(batch, "Press ESC to Title", cx - 90f, WORLD_HEIGHT / 2f);
         batch.end();
     }
 }
