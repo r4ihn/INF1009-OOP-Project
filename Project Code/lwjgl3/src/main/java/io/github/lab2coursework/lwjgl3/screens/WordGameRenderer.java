@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import io.github.lab2coursework.lwjgl3.entities.CraneArm;
 import io.github.lab2coursework.lwjgl3.entities.LetterBlock;
+import io.github.lab2coursework.lwjgl3.movement.WordGameController;
 import io.github.lab2coursework.lwjgl3.wordgame.GameScore;
 import io.github.lab2coursework.lwjgl3.wordgame.WordGameState;
 

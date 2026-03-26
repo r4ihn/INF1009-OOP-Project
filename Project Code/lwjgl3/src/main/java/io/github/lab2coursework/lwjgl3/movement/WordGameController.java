@@ -1,4 +1,4 @@
-package io.github.lab2coursework.lwjgl3.screens;
+package io.github.lab2coursework.lwjgl3.movement;
 
 // Import statements for LibGDX
 import com.badlogic.gdx.Gdx;
@@ -14,14 +14,12 @@ import io.github.lab2coursework.lwjgl3.entities.GarbageCan;
 import io.github.lab2coursework.lwjgl3.entities.LetterBlock;
 import io.github.lab2coursework.lwjgl3.managers.CollisionManager;
 import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
-import io.github.lab2coursework.lwjgl3.movement.CraneMovement;
-import io.github.lab2coursework.lwjgl3.movement.FallMovement;
-import io.github.lab2coursework.lwjgl3.movement.Movement;
-import io.github.lab2coursework.lwjgl3.movement.RopeSwingMovement;
+import io.github.lab2coursework.lwjgl3.screens.PauseScreen;
+import io.github.lab2coursework.lwjgl3.screens.WordGameEndScreen;
+import io.github.lab2coursework.lwjgl3.screens.WordGameRenderer;
 import io.github.lab2coursework.lwjgl3.wordgame.LetterBlockFactory;
 import io.github.lab2coursework.lwjgl3.wordgame.WordBank;
 import io.github.lab2coursework.lwjgl3.wordgame.WordGameState;
-import io.github.lab2coursework.lwjgl3.movement.AnchoredMovement;
 
 // Import statements for java utilities
 import java.util.ArrayList;

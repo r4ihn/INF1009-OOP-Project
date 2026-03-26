@@ -3,6 +3,7 @@ package io.github.lab2coursework.lwjgl3.screens;
 import com.badlogic.gdx.Gdx;
 
 import io.github.lab2coursework.lwjgl3.managers.ScreenManager;
+import io.github.lab2coursework.lwjgl3.movement.WordGameController;
 import io.github.lab2coursework.lwjgl3.wordgame.WordBank;
 
 /**
