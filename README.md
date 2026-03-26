@@ -1,219 +1,209 @@
-# P4_Team5_ProjectPart1Final 
-## OOP Abstract Game Engine project
+# 🏗️ Word Crane — OOP Educational Word Game
 
-A cross-platform game development project built with [libGDX](https://libgdx.com/), generated using [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
+A physics-based word-spelling game built with **LibGDX (LWJGL3)** as part of an Object-Oriented Programming coursework project. Players control a crane to stack letter blocks and spell target words, combining real-time gameplay with vocabulary and spelling practice.
 
-## Overview
+---
 
-This project serves as a foundation for building 2D/3D games and interactive applications using the libGDX framework. It includes a basic application structure with launchers and an `ApplicationAdapter` extension that demonstrates the libGDX logo rendering.
+## 📚 Educational Purpose
 
-## Project Information
+Word Crane is designed to make learning engaging and effective by transforming passive vocabulary study into active play:
 
-- **Project Name**: oopProjectWork
-- **Version**: 1.0.0
-- **libGDX Version**: 1.14.0
-- **Java Version**: 8+
-- **Build Tool**: Gradle
+- **Spelling & Vocabulary** — Players must identify and sequence correct letters to complete target words drawn from themed categories (Animals, Fruits, Colors, Objects, Actions).
+- **Memory & Attention** — Tracking multiple words simultaneously across three towers demands sustained focus and working memory.
+- **Problem-Solving** — Deciding which block to drop, discard, or save under time pressure develops real-time decision-making skills.
+- **Gamification** — Combo multipliers, lives, and level progression provide clear feedback loops that motivate continued play.
+- **Physics-Based Interaction** — The pendulum rope mechanic makes every drop feel consequential, turning each correct letter placement into a rewarding physical interaction.
 
-## Project Structure
+By blending game mechanics with language learning goals, Word Crane transforms rote spelling practice into an immersive and memorable experience.
 
-### Modules
+---
 
-- **`core`**: Main module containing the application logic shared across all platforms. This is where your game code should reside.
-- **`lwjgl3`**: Primary desktop platform using LWJGL3 (Lightweight Java Game Library). This module handles desktop-specific launching and configuration.
+## 🎮 Gameplay Overview
 
-### Key Files
+Three target words are displayed at the top of the screen. Letter blocks hang from a crane on a swinging rope, and the player must drop each block onto the correct tower to spell each word letter-by-letter from the ground up.
 
-- `build.gradle`: Main build configuration for all modules
-- `settings.gradle`: Defines which subprojects are included in the build
-- `gradle.properties`: Project-wide properties including versions and JVM settings
-- `gradlew` / `gradlew.bat`: Gradle wrapper scripts for Unix/Windows
+- **Drop too far off-centre** and the tower sways and collapses, resetting that word's progress.
+- **Catch the right letter** and the block lands cleanly, building toward a completed word.
+- **Discard unwanted blocks** by clicking the bin on the right side of the screen.
+- **Complete all three words** to advance to the next level with a fresh set of words.
+- **Lose all three lives** and the game ends, showing your highest level reached.
 
-## Prerequisites
+---
 
-- **Java Development Kit (JDK) 8 or higher**
-- **No Gradle installation required** - The project includes Gradle Wrapper
+## 🕹️ Controls
 
-## Getting Started
+| Input | Action |
+|---|---|
+| `A` / `←` | Move crane left |
+| `D` / `→` | Move crane right |
+| `SPACE` | Release hanging block |
+| `Left Click` on bin | Discard hanging block |
+| `P` / `ESC` | Pause game |
+| `W` (title screen) | Start word game |
+| `ESC` (title screen) | Exit application |
+| `R` (end screen) | Play again |
+| `ESC` (end screen) | Return to title |
 
-### Running the Application
+---
 
-On Unix/Mac:
+## 🏗️ Project Architecture
+
+The project follows a clean **OOP design** with well-separated responsibilities across the following packages:
+
+### `core`
+- **`GameMaster`** — Main LibGDX `ApplicationAdapter`. Wires all engine-level managers at startup and forwards frame events to the active screen via `ScreenManager`.
+- **`StartupHelper`** — Ensures the JVM is launched with `-XstartOnFirstThread` on macOS and works around Windows username encoding issues.
+
+### `screens`
+Implements the **Template Method** pattern via `AbstractScreen`, which defines a fixed `render → update → draw` flow for all screens.
+
+| Class | Role |
+|---|---|
+| `TitleScreen` | Main menu with controls and navigation |
+| `WordGameScreen` | Thin wrapper; delegates to controller and renderer |
+| `WordGameController` | All game logic, state transitions, and input handling |
+| `WordGameRenderer` | All rendering — shapes, textures, HUD, and labels |
+| `PauseScreen` | Pause overlay with resume/restart/quit options |
+| `WordGameEndScreen` | Game-over screen displaying highest level reached |
+
+Separating `WordGameController` from `WordGameRenderer` keeps game logic independent of rendering concerns.
+
+### `entities`
+All game objects extend the abstract `Entity` base class, which provides shared position, color, speed, and a pluggable **Strategy** slot for movement.
+
+| Entity | Description |
+|---|---|
+| `CraneArm` | Player-controlled horizontal crane arm with a hook |
+| `LetterBlock` | A block carrying a single letter; tracks landed/discarded state and which word tower it belongs to |
+| `GarbageCan` | Static bin used to discard unwanted blocks |
+
+### `movement`
+Implements the **Strategy** pattern. Each `Movement` subclass encapsulates one movement behavior and is injected into an entity at runtime.
+
+| Strategy | Behavior |
+|---|---|
+| `CraneMovement` | Keyboard-driven left/right movement with boundary clamping |
+| `RopeSwingMovement` | Driven pendulum physics (gravity + pivot acceleration + drag) for the hanging block |
+| `FallMovement` | Gravity-accelerated free fall after the block is released |
+| `PlayerMovement` | Direction-flag-based movement for general player entities |
+| `AIMovement` | Downward looping movement for AI-controlled entities |
+
+### `collision`
+Implements the **Rule** pattern — each `CollisionRule` is a self-contained behavior that the `CollisionManager` evaluates each frame.
+
+| Rule | Behavior |
+|---|---|
+| `BlockLandingRule` | Handles landing, stacking, sway animation, and tower collapse/reset |
+| `GarbageCollectionRule` | Detects overlap with the bin and discards the block |
+| `KeepInBoundsRule` | Clamps entities within world boundaries |
+
+Supporting classes keep `BlockLandingRule` focused on decisions rather than data:
+
+- **`BlockLandingValidator`** — Pure AABB geometry checks (overlap, landing-on-top detection).
+- **`BlockPlacementService`** — Applies final position and state changes after a landing decision.
+- **`BlockStackTracker`** — Stores per-word tower height and last-landed X position.
+- **`TowerSettlingController`** — Manages the sin-wave sway animation that plays before a stabilize or collapse outcome.
+
+### `wordgame`
+Contains all game-rules and data logic, fully decoupled from rendering.
+
+| Class | Role |
+|---|---|
+| `WordGameState` | Central mutable state: lives, level, per-word letter progress |
+| `GameScore` | Score, combo multiplier, and word-completion tracking |
+| `LetterBlockFactory` | **Factory Method** pattern; spawns letter blocks biased toward remaining target letters (70% useful, 30% noise) |
+| `WordBank` | In-memory dictionary of themed word categories |
+| `WordCategory` | Immutable name + word list pairing |
+
+### `managers`
+Engine-level service classes shared across screens:
+
+| Manager | Role |
+|---|---|
+| `ScreenManager` | Stack-based screen lifecycle (push/pop/set) |
+| `EntityManager` | Owns the active entity list; forwards update and draw calls |
+| `MovementManager` | Iterates entities and calls their movement strategy each frame |
+| `CollisionManager` | Applies registered collision rules to entity pairs |
+| `IOManager` | Global key-binding map forwarded to the active input handler |
+| `DebugManager` | Runtime debug toggles (render overlay, FPS display) |
+
+### `input`
+A small input-binding system decoupled from LibGDX's raw key codes.
+
+- **`Input`** (abstract) — Binding map base class.
+- **`KeyboardInput`** / **`MouseInput`** — Concrete handlers that translate raw codes into `Action` callbacks.
+- **`Key`** (enum) — Logical key constants with code mapping.
+- **`Action`** (interface) — Single-method command interface (`execute()`).
+
+---
+
+## 🔑 Design Patterns Used
+
+| Pattern | Where Applied |
+|---|---|
+| **Strategy** | Movement system (`Movement` and all subclasses) |
+| **Template Method** | Screen lifecycle (`AbstractScreen`) |
+| **Factory Method** | Letter block spawning (`LetterBlockFactory`) |
+| **Rule / Chain of Responsibility** | Collision resolution (`CollisionRule` + `CollisionManager`) |
+| **MVC-style separation** | `WordGameController` vs `WordGameRenderer` vs `WordGameState` |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Java 8 or higher
+- Gradle (wrapper included)
+
+### Running the Game
+
 ```bash
+# Clone the repository
+git clone <repository-url>
+cd <project-directory>
+
+# Run the desktop application
 ./gradlew lwjgl3:run
 ```
 
-On Windows:
-```bash
-gradlew.bat lwjgl3:run
-```
+On **macOS**, the JVM is automatically relaunched with `-XstartOnFirstThread` by `StartupHelper` if needed.
 
-### Building the Project
+### Build
 
-Build all modules:
-```bash
-./gradlew build
-```
-
-Create a runnable JAR:
 ```bash
 ./gradlew lwjgl3:jar
 ```
 
-The JAR file will be located at `lwjgl3/build/libs/`.
+---
 
-## Gradle Tasks
+## 📁 Project Structure
 
-### Essential Tasks
-
-| Task | Description |
-|------|-------------|
-| `lwjgl3:run` | Starts the application |
-| `lwjgl3:jar` | Builds application's runnable JAR |
-| `build` | Builds sources and archives of every project |
-| `clean` | Removes build folders |
-| `test` | Runs unit tests (if any) |
-
-### IDE Integration
-
-| Task | Description |
-|------|-------------|
-| `idea` | Generates IntelliJ IDEA project data |
-| `eclipse` | Generates Eclipse project data |
-| `cleanIdea` | Removes IntelliJ project data |
-| `cleanEclipse` | Removes Eclipse project data |
-
-### Useful Flags
-
-- `--continue`: Continue running tasks even if errors occur
-- `--daemon`: Use Gradle daemon for faster builds
-- `--offline`: Use cached dependencies (useful when offline)
-- `--refresh-dependencies`: Force validation of all dependencies
-
-### Module-Specific Tasks
-
-You can run tasks for specific modules using the format `moduleName:taskName`:
-```bash
-./gradlew core:clean    # Only cleans the core module
-./gradlew core:build    # Only builds the core module
 ```
-
-## Development Workflow
-
-### 1. Setting Up Your IDE
-
-**IntelliJ IDEA:**
-```bash
-./gradlew idea
+lwjgl3/src/main/java/io/github/lab2coursework/lwjgl3/
+├── collision/          # Collision rules and supporting services
+├── core/               # Application entry point and startup utilities
+├── entities/           # Game object classes
+├── graphics/           # Texture rendering helper
+├── input/              # Input binding system
+├── launch/             # LWJGL3 launcher and window configuration
+├── managers/           # Engine-level service managers
+├── movement/           # Movement strategy implementations
+├── screens/            # Screen classes and game loop
+└── wordgame/           # Game rules, state, scoring, and word data
 ```
-Then open the project in IntelliJ IDEA.
-
-**Eclipse:**
-```bash
-./gradlew eclipse
-```
-Then import the project as an existing Gradle project.
-
-### 2. Adding Dependencies
-
-Add dependencies to the appropriate module's `build.gradle` file. Common dependencies go in the `core` module, while platform-specific dependencies go in their respective modules.
-
-### 3. Asset Management
-
-The project includes automatic asset list generation:
-- Place your assets in the `assets/` folder
-- An `assets.txt` file will be automatically generated during build
-- This file lists all assets in your project
-
-## Project Configuration
-
-### Memory Settings
-
-Configured in `gradle.properties`:
-- **Initial Memory**: 512MB
-- **Maximum Memory**: 1GB
-- **Encoding**: UTF-8
-
-### JVM Options
-
-You can modify JVM options in `gradle.properties`:
-```properties
-org.gradle.jvmargs=-Xms512M -Xmx1G -Dfile.encoding=UTF-8
-```
-
-## Supported Platforms
-
-Currently configured for:
-- **Desktop (LWJGL3)**: Primary platform for development and testing
-
-The project structure supports adding additional platforms such as:
-- Android
-- iOS
-- HTML5 (GWT/TeaVM)
-- Headless server
-
-## Contributing
-
-When contributing to this project:
-1. Keep platform-independent code in the `core` module
-2. Place platform-specific code in the respective platform modules
-3. Follow Java 8 compatibility guidelines
-4. Run `./gradlew test` before committing
-
-## Build Directory Structure
-
-After building, the following structure will be created:
-```
-project-root/
-├── build/              # Parent project build artifacts
-├── core/build/         # Core module compiled classes and JARs
-├── lwjgl3/build/       # Desktop platform build artifacts
-│   └── libs/          # Runnable JAR location
-└── assets/            # Game assets
-    └── assets.txt     # Auto-generated asset list
-```
-
-## Troubleshooting
-
-### Dependency Issues
-
-If you encounter dependency download issues:
-```bash
-./gradlew --refresh-dependencies build
-```
-
-### Build Cache Issues
-
-Clear all build artifacts:
-```bash
-./gradlew clean
-```
-
-### IDE Issues
-
-Regenerate IDE project files:
-```bash
-./gradlew cleanIdea idea     # For IntelliJ IDEA
-./gradlew cleanEclipse eclipse  # For Eclipse
-```
-
-## Resources
-
-- [libGDX Official Documentation](https://libgdx.com/wiki/)
-- [libGDX Community](https://libgdx.com/community/)
-- [Gradle Documentation](https://docs.gradle.org/)
-- [LWJGL Website](https://www.lwjgl.org/)
-
-## License
-
-This project template is provided by the libGDX project and follows their licensing terms.
-
-## Additional Notes
-
-- The project uses Gradle's foojay-resolver plugin for automatic JDK downloads
-- Incremental compilation is enabled for faster builds
-- Build output logging is set to "quiet" mode by default (can be changed in `gradle.properties`)
 
 ---
 
-**Getting Started Tip**: Run `./gradlew lwjgl3:run` to see the demo application with the libGDX logo!
+## 🎯 Scoring
+
+- Each completed word awards **100 base points**.
+- Every **3rd consecutive word completion** triggers a **combo bonus of +150 points**.
+- The combo counter resets between levels.
+- Losing a life does **not** reset the score — only word tower progress is reset.
+
+---
+
+## 📝 License
+
+This project was developed as coursework for an Object-Oriented Programming module. All game code is original student work.
