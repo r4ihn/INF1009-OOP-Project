@@ -80,16 +80,16 @@ public class BlockLandingRule implements CollisionRule {
                 && landingValidator.isLandingOnTop(block, stacked);
 
         if (validTopLanding) {
-            handleValidTopLanding(block, stacked);
+            handleValidTopLanding(block, stacked, matchedWordIdx);
             return;
         }
 
         handleInvalidStackCollision(block, stacked, matchedWordIdx);
     }
 
-    private void handleValidTopLanding(LetterBlock block, LetterBlock stacked) {
+    private void handleValidTopLanding(LetterBlock block, LetterBlock stacked, int matchedWordIdx) {
         // Score/state advance is decided first so visual placement reflects the accepted word.
-        int placedWordIdx = state.placeNextLetter(block.getLetter());
+        int placedWordIdx = state.placeNextLetter(block.getLetter(), matchedWordIdx);
         if (placedWordIdx < 0) {
             placementService.markDiscarded(block);
             return;
@@ -155,13 +155,15 @@ public class BlockLandingRule implements CollisionRule {
     @Override
     public void resolve(Entity a, Entity b) {
         LetterBlock block = (LetterBlock) a;
-        int matchedWordIdx = state.peekMatchingWordIndex(block.getLetter());
 
         if (b instanceof LetterBlock) {
-            handleStackCollision(block, (LetterBlock) b, matchedWordIdx);
+            LetterBlock stacked = (LetterBlock) b;
+            int matchedWordIdx = state.peekMatchingWordIndex(block.getLetter(), stacked.getWordIndex());
+            handleStackCollision(block, stacked, matchedWordIdx);
             return;
         }
 
+        int matchedWordIdx = state.peekMatchingWordIndex(block.getLetter());
         handleGroundCollision(block, matchedWordIdx);
     }
 

@@ -67,17 +67,19 @@ public class WordGameState {
     }
 
     public int peekMatchingWordIndex(char letter) {
+        return peekMatchingWordIndex(letter, -1);
+    }
+
+    public int peekMatchingWordIndex(char letter, int preferredWordIndex) {
         letter = Character.toUpperCase(letter);
 
+        // If caller has a tower context, prioritize that word to avoid ambiguous same-letter matches.
+        if (isWordExpectingLetter(preferredWordIndex, letter)) {
+            return preferredWordIndex;
+        }
+
         for (int wordIdx = 0; wordIdx < GameScore.TARGET_WORD_COUNT; wordIdx++) {
-            if (gameScore.isWordCompleted(wordIdx)) {
-                continue;
-            }
-
-            String word = targetWords.get(wordIdx);
-            List<Character> stacked = stackedLettersPerWord.get(wordIdx);
-
-            if (stacked.size() < word.length() && letter == word.charAt(stacked.size())) {
+            if (isWordExpectingLetter(wordIdx, letter)) {
                 return wordIdx;
             }
         }
@@ -100,9 +102,13 @@ public class WordGameState {
     }
 
     public int placeNextLetter(char letter) {
+        return placeNextLetter(letter, -1);
+    }
+
+    public int placeNextLetter(char letter, int preferredWordIndex) {
         letter = Character.toUpperCase(letter);
 
-        int wordIdx = peekMatchingWordIndex(letter);
+        int wordIdx = peekMatchingWordIndex(letter, preferredWordIndex);
         if (wordIdx >= 0) {
             List<Character> stacked = stackedLettersPerWord.get(wordIdx);
             stacked.add(letter);
@@ -199,5 +205,15 @@ public class WordGameState {
 
     private boolean isValidWordIndex(int wordIndex) {
         return wordIndex >= 0 && wordIndex < GameScore.TARGET_WORD_COUNT;
+    }
+
+    private boolean isWordExpectingLetter(int wordIndex, char letter) {
+        if (!isValidWordIndex(wordIndex) || gameScore.isWordCompleted(wordIndex)) {
+            return false;
+        }
+
+        String word = targetWords.get(wordIndex);
+        List<Character> stacked = stackedLettersPerWord.get(wordIndex);
+        return stacked.size() < word.length() && letter == word.charAt(stacked.size());
     }
 }
